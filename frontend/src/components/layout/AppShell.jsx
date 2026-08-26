@@ -8,24 +8,24 @@ export const AppShell = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased selection:bg-[#0284C7] selection:text-white">
-      {/* Desktop Layout Container */}
+      {/* Main Layout Container */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Desktop Sidebar (Fixed 64 / 256px width on lg screens) */}
-        <div className="hidden lg:block lg:w-64 lg:shrink-0 h-screen sticky top-0 z-30">
+        {/* Persistent Sidebar for Medium & Desktop Screens (768px+) */}
+        <div className="hidden md:block md:w-64 md:shrink-0 h-screen sticky top-0 z-30">
           <Sidebar />
         </div>
 
         {/* Mobile Slide-over Drawer Overlay */}
         {mobileSidebarOpen && (
           <div
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 lg:hidden transition-opacity"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 md:hidden transition-opacity"
             onClick={() => setMobileSidebarOpen(false)}
           />
         )}
 
         {/* Mobile Slide-over Sidebar Content */}
         <div
-          className={`fixed inset-y-0 left-0 w-64 bg-[#0F172A] z-50 transform transition-transform duration-200 ease-in-out lg:hidden ${
+          className={`fixed inset-y-0 left-0 w-64 bg-[#0F172A] z-50 transform transition-transform duration-200 ease-in-out md:hidden ${
             mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >

@@ -26,7 +26,7 @@ export const Topbar = ({ onOpenMobileSidebar, onOpenMobileMenu }) => {
           type="button"
           onClick={handleOpenMobile}
           aria-label="Open Navigation Menu"
-          className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7]"
+          className="md:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7]"
         >
           <Menu className="w-5 h-5" />
         </button>
