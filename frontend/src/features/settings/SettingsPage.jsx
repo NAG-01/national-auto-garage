@@ -938,15 +938,24 @@ export const SettingsPage = () => {
 
             {/* Instant Demo OTP Hint Badge */}
             {generatedOtpHint && (
-              <div className="bg-gradient-to-r from-sky-500 to-blue-600 text-white p-3.5 rounded-2xl text-center space-y-1 shadow-md">
+              <div className="bg-gradient-to-r from-sky-500 to-blue-600 text-white p-4 rounded-2xl text-center space-y-2 shadow-md">
                 <span className="text-[10px] font-black uppercase tracking-widest text-sky-100 block">
-                  DEMO EMAIL CONFIRMATION CODE
+                  SECURITY EMAIL CONFIRMATION CODE
                 </span>
-                <span className="text-2xl font-black tracking-widest font-mono">
-                  {generatedOtpHint}
-                </span>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-3xl font-black tracking-widest font-mono select-all">
+                    {generatedOtpHint}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setInputOtp(generatedOtpHint)}
+                    className="px-3 py-1 rounded-xl text-xs font-extrabold bg-white text-[#0284C7] hover:bg-sky-50 active:scale-95 transition-all shadow-xs"
+                  >
+                    ⚡ Auto-Fill
+                  </button>
+                </div>
                 <span className="text-[10px] text-sky-100 block font-semibold">
-                  (Type this 6-digit code below to confirm change)
+                  (Type or click Auto-Fill to confirm email change)
                 </span>
               </div>
             )}
@@ -954,7 +963,7 @@ export const SettingsPage = () => {
             <div className="max-w-xs mx-auto">
               <Input
                 type="text"
-                placeholder="Enter 6-Digit OTP (e.g. 584920)"
+                placeholder="Enter 6-Digit OTP"
                 value={inputOtp}
                 onChange={(e) => setInputOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 maxLength={6}
