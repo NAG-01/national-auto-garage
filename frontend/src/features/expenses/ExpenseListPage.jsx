@@ -7,15 +7,12 @@ import {
   User,
   Building2,
   BookOpen,
-  Filter,
 } from 'lucide-react';
 import api from '../../api/client.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { PageHeader } from '../../components/layout/PageHeader.jsx';
 import { Button } from '../../components/ui/Button.jsx';
-import { KpiCard } from '../../components/ui/KpiCard.jsx';
-import { Badge } from '../../components/ui/Badge.jsx';
-import { Input, Select, Textarea } from '../../components/ui/Input.jsx';
+import { Input } from '../../components/ui/Input.jsx';
 import { Modal, ModalCancelButton, ConfirmDialog } from '../../components/ui/Modal.jsx';
 import {
   Table,
@@ -51,12 +48,9 @@ export const ExpenseListPage = () => {
 
   const [formData, setFormData] = useState({
     account: 'GARAGE_ACCOUNT', // 'GARAGE_ACCOUNT' | 'PARTNER_A' (Imran) | 'PARTNER_B' (Naim)
-    category: 'MISCELLANEOUS',
     amount: '',
     description: '',
-    paymentMethod: 'CASH',
     date: new Date().toISOString().split('T')[0],
-    notes: '',
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -110,10 +104,7 @@ export const ExpenseListPage = () => {
       toast.error('Kripya sahi paise (amount) bhare.');
       return;
     }
-    if (!formData.description.trim()) {
-      toast.error('Kripya paise kyu liye (detail) bhare.');
-      return;
-    }
+    // Detail is now OPTIONAL as requested!
     setShowSaveConfirm(true);
   };
 
@@ -121,14 +112,15 @@ export const ExpenseListPage = () => {
     setShowSaveConfirm(false);
     setSubmitting(true);
     try {
+      const finalDescription = formData.description.trim() || 'Expense Entry';
+
       await api.post('/expenses', {
-        category: formData.category || 'MISCELLANEOUS',
+        category: 'MISCELLANEOUS',
         amount: Number(formData.amount),
-        description: formData.description.trim(),
+        description: finalDescription,
         paidBy: formData.account,
-        paymentMethod: formData.paymentMethod,
+        paymentMethod: 'CASH',
         date: formData.date,
-        notes: formData.notes,
       });
 
       const accountLabel =
@@ -142,12 +134,9 @@ export const ExpenseListPage = () => {
       setModalOpen(false);
       setFormData({
         account: 'GARAGE_ACCOUNT',
-        category: 'MISCELLANEOUS',
         amount: '',
         description: '',
-        paymentMethod: 'CASH',
         date: new Date().toISOString().split('T')[0],
-        notes: '',
       });
       fetchExpenses();
     } catch (err) {
@@ -345,7 +334,7 @@ export const ExpenseListPage = () => {
 
       {/* Entry Table (Notebook Page View) */}
       {loading ? (
-        <TableSkeleton rows={6} cols={6} />
+        <TableSkeleton rows={6} cols={5} />
       ) : expenses.length === 0 ? (
         <EmptyState
           icon={Receipt}
@@ -363,7 +352,6 @@ export const ExpenseListPage = () => {
                 <TableHead>Voucher No.</TableHead>
                 <TableHead>Kiske Liye (Account)</TableHead>
                 <TableHead>Kyu Liye (Detail / Purpose)</TableHead>
-                <TableHead>Payment Mode</TableHead>
                 <TableHead className="text-right">Paise (Amount ₹)</TableHead>
               </TableRow>
             </TableHeader>
@@ -384,17 +372,8 @@ export const ExpenseListPage = () => {
 
                   <TableCell>
                     <div className="font-semibold text-slate-900 text-xs max-w-sm">
-                      {exp.description}
+                      {exp.description || '—'}
                     </div>
-                    {exp.notes && (
-                      <div className="text-[11px] text-slate-400 mt-0.5">{exp.notes}</div>
-                    )}
-                  </TableCell>
-
-                  <TableCell>
-                    <span className="text-xs text-slate-600 font-mono font-semibold">
-                      {exp.paymentMethod || 'CASH'}
-                    </span>
                   </TableCell>
 
                   <TableCell className="text-right">
@@ -419,7 +398,7 @@ export const ExpenseListPage = () => {
         onClose={() => setModalOpen(false)}
         confirmOnClose={true}
         title="Paise / Kharcha Add Kare"
-        subtitle="3 me se ek account chune, kitne paise liye aur kyu liye detail bhare"
+        subtitle="3 me se ek account chune aur kitne paise liye bhare"
         footer={
           <div className="flex items-center justify-end gap-2 w-full">
             <ModalCancelButton disabled={submitting}>Cancel</ModalCancelButton>
@@ -438,7 +417,7 @@ export const ExpenseListPage = () => {
           {/* 1. Account Selection (Kiske Liye) */}
           <div className="space-y-1.5">
             <label className="block text-xs font-extrabold text-slate-900 uppercase tracking-wider">
-              1. Kiske Liye Paise Add Karne Hain? <span className="text-rose-500">*</span>
+              1. Kiske Liye Kaise Add Karne Hain? <span className="text-rose-500">*</span>
             </label>
 
             <div className="grid grid-cols-3 gap-2">
@@ -483,56 +462,33 @@ export const ExpenseListPage = () => {
             </div>
           </div>
 
-          {/* 2. Kyu Liye (Purpose / Detail) */}
+          {/* 2. Kitne Liye (Amount ₹) - Mandatory */}
           <Input
-            label="2. Kyu Liye? (Detail / Purpose)"
+            label="2. Kitne Paise Liye? (Amount ₹)"
+            type="number"
+            min="1"
+            step="0.01"
             required
-            placeholder="e.g. Chai nashta, Workshop kiraya, Personal, Petrol, Bill"
+            placeholder="e.g. 500"
+            value={formData.amount}
+            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+          />
+
+          {/* 3. Kyu Liye (Detail / Purpose) - OPTIONAL */}
+          <Input
+            label="3. Kyu Liye? (Detail / Purpose) (Optional)"
+            placeholder="e.g. Chai nashta, Workshop kiraya, Personal, Petrol"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           />
 
-          {/* 3. Kitne Liye (Amount) & Payment Method */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Input
-              label="3. Kitne Paise Liye? (Amount ₹)"
-              type="number"
-              min="1"
-              step="0.01"
-              required
-              placeholder="e.g. 500"
-              value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-            />
-
-            <Select
-              label="Payment Method"
-              required
-              value={formData.paymentMethod}
-              onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-            >
-              <option value="CASH">Cash</option>
-              <option value="UPI">UPI</option>
-              <option value="BANK_TRANSFER">Bank Transfer</option>
-              <option value="CARD">Card</option>
-            </Select>
-          </div>
-
-          {/* 4. Date */}
+          {/* 4. Tareekh (Date) */}
           <Input
             label="Tareekh (Date)"
             type="date"
             required
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-          />
-
-          {/* 5. Additional Notes */}
-          <Textarea
-            label="Extra Notes (Optional)"
-            placeholder="Koi extra detail likhni ho to yaha likhe"
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
           />
         </form>
       </Modal>
@@ -549,7 +505,7 @@ export const ExpenseListPage = () => {
             : formData.account === 'PARTNER_B'
             ? 'Naim Pathan'
             : 'Garage'
-        } ke khate me ${formatINR(Number(formData.amount || 0))} ki entry save kare ("${formData.description}")?`}
+        } ke khate me ${formatINR(Number(formData.amount || 0))} ki entry save kare?`}
         confirmText="Haan, Entry Save Kare"
         cancelText="Check Kare"
         variant="success"
