@@ -38,16 +38,16 @@ export const DashboardPage = () => {
   return (
     <div className="space-y-5 max-w-3xl mx-auto py-2">
       {/* Clean Dashboard Header */}
-      <div className="flex items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-[#BAE6FD] shadow-2xs">
+      <div className="flex items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
           <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0284C7] uppercase tracking-wider mb-1">
             <Package className="w-4 h-4" />
             Stock Alert Monitor
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-[#0C4A6E] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
             Garage Stock Alerts
           </h1>
-          <p className="text-xs text-[#0369A1] font-medium">
+          <p className="text-xs text-slate-500 font-medium">
             Workshop spare parts aur oil stock ka automatic alert status
           </p>
         </div>
@@ -78,7 +78,7 @@ export const DashboardPage = () => {
                 <AlertTriangle className="w-5 h-5 animate-bounce" />
               </div>
               <div>
-                <h2 className="text-base font-black text-[#0C4A6E] tracking-tight">
+                <h2 className="text-base font-black text-slate-900 tracking-tight">
                   Stock Warning Alert
                 </h2>
                 <p className="text-xs font-semibold text-amber-900 mt-0.5">
@@ -100,7 +100,7 @@ export const DashboardPage = () => {
                 className="p-4 bg-white rounded-xl border border-amber-200 border-l-4 border-l-[#F59E0B] shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
                 <div>
-                  <h3 className="font-extrabold text-[#0C4A6E] text-sm sm:text-base">
+                  <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
                     {p.name}
                   </h3>
                   <p className="text-xs font-bold text-rose-600 mt-1 flex items-center gap-1">
@@ -128,10 +128,10 @@ export const DashboardPage = () => {
           <div className="w-11 h-11 rounded-xl bg-emerald-500 text-white flex items-center justify-center mx-auto shadow-2xs">
             <CheckCircle2 className="w-6 h-6" />
           </div>
-          <h2 className="text-base font-extrabold text-[#0C4A6E]">
+          <h2 className="text-base font-extrabold text-slate-900">
             Sabhi Items Stock Me Available Hain
           </h2>
-          <p className="text-xs text-[#0369A1] font-medium max-w-md mx-auto">
+          <p className="text-xs text-slate-600 font-medium max-w-md mx-auto">
             Abhi koi bhi spare part ya oil kam nahi pad raha hai. Jab bhi koi item kam hoga, yahan automatic alert aa jayega.
           </p>
         </div>

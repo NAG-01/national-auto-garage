@@ -33,11 +33,11 @@ export const Button = React.forwardRef(
       accent:
         'bg-[#F59E0B] hover:bg-[#D97706] text-white focus-visible:ring-[#F59E0B] border border-transparent shadow-xs',
       secondary:
-        'bg-[#E0F2FE] text-[#0C4A6E] hover:bg-[#BAE6FD] focus-visible:ring-[#7DD3FC] border border-[#BAE6FD]',
+        'bg-slate-100 text-slate-800 hover:bg-slate-200 focus-visible:ring-slate-400 border border-slate-200',
       outline:
-        'bg-white text-[#0C4A6E] hover:bg-[#F0F9FF] border border-[#BAE6FD] focus-visible:ring-[#0284C7] shadow-2xs',
+        'bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 border border-slate-300 focus-visible:ring-[#0284C7] shadow-2xs',
       ghost:
-        'bg-transparent text-[#0C4A6E] hover:bg-[#E0F2FE] hover:text-[#0284C7] focus-visible:ring-[#0284C7]',
+        'bg-transparent text-slate-700 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-[#0284C7]',
       danger:
         'bg-[#E11D48] hover:bg-[#BE123C] text-white focus-visible:ring-rose-500 border border-transparent shadow-xs',
       success:
