@@ -372,8 +372,10 @@ export const SettlementCalculatorPage = () => {
           <div className="mb-3">
             <BulkActionBar
               selectedCount={selectedCount}
-              onClearSelection={clearSelection}
-              onDeleteSelected={() => setShowBulkConfirm(true)}
+              onClear={clearSelection}
+              onDelete={() => setShowBulkConfirm(true)}
+              entityName="calculation records"
+              deleting={isBulkDeleting}
             />
           </div>
         )}
