@@ -53,12 +53,12 @@ const drawWatermark = (doc, yStart = 110, yEnd = 240) => {
   const centerY = (yStart + yEnd) / 2;
   doc.saveGraphicsState();
   
-  // Set ultra light watermark styling
-  doc.setGState(new doc.GState({ opacity: 0.05 }));
+  // Set light watermark styling
+  doc.setGState(new doc.GState({ opacity: 0.08 }));
   
   if (logoBase64) {
     try {
-      doc.addImage(logoBase64, 'JPEG', 45, centerY - 25, 120, 50);
+      doc.addImage(logoBase64, 'PNG', 32, centerY - 32, 146, 64);
     } catch (e) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(28);
@@ -105,10 +105,10 @@ export const getBillPDFDoc = (bill) => {
   drawTopBorder(doc);
 
   // --- PAGE 1 HEADER ---
-  // Left: Exact High-Res Logo Image
+  // Left: Exact High-Res PNG Logo Image
   if (logoBase64) {
     try {
-      doc.addImage(logoBase64, 'JPEG', 10, y + 2, 58, 26);
+      doc.addImage(logoBase64, 'PNG', 10, y + 1, 62, 28);
     } catch (e) {
       console.error('Failed to render logo base64:', e);
     }
