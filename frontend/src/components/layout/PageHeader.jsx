@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -10,6 +10,15 @@ export const PageHeader = ({
   actions,
   className = '',
 }) => {
+  useEffect(() => {
+    if (title) {
+      document.title = `${title} | National Auto Garage`;
+    }
+    return () => {
+      document.title = 'National Auto Garage';
+    };
+  }, [title]);
+
   return (
     <div className={`bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs mb-5 ${className}`}>
       {/* Breadcrumb Navigation */}

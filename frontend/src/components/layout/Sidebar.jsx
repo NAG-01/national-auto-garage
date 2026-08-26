@@ -61,20 +61,25 @@ export const Sidebar = ({ onClose }) => {
 
   return (
     <aside className="w-64 bg-[#0F172A] text-slate-100 flex flex-col h-full select-none border-r border-slate-800">
-      {/* Brand Header */}
-      <div className="h-16 px-5 border-b border-slate-800/80 flex items-center gap-3 bg-[#0B1120]">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0284C7] to-[#0369A1] flex items-center justify-center text-white font-black text-base shadow-md shadow-sky-900/40 shrink-0">
+      {/* Brand Header (Clickable Link to Dashboard) */}
+      <Link
+        to="/dashboard"
+        onClick={onClose}
+        title="Go to Dashboard"
+        className="h-16 px-5 border-b border-slate-800/80 flex items-center gap-3 bg-[#0B1120] hover:bg-slate-900 transition-colors group cursor-pointer"
+      >
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0284C7] to-[#0369A1] group-hover:scale-105 transition-transform flex items-center justify-center text-white font-black text-base shadow-md shadow-sky-900/40 shrink-0">
           N
         </div>
         <div className="min-w-0">
-          <h2 className="text-sm font-black text-white tracking-tight leading-none uppercase truncate">
+          <h2 className="text-sm font-black text-white tracking-tight leading-none uppercase truncate group-hover:text-sky-400 transition-colors">
             National Auto
           </h2>
           <span className="text-[10px] font-bold text-sky-400 tracking-widest uppercase mt-1 block">
             Garage Portal
           </span>
         </div>
-      </div>
+      </Link>
 
       {/* Navigation Links */}
       <div className="flex-1 px-3 py-4 space-y-4 overflow-y-auto scrollbar-thin">

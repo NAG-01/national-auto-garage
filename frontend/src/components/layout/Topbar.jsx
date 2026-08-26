@@ -1,10 +1,20 @@
-import React from 'react';
-import { Menu, ShieldCheck, LogOut, Activity } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, ShieldCheck, LogOut, Activity, Plus, Wrench, Package, FileText, Receipt } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 export const Topbar = ({ onOpenMobileSidebar, onOpenMobileMenu }) => {
   const { logout, user } = useAuth();
+  const navigate = useNavigate();
   const handleOpenMobile = onOpenMobileSidebar || onOpenMobileMenu;
+  const [showQuickMenu, setShowQuickMenu] = useState(false);
+
+  const quickActions = [
+    { label: 'New Service Job', to: '/jobs/full-service', icon: Wrench, color: 'text-indigo-600' },
+    { label: 'Add Inventory Item', to: '/inventory', icon: Package, color: 'text-emerald-600' },
+    { label: 'Create New Bill', to: '/invoices', icon: FileText, color: 'text-sky-600' },
+    { label: 'Record Expense', to: '/expenses', icon: Receipt, color: 'text-amber-600' },
+  ];
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between gap-4 select-none shadow-2xs">
@@ -19,22 +29,74 @@ export const Topbar = ({ onOpenMobileSidebar, onOpenMobileMenu }) => {
           <Menu className="w-5 h-5" />
         </button>
 
-        {/* Current Context (Clean, non-repetitive) */}
-        <div className="flex items-center gap-2.5">
+        {/* Current Context (Clickable Link to Dashboard) */}
+        <Link
+          to="/dashboard"
+          title="Go to Dashboard"
+          className="flex items-center gap-2.5 hover:opacity-85 transition-opacity cursor-pointer group"
+        >
           <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500">
-            <Activity className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Workshop System</span>
+            <Activity className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+            <span className="group-hover:text-slate-900 transition-colors">Workshop System</span>
             <span className="text-slate-300">•</span>
           </div>
-          <span className="text-xs bg-sky-50 text-[#0284C7] font-extrabold px-3 py-1 rounded-full border border-sky-200 uppercase tracking-wider">
+          <span className="text-xs bg-sky-50 text-[#0284C7] group-hover:bg-[#0284C7] group-hover:text-white font-extrabold px-3 py-1 rounded-full border border-sky-200 uppercase tracking-wider transition-all shadow-2xs">
             Admin Portal
           </span>
-        </div>
+        </Link>
       </div>
 
-      {/* Right Controls: Admin User & Logout Button */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
+      {/* Right Controls: Quick Action Menu, Admin User & Logout Button */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Quick Action Dropdown */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowQuickMenu(!showQuickMenu)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-2xs transition-all active:scale-[0.98]"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Quick Action</span>
+          </button>
+
+          {showQuickMenu && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowQuickMenu(false)}
+              />
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5 animate-in fade-in zoom-in-95">
+                <div className="px-3 py-1.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                  Create / Add New
+                </div>
+                {quickActions.map((act) => {
+                  const Icon = act.icon;
+                  return (
+                    <button
+                      key={act.to}
+                      type="button"
+                      onClick={() => {
+                        setShowQuickMenu(false);
+                        navigate(act.to);
+                      }}
+                      className="w-full text-left px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors"
+                    >
+                      <Icon className={`w-4 h-4 ${act.color}`} />
+                      <span>{act.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* User Profile (Clickable Link to Dashboard) */}
+        <Link
+          to="/dashboard"
+          title="Go to Dashboard"
+          className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200 hover:opacity-85 transition-opacity cursor-pointer"
+        >
           <div className="w-8 h-8 rounded-xl bg-[#0284C7] text-white font-black text-xs flex items-center justify-center shadow-2xs shrink-0">
             {user?.username ? user.username.charAt(0).toUpperCase() : 'A'}
           </div>
@@ -47,7 +109,7 @@ export const Topbar = ({ onOpenMobileSidebar, onOpenMobileMenu }) => {
               Workshop Admin
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Sleek Logout Button */}
         <button
