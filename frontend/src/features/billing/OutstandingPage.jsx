@@ -114,7 +114,7 @@ export const OutstandingPage = () => {
         subtitle="Kiske paas kitne paise baaki hain unka manual text record rakhein (Add, Edit, Delete)"
         actions={
           <Button variant="accent" icon={Plus} onClick={handleOpenAddModal}>
-            + Naya Baaki / Dues Add Karein
+            Naya Baaki / Dues Add Karein
           </Button>
         }
       />
@@ -167,9 +167,9 @@ export const OutstandingPage = () => {
           description={
             search
               ? `'${search}' ke naam ya number par koi baaki dues record nahi hai.`
-              : 'Naye customer ke baaki dues add karne ke liye upar "+ Naya Baaki / Dues Add Karein" button par click karein.'
+              : 'Naye customer ke baaki dues add karne ke liye upar "Naya Baaki / Dues Add Karein" button par click karein.'
           }
-          actionLabel={search ? 'Clear Search' : '+ Add New Dues Record'}
+          actionLabel={search ? 'Clear Search' : 'Add New Dues Record'}
           onAction={search ? () => setSearch('') : handleOpenAddModal}
         />
       ) : (
