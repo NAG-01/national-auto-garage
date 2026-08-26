@@ -27,7 +27,7 @@ export class SettingsService {
         invoiceFooterNote: 'Thank you for choosing National Auto Garage! Safe Riding.',
       });
     } else {
-      // Backwards compatibility for existing document
+      // Ensure defaults for any missing properties
       let updated = false;
       if (!settings.portalBadgeText) { settings.portalBadgeText = 'ADMIN PORTAL'; updated = true; }
       if (!settings.topbarContextText) { settings.topbarContextText = 'Workshop System'; updated = true; }
@@ -43,11 +43,13 @@ export class SettingsService {
 
   static async updateSettings(data) {
     const { _id, id, createdAt, updatedAt, __v, ...cleanData } = data;
-    let settings = await Settings.findOneAndUpdate(
-      {},
-      { $set: cleanData },
-      { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = new Settings(cleanData);
+    } else {
+      Object.assign(settings, cleanData);
+    }
+    await settings.save();
     return settings;
   }
 

@@ -24,10 +24,21 @@ export const SettingsProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
+  const extractSettings = (res) => {
+    if (!res) return null;
+    if (res.data && typeof res.data === 'object' && (res.data.garageName || res.data.portalBadgeText)) {
+      return res.data;
+    }
+    if (res.garageName || res.portalBadgeText) {
+      return res;
+    }
+    return res.data || res;
+  };
+
   const fetchSettings = useCallback(async () => {
     try {
       const res = await api.get('/settings');
-      const payload = res.data || res;
+      const payload = extractSettings(res);
       if (payload) {
         setSettings((prev) => ({ ...prev, ...payload }));
       }
@@ -44,7 +55,7 @@ export const SettingsProvider = ({ children }) => {
 
   const updateSettings = async (newSettingsData) => {
     const res = await api.put('/settings', newSettingsData);
-    const payload = res.data || res;
+    const payload = extractSettings(res);
     if (payload) {
       setSettings((prev) => ({ ...prev, ...payload }));
     }

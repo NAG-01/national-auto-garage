@@ -115,7 +115,10 @@ export const SettingsPage = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      await updateSettings(formData);
+      const updated = await updateSettings(formData);
+      if (updated) {
+        setFormData((prev) => ({ ...prev, ...updated }));
+      }
       showSuccess('System Settings & Dynamic UI Configuration updated successfully!');
     } catch (err) {
       showError(err.message || 'Failed to update settings');
