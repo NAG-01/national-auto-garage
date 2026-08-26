@@ -1,6 +1,5 @@
 import { Settings } from '../models/Settings.js';
 import { AuditLog } from '../models/AuditLog.js';
-import { Partner } from '../models/Partner.js';
 import { ServiceType } from '../models/ServiceType.js';
 import { Employee } from '../models/Employee.js';
 import { EXPENSE_CATEGORIES } from '../config/constants.js';
@@ -26,13 +25,11 @@ export class SettingsService {
       });
     }
 
-    const partners = await Partner.find();
     const serviceTypes = await ServiceType.find();
     const employees = await Employee.find();
 
     return {
       settings,
-      partners,
       serviceTypes,
       employees,
     };

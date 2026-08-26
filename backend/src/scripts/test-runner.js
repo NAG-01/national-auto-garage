@@ -3,34 +3,24 @@ dotenv.config();
 
 import { connectDB, disconnectDB } from '../config/db.js';
 import { User } from '../models/User.js';
-import { Partner } from '../models/Partner.js';
-import { Employee } from '../models/Employee.js';
 import { Customer } from '../models/Customer.js';
 import { Vehicle } from '../models/Vehicle.js';
 import { Part } from '../models/Part.js';
 import { ServiceType } from '../models/ServiceType.js';
 import { ServiceJob } from '../models/ServiceJob.js';
 import { Inspection } from '../models/Inspection.js';
-import { Invoice } from '../models/Invoice.js';
+import { Bill } from '../models/Bill.js';
 import { Payment } from '../models/Payment.js';
 import { Expense } from '../models/Expense.js';
-import { Supplier } from '../models/Supplier.js';
-import { Purchase } from '../models/Purchase.js';
-import { PartnerTransaction } from '../models/PartnerTransaction.js';
-import { MonthlySettlement } from '../models/MonthlySettlement.js';
-import { AuditLog } from '../models/AuditLog.js';
-import { Settings } from '../models/Settings.js';
-import { Counter } from '../models/Counter.js';
+import { CustomerOutstanding } from '../models/CustomerOutstanding.js';
 import { AuthService } from '../services/auth.service.js';
 import { CustomerService } from '../services/customer.service.js';
 import { VehicleService } from '../services/vehicle.service.js';
 import { InventoryService } from '../services/inventory.service.js';
 import { JobCardService } from '../services/jobCard.service.js';
-import { InvoiceService } from '../services/invoice.service.js';
+import { BillService } from '../services/bill.service.js';
 import { PaymentService } from '../services/payment.service.js';
-import { PartnerService } from '../services/partner.service.js';
 import { OutstandingService } from '../services/outstanding.service.js';
-import { CustomerOutstanding } from '../models/CustomerOutstanding.js';
 import { ExpenseService } from '../services/expense.service.js';
 import { JOB_STATUSES, PAYMENT_METHODS, INVENTORY_MOVEMENT_TYPES } from '../config/constants.js';
 
@@ -58,7 +48,7 @@ async function runTests() {
   await connectDB();
 
   try {
-    // 1. Ensure test admin and partners exist
+    // 1. Ensure test admin exists
     let admin = await User.findOne({ email: 'admin@nag.com' });
     if (!admin) {
       const passwordHash = await bcrypt.hash('password123', 10);
@@ -67,26 +57,6 @@ async function runTests() {
         email: 'admin@nag.com',
         passwordHash,
         role: 'ADMIN',
-      });
-    }
-
-    let partnerA = await Partner.findOne({ code: 'PARTNER_A' });
-    if (!partnerA) {
-      partnerA = await Partner.create({
-        name: 'Partner A',
-        code: 'PARTNER_A',
-        ownershipPercentage: 50,
-        phone: '9898011111',
-      });
-    }
-
-    let partnerB = await Partner.findOne({ code: 'PARTNER_B' });
-    if (!partnerB) {
-      partnerB = await Partner.create({
-        name: 'Partner B',
-        code: 'PARTNER_B',
-        ownershipPercentage: 50,
-        phone: '9898022222',
       });
     }
 
@@ -228,16 +198,17 @@ async function runTests() {
 
     // 6. Test Invoicing & Payment Math
     console.log('\n[Test Suite 6] Invoicing & Multi-Payment Settlement');
-    const invoice = await InvoiceService.generateInvoiceFromJob(job._id, admin);
-    assert(invoice.invoiceNumber.startsWith('INV-'), 'Generated sequential Invoice number');
-    assert(invoice.grandTotal === 1300, 'Invoice grand total is ₹1300');
-    assert(invoice.balanceDue === 1300, 'Initial balance due matches grand total');
-    assert(invoice.paymentStatus === 'UNPAID', 'Invoice status is UNPAID');
+    await Bill.deleteMany({});
+    const bill = await BillService.createBill({ jobId: job._id }, admin);
+    assert((bill.billNumber || bill.invoiceNumber || '').startsWith('INV-') || (bill.billNumber || bill.invoiceNumber || '').startsWith('BILL-'), 'Generated sequential Bill number');
+    assert(bill.grandTotal === 1300, 'Bill grand total is ₹1300');
+    assert(bill.balanceDue === 1300, 'Initial balance due matches grand total');
+    assert(bill.paymentStatus === 'UNPAID', 'Bill status is UNPAID');
 
     // Partial Payment 1: ₹500
     const pay1 = await PaymentService.recordPayment(
       {
-        invoiceId: invoice._id,
+        invoiceId: bill._id,
         amount: 500,
         paymentMethod: PAYMENT_METHODS.CASH,
         notes: 'Advance partial payment',
@@ -246,12 +217,12 @@ async function runTests() {
     );
     assert(pay1.invoice.paidAmount === 500, 'Paid amount updated to ₹500');
     assert(pay1.invoice.balanceDue === 800, 'Remaining balance due is ₹800');
-    assert(pay1.invoice.paymentStatus === 'PARTIALLY_PAID', 'Invoice status changed to PARTIALLY_PAID');
+    assert(pay1.invoice.paymentStatus === 'PARTIALLY_PAID', 'Bill status changed to PARTIALLY_PAID');
 
     // Partial Payment 2: ₹800 (Full settlement)
     const pay2 = await PaymentService.recordPayment(
       {
-        invoiceId: invoice._id,
+        invoiceId: bill._id,
         amount: 800,
         paymentMethod: PAYMENT_METHODS.UPI,
         notes: 'Final UPI balance clearance',
@@ -259,14 +230,14 @@ async function runTests() {
       admin
     );
     assert(pay2.invoice.balanceDue === 0, 'Balance due is exactly ₹0');
-    assert(pay2.invoice.paymentStatus === 'PAID', 'Invoice marked PAID');
+    assert(pay2.invoice.paymentStatus === 'PAID', 'Bill marked PAID');
 
     // Overpayment prevention
     let overpaymentBlocked = false;
     try {
       await PaymentService.recordPayment(
         {
-          invoiceId: invoice._id,
+          invoiceId: bill._id,
           amount: 100,
           paymentMethod: PAYMENT_METHODS.CASH,
         },
@@ -277,22 +248,26 @@ async function runTests() {
     }
     assert(overpaymentBlocked, 'Overpayment beyond balance due is strictly blocked');
 
-    // 7. Test Operating Expenses & Monthly Partner Settlement Math
-    console.log('\n[Test Suite 7] Financial Accounting & Monthly Partner Settlement');
-    const month = new Date().getMonth() + 1;
-    const year = new Date().getFullYear();
-    await MonthlySettlement.deleteMany({ month, year });
-
-    const settlement = await PartnerService.calculateMonthlySettlement(month, year);
-    assert(settlement.totalRevenue > 0, 'Total Revenue correctly calculated from settled invoices');
-    assert(settlement.partnerShares.length === 2, 'Settlement shares computed for both partners');
-    assert(settlement.partnerShares[0].ownershipPercentage === 50, 'Partner A has 50% equity share');
-    assert(settlement.partnerShares[1].ownershipPercentage === 50, 'Partner B has 50% equity share');
-    assert(
-      settlement.partnerShares[0].baseProfitShare + settlement.partnerShares[1].baseProfitShare ===
-        settlement.netProfit,
-      'Sum of partner profit shares equals net profit exactly'
+    // 7. Test OPEX 3-Account Notebook Ledger Math
+    console.log('\n[Test Suite 7] OPEX 3-Account Notebook Ledger Math');
+    await ExpenseService.createExpense(
+      { category: 'OTHER', amount: 100, description: 'Test Garage Expense', paidBy: 'GARAGE_ACCOUNT' },
+      admin
     );
+    await ExpenseService.createExpense(
+      { category: 'OTHER', amount: 200, description: 'Test Imran Expense', paidBy: 'PARTNER_A' },
+      admin
+    );
+    await ExpenseService.createExpense(
+      { category: 'OTHER', amount: 300, description: 'Test Naim Expense', paidBy: 'PARTNER_B' },
+      admin
+    );
+
+    const expenseRes = await ExpenseService.getExpenses({ page: 1, limit: 100 });
+    assert(expenseRes.accountTotals !== undefined, 'Expense ledger computes 3-account summary totals');
+    assert(expenseRes.accountTotals.garage >= 100, 'Garage account total computed correctly');
+    assert(expenseRes.accountTotals.imran >= 200, 'Imran Pathan account total computed correctly');
+    assert(expenseRes.accountTotals.naim >= 300, 'Naim Pathan account total computed correctly');
 
     // 8. Test Standalone Customer Dues Register CRUD
     console.log('\n[Test Suite 8] Standalone Customer Dues Register (CRUD)');

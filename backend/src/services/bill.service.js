@@ -42,7 +42,7 @@ export class BillService {
       bikeNumber = job.registrationNumberSnapshot || job.vehicleId.registrationNumber || '';
       serviceType = job.serviceType;
       serviceDetails = job.serviceDetails;
-      labourCharges = roundMoney(job.labourCharges || 0);
+      labourCharges = roundMoney(job.labourCharges || (job.serviceTypeId && job.serviceTypeId.baseLabourCharge) || 600);
 
       if (job.items && job.items.length > 0) {
         for (const item of job.items) {
@@ -134,7 +134,9 @@ export class BillService {
       tax,
       grandTotal,
       totalPaid: initialPaid,
+      paidAmount: initialPaid,
       outstandingAmount,
+      balanceDue: outstandingAmount,
       paymentStatus: statusInput,
       billDate: new Date(),
     });

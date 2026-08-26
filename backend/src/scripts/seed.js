@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { connectDB, disconnectDB } from '../config/db.js';
 import { User } from '../models/User.js';
-import { Partner } from '../models/Partner.js';
 import { Employee } from '../models/Employee.js';
 import { ServiceType } from '../models/ServiceType.js';
 import { Supplier } from '../models/Supplier.js';
@@ -16,39 +15,28 @@ import { Vehicle } from '../models/Vehicle.js';
 import { ServiceJob } from '../models/ServiceJob.js';
 import { Inspection } from '../models/Inspection.js';
 import { Expense } from '../models/Expense.js';
-import { BusinessExpense } from '../models/BusinessExpense.js';
-import { Invoice } from '../models/Invoice.js';
 import { Bill } from '../models/Bill.js';
 import { Payment } from '../models/Payment.js';
-import { PartnerTransaction } from '../models/PartnerTransaction.js';
 import { CustomerOutstanding } from '../models/CustomerOutstanding.js';
 import { Settings } from '../models/Settings.js';
 import { Counter } from '../models/Counter.js';
-import { MonthlySettlement } from '../models/MonthlySettlement.js';
 import { InventoryMovement } from '../models/InventoryMovement.js';
 import {
   ROLES,
-  VEHICLE_TYPES,
-  JOB_STATUSES,
-  JOB_PRIORITIES,
+  EXPENSE_CATEGORIES,
+  PAYMENT_METHODS,
   INSPECTION_CATEGORIES,
   INSPECTION_CONDITIONS,
-  PAYMENT_METHODS,
-  PAYMENT_STATUSES,
-  PARTNER_TRANSACTION_TYPES,
-  EXPENSE_CATEGORIES,
+  PRODUCT_CATEGORIES,
 } from '../config/constants.js';
 
-async function seedDatabase(disconnectAfter = true) {
-  console.log('--- Seeding National Auto Garage Master Data ---');
-  if (mongoose.connection.readyState === 0) {
-    await connectDB();
-  }
+export async function seedDatabase() {
+  console.log('--- STARTING NAG SEEDING PROCESS ---');
+  await connectDB();
 
-  // Clear existing collections
+  console.log('Clearing existing collection records...');
   await Promise.all([
     User.deleteMany({}),
-    Partner.deleteMany({}),
     Employee.deleteMany({}),
     ServiceType.deleteMany({}),
     Supplier.deleteMany({}),
@@ -59,35 +47,14 @@ async function seedDatabase(disconnectAfter = true) {
     ServiceJob.deleteMany({}),
     Inspection.deleteMany({}),
     Expense.deleteMany({}),
-    BusinessExpense.deleteMany({}),
-    Invoice.deleteMany({}),
+    Bill.deleteMany({}),
     Payment.deleteMany({}),
-    PartnerTransaction.deleteMany({}),
     Settings.deleteMany({}),
     Counter.deleteMany({}),
-    MonthlySettlement.deleteMany({}),
     CustomerOutstanding.deleteMany({}),
   ]);
 
-  console.log('[1/10] Seeding Partners & Settings...');
-  const partnerA = await Partner.create({
-    name: 'Partner A',
-    code: 'PARTNER_A',
-    phone: '9825011111',
-    email: 'partnera@nationalautogarage.com',
-    ownershipPercentage: 50.0,
-    isActive: true,
-  });
-
-  const partnerB = await Partner.create({
-    name: 'Partner B',
-    code: 'PARTNER_B',
-    phone: '9825022222',
-    email: 'partnerb@nationalautogarage.com',
-    ownershipPercentage: 50.0,
-    isActive: true,
-  });
-
+  console.log('[1/10] Seeding Settings...');
   await Settings.create({
     garageName: 'National Auto Garage',
     tagline: 'Two-Wheeler Service & Repair Specialists',
@@ -493,8 +460,6 @@ async function seedDatabase(disconnectAfter = true) {
     await disconnectDB();
   }
 }
-
-export { seedDatabase };
 
 if (process.argv[1]?.endsWith('seed.js')) {
   seedDatabase(true).catch((err) => {

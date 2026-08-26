@@ -1,7 +1,4 @@
 import { Expense } from '../models/Expense.js';
-import { Partner } from '../models/Partner.js';
-import { PartnerService } from './partner.service.js';
-import { PARTNERS, PARTNER_TRANSACTION_TYPES } from '../config/constants.js';
 import { ApiError } from '../utils/apiError.js';
 import { roundMoney } from '../utils/currency.js';
 import { getNextSequence } from '../utils/sequenceGenerator.js';
@@ -14,25 +11,11 @@ export class ExpenseService {
 
     const expenseNumber = await getNextSequence('EXP', 4, true);
 
-    let partnerId = expenseData.partnerId || null;
-    if (expenseData.paidBy && expenseData.paidBy !== 'GARAGE_ACCOUNT') {
-      const partner = await Partner.findOne({
-        $or: [
-          { _id: expenseData.partnerId },
-          { code: expenseData.paidBy },
-          { name: { $regex: new RegExp(expenseData.paidBy, 'i') } },
-        ],
-      });
-      if (partner) {
-        partnerId = partner._id;
-      }
-    }
-
     const expense = await Expense.create({
       ...expenseData,
       expenseNumber,
       amount,
-      partnerId,
+      paidBy: expenseData.paidBy || 'GARAGE_ACCOUNT',
       date: expenseData.date ? new Date(expenseData.date) : new Date(),
       createdBy: user?._id || 'ADMIN',
     });
@@ -44,7 +27,7 @@ export class ExpenseService {
       action: 'CREATE_EXPENSE',
       entityType: 'EXPENSE',
       entityId: expense._id,
-      summary: `Created expense ${expense.expenseNumber} (₹${amount}, ${expense.category}) paid by ${expense.paidBy}`,
+      summary: `Created expense ${expense.expenseNumber} (₹${amount}) paid by ${expense.paidBy}`,
     });
 
     return expense;
@@ -70,7 +53,6 @@ export class ExpenseService {
     const skip = (page - 1) * limit;
     const [expenses, totalRecords] = await Promise.all([
       Expense.find(query)
-        .populate('partnerId')
         .populate('createdBy', 'name')
         .sort({ date: -1 })
         .skip(skip)
@@ -130,7 +112,6 @@ export class ExpenseService {
 
   static async getExpenseById(id) {
     const expense = await Expense.findById(id)
-      .populate('partnerId')
       .populate('createdBy', 'name role')
       .lean();
     if (!expense) throw ApiError.notFound('Expense not found');
