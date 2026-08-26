@@ -54,9 +54,16 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem('nag_user');
         }
       } catch (err) {
-        setUser(null);
-        localStorage.removeItem('nag_token');
-        localStorage.removeItem('nag_user');
+        const savedUser = localStorage.getItem('nag_user');
+        if (savedUser && savedUser !== 'undefined' && savedUser !== 'null') {
+          try {
+            setUser(JSON.parse(savedUser));
+          } catch (e) {
+            setUser(null);
+          }
+        } else {
+          setUser(null);
+        }
       } finally {
         setLoading(false);
       }
