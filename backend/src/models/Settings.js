@@ -75,6 +75,15 @@ const settingsSchema = new mongoose.Schema(
       type: String,
       default: 'Thank you for choosing National Auto Garage! Safe Riding.',
     },
+    // Real Gmail Inbox SMTP Credentials
+    smtpUser: {
+      type: String,
+      default: '',
+    },
+    smtpPass: {
+      type: String,
+      default: '',
+    },
     inventoryCategories: [
       {
         type: String,

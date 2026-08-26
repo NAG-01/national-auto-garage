@@ -117,6 +117,9 @@ export const SettingsPage = () => {
         jobIdPrefix: settings.jobIdPrefix || 'NAG',
         duesPrefix: settings.duesPrefix || 'DUE',
         expensePrefix: settings.expensePrefix || 'EXP',
+
+        smtpUser: settings.smtpUser || '',
+        smtpPass: settings.smtpPass || '',
       });
     }
     if (user?.email) {
@@ -727,6 +730,35 @@ export const SettingsPage = () => {
                     required
                     helpText="Apna Naya Official Admin Gmail Address enter karein."
                   />
+
+                  {/* Gmail SMTP Server Integration Credentials Card */}
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 text-xs">
+                    <span className="font-extrabold text-slate-900 flex items-center gap-1.5 uppercase tracking-wider">
+                      ⚙️ Real Gmail Inbox SMTP Sender Credentials (Optional)
+                    </span>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">
+                      Apne real Gmail inbox me email prapt karne ke liye niche apna **Sender Gmail Email** aur Google ka **16-Digit App Password** enter karein:
+                    </p>
+
+                    <div className="space-y-4">
+                      <Input
+                        type="email"
+                        label="Sender Gmail Email Address"
+                        placeholder="e.g. yourgarage@gmail.com"
+                        value={formData.smtpUser}
+                        onChange={(e) => handleChange('smtpUser', e.target.value)}
+                        helpText="Aapka sending Gmail address."
+                      />
+                      <Input
+                        type="password"
+                        label="Gmail 16-Digit App Password"
+                        placeholder="e.g. xxxx xxxx xxxx xxxx"
+                        value={formData.smtpPass}
+                        onChange={(e) => handleChange('smtpPass', e.target.value)}
+                        helpText="Google Account ➔ Security ➔ App Passwords se generated 16-digit password."
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200">

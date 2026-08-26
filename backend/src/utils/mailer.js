@@ -1,39 +1,48 @@
 import nodemailer from 'nodemailer';
+import { Settings } from '../models/Settings.js';
 
 /**
- * Creates SMTP transporter if env credentials exist, else uses ethereal/mock fallback
+ * Creates SMTP transporter checking env variables first, then database Settings
  */
-function createTransporter() {
+async function createTransporter() {
+  const settings = await Settings.findOne().catch(() => null);
+
   const host = process.env.SMTP_HOST || 'smtp.gmail.com';
   const port = parseInt(process.env.SMTP_PORT || '587', 10);
-  const user = process.env.SMTP_USER || '';
-  const pass = process.env.SMTP_PASS || '';
+  const user = (process.env.SMTP_USER || settings?.smtpUser || '').trim();
+  const pass = (process.env.SMTP_PASS || settings?.smtpPass || '').trim();
 
   if (user && pass) {
-    return nodemailer.createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: { user, pass },
-    });
+    return {
+      user,
+      transporter: nodemailer.createTransport({
+        host,
+        port,
+        secure: port === 465,
+        auth: { user, pass },
+      }),
+    };
   }
 
   // Fallback logger transporter for development/testing
   return {
-    sendMail: async (options) => {
-      console.log(`====================================================`);
-      console.log(`  [GMAIL SMTP ENGINE] MOCK EMAIL SENT`);
-      console.log(`  To: ${options.to}`);
-      console.log(`  Subject: ${options.subject}`);
-      console.log(`  (Configure SMTP_USER & SMTP_PASS in .env to send real Gmail emails)`);
-      console.log(`====================================================`);
-      return { messageId: 'mock-mail-id-' + Date.now() };
+    user: null,
+    transporter: {
+      sendMail: async (options) => {
+        console.log(`====================================================`);
+        console.log(`  [GMAIL SMTP ENGINE] SIMULATED EMAIL LOGGED`);
+        console.log(`  To: ${options.to}`);
+        console.log(`  Subject: ${options.subject}`);
+        console.log(`  (Configure Gmail Email & App Password in System Settings to send real emails to inbox)`);
+        console.log(`====================================================`);
+        return { messageId: 'simulated-mail-id-' + Date.now() };
+      },
     },
   };
 }
 
 export async function sendEmailConfirmationLink({ toEmail, magicLink, token }) {
-  const transporter = createTransporter();
+  const { user: fromUser, transporter } = await createTransporter();
 
   const htmlContent = `
     <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc; border-radius: 16px;">
@@ -70,8 +79,10 @@ export async function sendEmailConfirmationLink({ toEmail, magicLink, token }) {
     </div>
   `;
 
+  const senderEmail = fromUser || 'no-reply@nationalautogarage.com';
+
   const info = await transporter.sendMail({
-    from: `"National Auto Garage Security" <${process.env.SMTP_USER || 'no-reply@nationalautogarage.com'}>`,
+    from: `"National Auto Garage Security" <${senderEmail}>`,
     to: toEmail,
     subject: 'Confirm your National Auto Garage Admin Email Change',
     html: htmlContent,
