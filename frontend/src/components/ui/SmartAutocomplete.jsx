@@ -178,9 +178,6 @@ export const SmartAutocomplete = ({
                   <Tag className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />
                   <span className="truncate font-bold">{kw.word}</span>
                 </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-extrabold shrink-0 border border-slate-200">
-                  {kw.category || 'General'}
-                </span>
               </button>
             ))}
           </div>

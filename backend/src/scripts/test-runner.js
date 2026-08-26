@@ -303,7 +303,6 @@ async function runTests() {
     console.log('\n[Test Suite 9] Smart Master Keywords Register & Typo Tolerance');
     const createdKw = await MasterKeyword.create({
       word: 'Test Tyre Keyword',
-      category: 'Spare Part',
     });
     assert(createdKw.word === 'Test Tyre Keyword', 'Master keyword created successfully');
 

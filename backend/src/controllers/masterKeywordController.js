@@ -6,12 +6,8 @@ import { MasterKeyword } from '../models/MasterKeyword.js';
  */
 export const getMasterKeywords = async (req, res) => {
   try {
-    const { search, category } = req.query;
+    const { search } = req.query;
     const filter = {};
-
-    if (category && category !== 'ALL') {
-      filter.category = category;
-    }
 
     if (search) {
       filter.word = { $regex: search.trim(), $options: 'i' };
@@ -40,7 +36,7 @@ export const getMasterKeywords = async (req, res) => {
  */
 export const createMasterKeyword = async (req, res) => {
   try {
-    const { word, category } = req.body;
+    const { word } = req.body;
 
     if (!word || !word.trim()) {
       return res.status(400).json({
@@ -65,7 +61,6 @@ export const createMasterKeyword = async (req, res) => {
 
     const keyword = await MasterKeyword.create({
       word: trimmedWord,
-      category: category || 'General',
     });
 
     res.status(201).json({
@@ -88,7 +83,7 @@ export const createMasterKeyword = async (req, res) => {
 export const updateMasterKeyword = async (req, res) => {
   try {
     const { id } = req.params;
-    const { word, category, incrementUsage } = req.body;
+    const { word, incrementUsage } = req.body;
 
     const keyword = await MasterKeyword.findById(id);
 
@@ -105,10 +100,6 @@ export const updateMasterKeyword = async (req, res) => {
 
     if (word && word.trim()) {
       keyword.word = word.trim();
-    }
-
-    if (category) {
-      keyword.category = category;
     }
 
     await keyword.save();

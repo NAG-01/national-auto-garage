@@ -8,12 +8,6 @@ const masterKeywordSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
-    category: {
-      type: String,
-      trim: true,
-      default: 'General',
-      enum: ['General', 'Spare Part', 'Service', 'Brand', 'Consumable'],
-    },
     usageCount: {
       type: Number,
       default: 0,

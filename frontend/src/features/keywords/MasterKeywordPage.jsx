@@ -5,28 +5,22 @@ import {
   Trash2,
   Sparkles,
   CheckCircle2,
-  BookOpen,
   TrendingUp,
-  Search,
-  Filter,
 } from 'lucide-react';
 import api from '../../api/client.js';
 import { PageHeader } from '../../components/layout/PageHeader.jsx';
-import { Card } from '../../components/ui/Card.jsx';
 import { Button } from '../../components/ui/Button.jsx';
-import { Input, Select, SearchInput } from '../../components/ui/Input.jsx';
+import { Input, SearchInput } from '../../components/ui/Input.jsx';
 import { Skeleton } from '../../components/ui/Skeleton.jsx';
 import { ErrorState } from '../../components/ui/ErrorState.jsx';
 import { ConfirmDialog } from '../../components/ui/Modal.jsx';
 import { useTableSelection } from '../../hooks/useTableSelection.js';
 import { BulkActionBar } from '../../components/ui/BulkActionBar.jsx';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableHeadCheckbox, TableCellCheckbox } from '../../components/ui/Table.jsx';
-import { Badge } from '../../components/ui/Badge.jsx';
 
 export const MasterKeywordPage = () => {
   // Form State
   const [newWord, setNewWord] = useState('');
-  const [newCategory, setNewCategory] = useState('Spare Part');
 
   // List State
   const [keywords, setKeywords] = useState([]);
@@ -35,7 +29,6 @@ export const MasterKeywordPage = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [search, setSearch] = useState('');
-  const [selectedCategoryTab, setSelectedCategoryTab] = useState('ALL');
 
   // Confirm Delete State
   const [deleteId, setDeleteId] = useState(null);
@@ -84,7 +77,6 @@ export const MasterKeywordPage = () => {
     try {
       await api.post('/master-keywords', {
         word: newWord.trim(),
-        category: newCategory,
       });
       setNewWord('');
       setSuccessMessage(`Keyword "${newWord.trim()}" successfully add ho gaya!`);
@@ -127,19 +119,14 @@ export const MasterKeywordPage = () => {
 
   // Filtered List
   const filteredKeywords = keywords.filter((k) => {
-    const matchesCategory = selectedCategoryTab === 'ALL' || k.category === selectedCategoryTab;
-    const matchesSearch =
-      !search ||
-      k.word.toLowerCase().includes(search.trim().toLowerCase()) ||
-      k.category.toLowerCase().includes(search.trim().toLowerCase());
-    return matchesCategory && matchesSearch;
+    return !search || k.word.toLowerCase().includes(search.trim().toLowerCase());
   });
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       <PageHeader
         title="Smart Keywords Master"
-        subtitle="Website par typo-tolerant auto-suggestions ke liye keywords aur frequently used terms manage karein."
+        subtitle="Website par typo-tolerant auto-suggestions ke liye global keywords aur frequently used terms manage karein."
       />
 
       {successMessage && (
@@ -161,8 +148,8 @@ export const MasterKeywordPage = () => {
           </div>
 
           <form onSubmit={handleAddKeyword} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="sm:col-span-2">
+            <div className="flex flex-col sm:flex-row items-end gap-3">
+              <div className="flex-1 w-full">
                 <Input
                   label="Keyword / Item Name"
                   placeholder="e.g. Tyre, Brake Pad, Engine Oil, Spark Plug"
@@ -172,30 +159,16 @@ export const MasterKeywordPage = () => {
                 />
               </div>
 
-              <div>
-                <Select
-                  label="Category"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                >
-                  <option value="Spare Part">Spare Part</option>
-                  <option value="Service">Service</option>
-                  <option value="General">General</option>
-                  <option value="Brand">Brand</option>
-                  <option value="Consumable">Consumable</option>
-                </Select>
-              </div>
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={saving}
+                className="w-full sm:w-auto justify-center py-2.5 px-6 font-bold text-xs sm:text-sm shrink-0"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                {saving ? 'Adding...' : 'Add Keyword'}
+              </Button>
             </div>
-
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={saving}
-              className="w-full sm:w-auto justify-center py-2.5 px-6 font-bold text-xs sm:text-sm"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              {saving ? 'Adding...' : 'Add Keyword to Master'}
-            </Button>
           </form>
         </div>
 
@@ -205,16 +178,16 @@ export const MasterKeywordPage = () => {
             <div className="flex items-center gap-2 pb-3 mb-3 border-b border-sky-200/80">
               <Sparkles className="w-4 h-4 text-[#0284C7]" />
               <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 uppercase tracking-wider">
-                Smart Recommendation Engine
+                Global Recommendation Engine
               </h3>
             </div>
             <p className="text-xs text-slate-700 leading-relaxed font-medium">
-              Yahan add kiye gaye words poori website me auto-suggest honge. Agar koi galat spelling likhega (e.g. <span className="font-mono font-bold text-[#0284C7]">tayer</span> ya <span className="font-mono font-bold text-[#0284C7]">brek</span>), tab bhi system samajhkar sahi word suggest kar dega!
+              Yahan add kiye gaye sabhi keywords poori website par automatically suggest honge. Pehle letter (e.g. <span className="font-mono font-bold text-[#0284C7]">T</span>) ya spelling mistake (e.g. <span className="font-mono font-bold text-[#0284C7]">tayer</span>) par bhi smart recommendation aayega!
             </p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-sky-200/80 text-[11px] font-bold text-[#0284C7] flex items-center justify-between">
-            <span>Total Saved Keywords: {keywords.length}</span>
+            <span>Total Master Keywords: {keywords.length}</span>
             <Tag className="w-4 h-4" />
           </div>
         </div>
@@ -232,46 +205,26 @@ export const MasterKeywordPage = () => {
             </p>
           </div>
 
-          {/* Search & Category Filter Tabs */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {['ALL', 'Spare Part', 'Service', 'General'].map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategoryTab(cat)}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
-                  selectedCategoryTab === cat
-                    ? 'bg-[#0284C7] text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Search input & Bulk Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="max-w-xs w-full">
             <SearchInput
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onClear={() => setSearch('')}
-              placeholder="Search keyword or category..."
+              placeholder="Search keyword..."
             />
           </div>
-
-          {selectedCount > 0 && (
-            <BulkActionBar
-              selectedCount={selectedCount}
-              onClear={clearSelection}
-              onDelete={() => setShowBulkConfirm(true)}
-              entityName="keywords"
-              deleting={isBulkDeleting}
-            />
-          )}
         </div>
+
+        {/* Bulk Actions */}
+        {selectedCount > 0 && (
+          <BulkActionBar
+            selectedCount={selectedCount}
+            onClear={clearSelection}
+            onDelete={() => setShowBulkConfirm(true)}
+            entityName="keywords"
+            deleting={isBulkDeleting}
+          />
+        )}
 
         {loading ? (
           <Skeleton className="h-64 w-full rounded-2xl" />
@@ -282,11 +235,11 @@ export const MasterKeywordPage = () => {
             <Tag className="w-10 h-10 text-slate-400 mx-auto mb-3" />
             <h4 className="text-sm font-bold text-slate-700">Koi Keyword Nahi Mila</h4>
             <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-              Upar form me detail bharkar "Add Keyword to Master" dabayein.
+              Upar form me name bharkar "Add Keyword" dabayein.
             </p>
           </div>
         ) : (
-          <Table className="min-w-[600px]">
+          <Table className="min-w-[500px]">
             <TableHeader>
               <TableRow hover={false}>
                 <TableHeadCheckbox
@@ -294,7 +247,6 @@ export const MasterKeywordPage = () => {
                   onChange={toggleSelectAll}
                 />
                 <TableHead>Keyword Word</TableHead>
-                <TableHead>Category</TableHead>
                 <TableHead className="text-right">Usage Frequency</TableHead>
                 <TableHead className="text-center">Action</TableHead>
               </TableRow>
@@ -316,11 +268,6 @@ export const MasterKeywordPage = () => {
                         <Tag className="w-4 h-4 text-[#0284C7]" />
                         <span>{kw.word}</span>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="info" dot>
-                        {kw.category || 'General'}
-                      </Badge>
                     </TableCell>
                     <TableCell className="text-right font-bold text-slate-700">
                       <span className="inline-flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
