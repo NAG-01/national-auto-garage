@@ -110,13 +110,13 @@ export const BillPreviewModal = ({ isOpen, onClose, bill, isNewGeneration = fals
             <div>
               <h3 className="text-base font-black text-slate-900 tracking-tight">NATIONAL AUTO GARAGE</h3>
               <p className="text-[11px] text-slate-500 font-medium">Two-Wheeler Service & Repair Center</p>
-              <p className="text-[10px] text-orange-600 font-bold mt-0.5">Imran Pathan: +91 96248 44188 • Naim Pathan: +91 81281 44350</p>
+              <p className="text-[10px] text-rose-600 font-bold mt-0.5">Imran Pathan: +91 96248 44188 • Naim Pathan: +91 81281 44350</p>
             </div>
             <div className="text-right">
-              <span className="font-mono text-xs font-extrabold text-orange-600 bg-orange-50 px-2.5 py-1 rounded border border-orange-200">
-                {billNo}
+              <span className="font-mono text-xs font-extrabold text-rose-600 bg-rose-50 px-2.5 py-1 rounded border border-rose-200">
+                INVOICE / SERVICE BILL
               </span>
-              <div className="text-[10px] font-mono text-slate-400 mt-1">
+              <div className="text-[10px] font-mono text-slate-500 mt-1">
                 {formatDate(bill.billDate || bill.createdAt)}
               </div>
             </div>
@@ -133,7 +133,7 @@ export const BillPreviewModal = ({ isOpen, onClose, bill, isNewGeneration = fals
             <div>
               <span className="text-slate-400 block text-[10px] font-bold uppercase">Vehicle</span>
               <span className="font-bold text-slate-900">{bike || '—'}</span>
-              {regNo && <div className="font-mono text-orange-700 text-[11px] font-bold">{formatRegNumber(regNo)}</div>}
+              {regNo && <div className="font-mono text-slate-900 text-[11px] font-bold">{formatRegNumber(regNo)}</div>}
             </div>
           </div>
 
@@ -155,9 +155,9 @@ export const BillPreviewModal = ({ isOpen, onClose, bill, isNewGeneration = fals
           </div>
 
           {/* Grand Total Box */}
-          <div className="p-3.5 bg-orange-500 text-white rounded-xl flex items-center justify-between font-bold text-sm shadow-2xs">
-            <span>TOTAL BILL AMOUNT</span>
-            <span className="font-mono text-base">₹{grandTotal.toLocaleString('en-IN')}</span>
+          <div className="p-3.5 bg-rose-600 text-white rounded-xl flex items-center justify-between font-bold text-sm shadow-2xs">
+            <span>TOTAL AMOUNT (₹)</span>
+            <span className="font-mono text-base font-black">₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
           </div>
         </div>
       </div>
