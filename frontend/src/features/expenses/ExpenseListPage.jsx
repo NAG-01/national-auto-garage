@@ -12,11 +12,10 @@ import api from '../../api/client.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { PageHeader } from '../../components/layout/PageHeader.jsx';
 import { Button } from '../../components/ui/Button.jsx';
-import { Card } from '../../components/ui/Card.jsx';
 import { KpiCard } from '../../components/ui/KpiCard.jsx';
 import { Badge } from '../../components/ui/Badge.jsx';
 import { Input, Select, Textarea } from '../../components/ui/Input.jsx';
-import { Modal } from '../../components/ui/Modal.jsx';
+import { Modal, ModalCancelButton, ConfirmDialog } from '../../components/ui/Modal.jsx';
 import {
   Table,
   TableHeader,
@@ -45,8 +44,10 @@ export const ExpenseListPage = () => {
   const [categories, setCategories] = useState([]);
   const [partners, setPartners] = useState([]);
 
-  // Create Modal
+  // Create Modal & Save Confirm
   const [modalOpen, setModalOpen] = useState(false);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+
   const [formData, setFormData] = useState({
     category: 'RENT',
     amount: '',
@@ -67,10 +68,17 @@ export const ExpenseListPage = () => {
         api.get('/settings'),
         api.get('/partnership'),
       ]);
-      setCategories(settingsRes.data.settings?.expenseCategories || []);
-      setPartners(partnerRes.data || []);
+
+      const catList = settingsRes.data?.settings?.expenseCategories ||
+        settingsRes.data?.expenseCategories ||
+        ['RENT', 'ELECTRICITY', 'SALARY', 'PARTS_SUPPLIES', 'TOOLS_EQUIPMENT', 'TEA_SNACKS', 'TRANSPORT', 'MISC'];
+      setCategories(catList);
+
+      const partnerList = Array.isArray(partnerRes.data) ? partnerRes.data : (partnerRes.data?.partners || []);
+      setPartners(partnerList);
     } catch (err) {
       console.error('Failed to load expense masters:', err);
+      setCategories(['RENT', 'ELECTRICITY', 'SALARY', 'PARTS_SUPPLIES', 'TOOLS_EQUIPMENT', 'TEA_SNACKS', 'TRANSPORT', 'MISC']);
     }
   };
 
@@ -85,12 +93,20 @@ export const ExpenseListPage = () => {
           limit: 15,
         },
       });
-      const dataPayload = res.data || res.message || res;
-      setExpenses(dataPayload.expenses || res.expenses || []);
-      setTotalAmount(dataPayload.totalAmount || res.totalAmount || 0);
-      setPagination(res.meta || res.pagination || dataPayload.pagination || null);
+
+      const payload = res.data || {};
+      const expList = Array.isArray(payload.expenses)
+        ? payload.expenses
+        : Array.isArray(res.data)
+        ? res.data
+        : [];
+
+      setExpenses(expList);
+      setTotalAmount(payload.totalAmount || res.totalAmount || 0);
+      setPagination(res.meta || res.pagination || payload.pagination || null);
     } catch (err) {
       console.error('Failed to fetch expenses:', err);
+      setExpenses([]);
     } finally {
       setLoading(false);
     }
@@ -104,8 +120,8 @@ export const ExpenseListPage = () => {
     fetchExpenses();
   }, [categoryFilter, paidByFilter, page]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleFormSubmit = (e) => {
+    if (e) e.preventDefault();
     if (!formData.amount || Number(formData.amount) <= 0) {
       toast.error('Expense amount must be greater than zero.');
       return;
@@ -114,7 +130,12 @@ export const ExpenseListPage = () => {
       toast.error('Please enter a description for the expense.');
       return;
     }
+    // Prompt confirmation before executing save action
+    setShowSaveConfirm(true);
+  };
 
+  const executeSaveExpense = async () => {
+    setShowSaveConfirm(false);
     setSubmitting(true);
     try {
       await api.post('/expenses', {
@@ -135,7 +156,7 @@ export const ExpenseListPage = () => {
       });
       fetchExpenses();
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.message || 'Failed to record expense.');
     } finally {
       setSubmitting(false);
     }
@@ -145,7 +166,7 @@ export const ExpenseListPage = () => {
     <div className="space-y-6">
       <PageHeader
         title="Operating Expenses (OPEX)"
-        subtitle="Track daily business running costs (Rent, Electricity, Mechanic Salaries, Tools, Transport, etc.) and who paid them."
+        subtitle="Track daily workshop running costs (Rent, Electricity, Technician Salaries, Tools, Transport, etc.) and payment attribution."
         actions={
           <Button
             variant="accent"
@@ -170,7 +191,7 @@ export const ExpenseListPage = () => {
 
         <KpiCard
           title="Total Expense Records"
-          value={pagination?.totalRecords || 0}
+          value={pagination?.totalRecords || expenses.length || 0}
           subtitle="Expense vouchers logged"
           icon={Receipt}
           variant="default"
@@ -199,7 +220,7 @@ export const ExpenseListPage = () => {
             <option value="">All Categories</option>
             {categories.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {c.replace('_', ' ')}
               </option>
             ))}
           </Select>
@@ -215,7 +236,7 @@ export const ExpenseListPage = () => {
             <option value="">All Payers</option>
             <option value="GARAGE_ACCOUNT">Garage Account</option>
             {partners.map((p) => (
-              <option key={p._id} value={p.code}>
+              <option key={p._id || p.code} value={p.code}>
                 {p.name} (Personal)
               </option>
             ))}
@@ -239,12 +260,12 @@ export const ExpenseListPage = () => {
 
       {/* Expense List */}
       {loading ? (
-        <TableSkeleton rows={6} cols={6} />
+        <TableSkeleton rows={6} cols={7} />
       ) : expenses.length === 0 ? (
         <EmptyState
           icon={Receipt}
-          title="No expenses found"
-          description="Record daily garage utility bills, rent, and operational costs."
+          title="No expenses recorded"
+          description="Record daily workshop utility bills, rent, technician salaries, and operational costs."
           actionText="Record Expense"
           onAction={() => setModalOpen(true)}
         />
@@ -269,24 +290,24 @@ export const ExpenseListPage = () => {
                   <TableRow key={exp._id} hover={false}>
                     <TableCell>
                       <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded">
-                        {exp.expenseNumber}
+                        {exp.expenseNumber || `EXP-${exp._id?.slice(-4)}`}
                       </span>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="default">{exp.category}</Badge>
+                      <Badge variant="default">{exp.category?.replace('_', ' ')}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="font-medium text-slate-800 text-xs max-w-sm">
                         {exp.description}
                       </div>
-                      {exp.notes && <div className="text-[11px] text-slate-400">{exp.notes}</div>}
+                      {exp.notes && <div className="text-[11px] text-slate-400 mt-0.5">{exp.notes}</div>}
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`text-xs font-semibold px-2 py-0.5 rounded ${
+                        className={`text-xs font-bold px-2 py-0.5 rounded ${
                           isPartnerPaid
-                            ? 'bg-orange-50 text-orange-700 border border-orange-200'
-                            : 'text-slate-600 bg-slate-100'
+                            ? 'bg-slate-900 text-white shadow-xs'
+                            : 'text-slate-700 bg-slate-100 border border-slate-200'
                         }`}
                       >
                         {exp.paidBy?.replace('_', ' ')}
@@ -296,11 +317,11 @@ export const ExpenseListPage = () => {
                       <span className="text-xs text-slate-600 font-mono">{exp.paymentMethod}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs font-bold text-rose-600">
+                      <span className="text-xs font-extrabold text-rose-600">
                         {formatINR(exp.amount)}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right text-xs text-slate-500">
+                    <TableCell className="text-right text-xs text-slate-500 font-medium">
                       {formatDate(exp.date)}
                     </TableCell>
                   </TableRow>
@@ -309,7 +330,7 @@ export const ExpenseListPage = () => {
             </TableBody>
           </Table>
 
-          <Pagination pagination={pagination} onPageChange={(newPage) => setPage(newPage)} />
+          {pagination && <Pagination pagination={pagination} onPageChange={(newPage) => setPage(newPage)} />}
         </div>
       )}
 
@@ -317,20 +338,24 @@ export const ExpenseListPage = () => {
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
+        confirmOnClose={true}
         title="Record Operating Expense (OPEX)"
         subtitle="Log workshop utility bills, rent, supplies, or technician salaries"
         footer={
-          <>
-            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={submitting}>
-              Cancel
+          <div className="flex items-center justify-end gap-2 w-full">
+            <ModalCancelButton disabled={submitting}>Cancel</ModalCancelButton>
+            <Button
+              type="submit"
+              form="expense-form"
+              variant="accent"
+              loading={submitting}
+            >
+              Save Expense Record
             </Button>
-            <Button variant="primary" onClick={handleSubmit} loading={submitting}>
-              Save Expense
-            </Button>
-          </>
+          </div>
         }
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form id="expense-form" onSubmit={handleFormSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Select
               label="Expense Category"
@@ -340,7 +365,7 @@ export const ExpenseListPage = () => {
             >
               {categories.map((c) => (
                 <option key={c} value={c}>
-                  {c}
+                  {c.replace('_', ' ')}
                 </option>
               ))}
             </Select>
@@ -375,7 +400,7 @@ export const ExpenseListPage = () => {
             >
               <option value="GARAGE_ACCOUNT">Garage Account</option>
               {partners.map((p) => (
-                <option key={p._id} value={p.code}>
+                <option key={p._id || p.code} value={p.code}>
                   {p.name} (Personal Account)
                 </option>
               ))}
@@ -418,6 +443,19 @@ export const ExpenseListPage = () => {
           />
         </form>
       </Modal>
+
+      {/* Save Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showSaveConfirm}
+        onClose={() => setShowSaveConfirm(false)}
+        onConfirm={executeSaveExpense}
+        title="Save Operating Expense?"
+        message={`Save expense record of ${formatINR(Number(formData.amount || 0))} for "${formData.description}"?`}
+        confirmText="Yes, Save Record"
+        cancelText="Review Form"
+        variant="success"
+        loading={submitting}
+      />
     </div>
   );
 };
