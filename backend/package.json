@@ -1,0 +1,38 @@
+{
+  "name": "national-auto-garage-backend",
+  "version": "1.0.0",
+  "description": "Backend API for National Auto Garage Management System",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "seed": "node src/scripts/seed.js",
+    "test": "node src/scripts/test-runner.js",
+    "test:phase1": "node src/scripts/test-phase1.js",
+    "test:payment": "node src/scripts/test-payment-integrity.js",
+    "test:phase5": "node src/scripts/test-phase5.js",
+    "test:phase6": "node src/scripts/test-phase6.js",
+    "test:phase7": "node src/scripts/test-phase7.js",
+    "test:phase8": "node src/scripts/test-phase8.js",
+    "test:phase9": "node src/scripts/test-phase9.js",
+    "test:phase10": "node src/scripts/test-phase10.js",
+    "test:phase11": "node src/scripts/test-phase11.js",
+    "test:phase12": "node src/scripts/test-phase12.js",
+    "test:phase13": "node src/scripts/test-phase13.js",
+    "test:phase14": "node src/scripts/test-phase14.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb-memory-server": "^11.2.0",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "zod": "^3.24.1"
+  }
+}
