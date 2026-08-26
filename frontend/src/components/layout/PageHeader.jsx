@@ -11,7 +11,7 @@ export const PageHeader = ({
   className = '',
 }) => {
   return (
-    <div className={`mb-6 md:mb-8 ${className}`}>
+    <div className={`bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs mb-5 ${className}`}>
       {/* Breadcrumb Navigation */}
       {breadcrumbs && breadcrumbs.length > 0 && (
         <nav aria-label="Breadcrumb" className="mb-2 flex items-center gap-1.5 text-xs text-slate-500">
@@ -39,16 +39,16 @@ export const PageHeader = ({
       )}
 
       {/* Main Header Content */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2.5">
-            <span className="w-1.5 h-6 rounded-full bg-[#0284C7] inline-block" />
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-5 rounded-full bg-[#0284C7] inline-block shrink-0" />
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               {title}
             </h1>
           </div>
           {subtitle && (
-            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1 pl-4">
+            <p className="text-xs text-slate-500 font-medium mt-1 pl-3.5">
               {subtitle}
             </p>
           )}

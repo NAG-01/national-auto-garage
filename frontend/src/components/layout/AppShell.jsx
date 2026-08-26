@@ -32,9 +32,9 @@ export const AppShell = ({ children }) => {
         </div>
 
         {/* Main Content Viewport */}
-        <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+        <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto overflow-x-hidden">
           <Topbar onOpenMobileSidebar={() => setMobileSidebarOpen(true)} />
-          <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6">
+          <main className="flex-1 p-3 sm:p-5 md:p-6 max-w-7xl w-full mx-auto space-y-5 overflow-x-hidden">
             {children}
           </main>
         </div>
