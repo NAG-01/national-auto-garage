@@ -14,6 +14,7 @@ import outstandingRoutes from './outstanding.routes.js';
 import dashboardRoutes from './dashboard.routes.js';
 import settingsRoutes from './settings.routes.js';
 import settlementCalculationRoutes from './settlementCalculation.routes.js';
+import masterKeywordRoutes from './masterKeywordRoutes.js';
 
 const router = Router();
 
@@ -31,6 +32,7 @@ router.use('/bills', billRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/outstanding', outstandingRoutes);
 router.use('/settlement-calculations', settlementCalculationRoutes);
+router.use('/master-keywords', masterKeywordRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/settings', settingsRoutes);
 

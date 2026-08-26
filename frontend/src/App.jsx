@@ -21,6 +21,7 @@ import { InvoiceDetailPage } from './features/billing/InvoiceDetailPage.jsx';
 import { OutstandingPage } from './features/billing/OutstandingPage.jsx';
 import { ExpenseListPage } from './features/expenses/ExpenseListPage.jsx';
 import { SettlementCalculatorPage } from './features/calculator/SettlementCalculatorPage.jsx';
+import { MasterKeywordPage } from './features/keywords/MasterKeywordPage.jsx';
 import { PageSkeleton } from './components/ui/Skeleton.jsx';
 
 const ProtectedRoute = () => {
@@ -117,6 +118,9 @@ export default function App() {
 
         {/* Settlement Calculator & History Register */}
         <Route path="/calculator" element={<SettlementCalculatorPage />} />
+
+        {/* Smart Keywords Master */}
+        <Route path="/keywords" element={<MasterKeywordPage />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

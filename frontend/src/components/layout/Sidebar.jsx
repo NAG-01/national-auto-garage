@@ -11,6 +11,7 @@ import {
   CreditCard,
   Receipt,
   Calculator,
+  Tag,
   LogOut,
   ShieldCheck,
   ChevronRight,
@@ -31,6 +32,7 @@ export const Sidebar = ({ onClose }) => {
     { label: 'Customer Outstanding', to: '/outstanding', icon: CreditCard, highlight: true },
     { label: 'Operating Expenses', to: '/expenses', icon: Receipt },
     { label: 'Settlement Calculator', to: '/calculator', icon: Calculator },
+    { label: 'Smart Keywords Master', to: '/keywords', icon: Tag },
   ];
 
   const renderLink = (item) => {

@@ -20,7 +20,7 @@ import { Payment } from '../models/Payment.js';
 import { CustomerOutstanding } from '../models/CustomerOutstanding.js';
 import { Settings } from '../models/Settings.js';
 import { Counter } from '../models/Counter.js';
-import { InventoryMovement } from '../models/InventoryMovement.js';
+import { MasterKeyword } from '../models/MasterKeyword.js';
 import {
   ROLES,
   EXPENSE_CATEGORIES,
@@ -52,11 +52,13 @@ export async function seedDatabase() {
     Settings.deleteMany({}),
     Counter.deleteMany({}),
     CustomerOutstanding.deleteMany({}),
+    MasterKeyword.deleteMany({}),
   ]);
 
-  console.log('[1/10] Seeding Settings...');
+  console.log('[1/10] Seeding Settings & Keywords...');
   await Settings.create({
     garageName: 'National Auto Garage',
+    footerNote: 'Thank you for choosing National Auto Garage! Safe Riding.',
     tagline: 'Two-Wheeler Service & Repair Specialists',
     phone: '+91 98765 43210',
     email: 'contact@nationalautogarage.com',

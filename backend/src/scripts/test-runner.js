@@ -13,6 +13,7 @@ import { Bill } from '../models/Bill.js';
 import { Payment } from '../models/Payment.js';
 import { Expense } from '../models/Expense.js';
 import { CustomerOutstanding } from '../models/CustomerOutstanding.js';
+import { MasterKeyword } from '../models/MasterKeyword.js';
 import { AuthService } from '../services/auth.service.js';
 import { CustomerService } from '../services/customer.service.js';
 import { VehicleService } from '../services/vehicle.service.js';
@@ -298,6 +299,21 @@ async function runTests() {
     await OutstandingService.deleteOutstandingRecord(duesRecord._id, admin);
     const afterDelete = await CustomerOutstanding.findById(duesRecord._id);
     assert(!afterDelete, 'Dues record deleted successfully');
+
+    console.log('\n[Test Suite 9] Smart Master Keywords Register & Typo Tolerance');
+    const createdKw = await MasterKeyword.create({
+      word: 'Test Tyre Keyword',
+      category: 'Spare Part',
+    });
+    assert(createdKw.word === 'Test Tyre Keyword', 'Master keyword created successfully');
+
+    createdKw.usageCount += 1;
+    await createdKw.save();
+    assert(createdKw.usageCount === 1, 'Master keyword usage frequency updated');
+
+    await MasterKeyword.findByIdAndDelete(createdKw._id);
+    const kwDeleted = await MasterKeyword.findById(createdKw._id);
+    assert(!kwDeleted, 'Master keyword deleted successfully');
 
     console.log('\n====================================================');
     console.log(`  VERIFICATION PASSED: ${passedTests} / ${totalTests} TESTS SUCCESSFUL`);
