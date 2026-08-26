@@ -59,9 +59,17 @@ export const OutstandingPage = () => {
         params: { search, page, limit: 15 },
       });
 
-      setRecords(res.data?.records || []);
-      setSummary(res.data?.summary || null);
-      setTotalPages(res.data?.pagination?.totalPages || 1);
+      const recordList = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.records)
+        ? res.records
+        : Array.isArray(res)
+        ? res
+        : [];
+
+      setRecords(recordList);
+      setSummary(res.summary || res.meta?.summary || null);
+      setTotalPages(res.pagination?.totalPages || res.meta?.pagination?.totalPages || 1);
     } catch (err) {
       console.error('Failed to fetch outstanding dues:', err);
       setError(err.message || 'Customer outstanding records load nahi ho paaye.');
