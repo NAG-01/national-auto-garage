@@ -41,8 +41,11 @@ export const PageHeader = ({
       {/* Main Header Content */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">{title}</h1>
-          {subtitle && <p className="text-xs sm:text-sm text-slate-500 mt-1">{subtitle}</p>}
+          <div className="flex items-center gap-2.5">
+            <span className="w-1.5 h-6 rounded-full bg-gradient-to-b from-indigo-600 to-blue-500 inline-block" />
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">{title}</h1>
+          </div>
+          {subtitle && <p className="text-xs sm:text-sm text-slate-500 mt-1 pl-4">{subtitle}</p>}
         </div>
         {(action || actions) && (
           <div className="flex items-center gap-2.5 flex-wrap flex-shrink-0">

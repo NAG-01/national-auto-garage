@@ -29,9 +29,9 @@ export const Button = React.forwardRef(
 
     const variantStyles = {
       primary:
-        'bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-slate-900 border border-transparent shadow-sm',
+        'bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500 border border-transparent shadow-sm shadow-indigo-100',
       accent:
-        'bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-slate-900 border border-transparent shadow-sm',
+        'bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500 border border-transparent shadow-sm shadow-indigo-100',
       secondary:
         'bg-slate-100 text-slate-800 hover:bg-slate-200 focus-visible:ring-slate-400 border border-slate-200',
       outline:

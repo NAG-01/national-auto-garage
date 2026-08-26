@@ -22,27 +22,27 @@ export const Topbar = ({ onOpenMobileSidebar, onOpenMobileMenu }) => {
 
         {/* Current Garage System Context */}
         <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-slate-900 hidden sm:inline-block">
+          <span className="text-sm font-extrabold text-slate-900 hidden sm:inline-block">
             National Auto Garage
           </span>
-          <Badge variant="neutral" size="sm">
+          <span className="text-[10px] bg-indigo-50 text-indigo-700 font-extrabold px-2.5 py-0.5 rounded-full border border-indigo-200 uppercase">
             Admin Portal
-          </Badge>
+          </span>
         </div>
       </div>
 
       {/* Admin Area & Logout */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
-          <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+        <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-600 text-white font-black text-xs flex items-center justify-center shadow-xs">
             {user?.username ? user.username.charAt(0).toUpperCase() : 'A'}
           </div>
           <div className="hidden sm:block text-left">
-            <div className="text-xs font-bold text-slate-900">
+            <div className="text-xs font-extrabold text-slate-900">
               {user?.username ? `@${user.username}` : 'Administrator'}
             </div>
-            <div className="text-[10px] text-slate-500 flex items-center gap-0.5 font-medium">
-              <Shield className="w-2.5 h-2.5 text-orange-600" />
+            <div className="text-[10px] text-indigo-600 flex items-center gap-0.5 font-bold">
+              <Shield className="w-2.5 h-2.5 text-indigo-600" />
               Full Workshop Admin
             </div>
           </div>
