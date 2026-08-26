@@ -22,6 +22,7 @@ import { OutstandingPage } from './features/billing/OutstandingPage.jsx';
 import { ExpenseListPage } from './features/expenses/ExpenseListPage.jsx';
 import { SettlementCalculatorPage } from './features/calculator/SettlementCalculatorPage.jsx';
 import { MasterKeywordPage } from './features/keywords/MasterKeywordPage.jsx';
+import { UserGuidePage } from './features/guide/UserGuidePage.jsx';
 import { PageSkeleton } from './components/ui/Skeleton.jsx';
 
 const ProtectedRoute = () => {
@@ -121,6 +122,9 @@ export default function App() {
 
         {/* Smart Keywords Master */}
         <Route path="/keywords" element={<MasterKeywordPage />} />
+
+        {/* User Guide & System Manual */}
+        <Route path="/help" element={<UserGuidePage />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

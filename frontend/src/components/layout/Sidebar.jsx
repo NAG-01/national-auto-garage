@@ -12,6 +12,7 @@ import {
   Receipt,
   Calculator,
   Tag,
+  BookOpen,
   LogOut,
   ShieldCheck,
   ChevronRight,
@@ -33,6 +34,7 @@ export const Sidebar = ({ onClose }) => {
     { label: 'Operating Expenses', to: '/expenses', icon: Receipt },
     { label: 'Settlement Calculator', to: '/calculator', icon: Calculator },
     { label: 'Smart Keywords Master', to: '/keywords', icon: Tag },
+    { label: 'User Guide & Documentation', to: '/help', icon: BookOpen },
   ];
 
   const renderLink = (item) => {
