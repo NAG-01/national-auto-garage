@@ -54,7 +54,7 @@ export class AuthService {
     return { user: userProfile, token };
   }
 
-  static async updateCredentials({ currentPassword, newUsername, newPassword }, currentUser) {
+  static async updateCredentials({ currentPassword, newUsername, newEmail, newPassword }, currentUser) {
     if (!currentPassword) {
       throw ApiError.badRequest('Current password is required to change credentials.');
     }
@@ -76,6 +76,15 @@ export class AuthService {
         throw ApiError.conflict(`Username '${cleanUsername}' is already taken.`);
       }
       user.username = cleanUsername;
+    }
+
+    if (newEmail && newEmail.trim()) {
+      const cleanEmail = newEmail.trim().toLowerCase();
+      const existing = await User.findOne({ email: cleanEmail, _id: { $ne: user._id } });
+      if (existing) {
+        throw ApiError.conflict(`Email '${cleanEmail}' is already registered.`);
+      }
+      user.email = cleanEmail;
     }
 
     if (newPassword && newPassword.trim()) {

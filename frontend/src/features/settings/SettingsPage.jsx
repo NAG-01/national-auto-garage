@@ -67,6 +67,7 @@ export const SettingsPage = () => {
   const [credForm, setCredForm] = useState({
     currentPassword: '',
     newUsername: '',
+    newEmail: '',
     newPassword: '',
     confirmPassword: '',
   });
@@ -105,8 +106,12 @@ export const SettingsPage = () => {
         expensePrefix: settings.expensePrefix || 'EXP',
       });
     }
-    if (user?.username) {
-      setCredForm((prev) => ({ ...prev, newUsername: user.username }));
+    if (user) {
+      setCredForm((prev) => ({
+        ...prev,
+        newUsername: user.username || '',
+        newEmail: user.email || '',
+      }));
     }
   }, [settings, user]);
 
@@ -165,6 +170,7 @@ export const SettingsPage = () => {
       const res = await api.put('/auth/update-credentials', {
         currentPassword: credForm.currentPassword,
         newUsername: credForm.newUsername,
+        newEmail: credForm.newEmail,
         newPassword: credForm.newPassword,
       });
 
@@ -181,7 +187,7 @@ export const SettingsPage = () => {
         confirmPassword: '',
       }));
 
-      showSuccess('Admin Username & Password updated successfully!');
+      showSuccess('Admin Username, Email & Password updated successfully!');
     } catch (err) {
       showError(err.message || 'Failed to update credentials');
     } finally {
@@ -618,12 +624,20 @@ export const SettingsPage = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
                     <Input
                       type="text"
-                      label="New Admin Username"
-                      placeholder="e.g. admin or naim_pathan"
+                      label="Admin Username (Name or Email)"
+                      placeholder="e.g. naim@nag.com or admin"
                       value={credForm.newUsername}
                       onChange={(e) => handleCredChange('newUsername', e.target.value)}
                       icon={User}
-                      helpText="Admin login username badalne ke liye enter karein."
+                      helpText="Login ke liye Naya Username ya Email rakhein."
+                    />
+                    <Input
+                      type="email"
+                      label="Admin Registered Email"
+                      placeholder="e.g. admin@nationalautogarage.com"
+                      value={credForm.newEmail}
+                      onChange={(e) => handleCredChange('newEmail', e.target.value)}
+                      helpText="Admin notification aur profile email."
                     />
                   </div>
 

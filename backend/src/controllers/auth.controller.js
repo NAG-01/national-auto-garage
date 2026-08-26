@@ -27,9 +27,9 @@ export class AuthController {
 
   static async updateCredentials(req, res, next) {
     try {
-      const { currentPassword, newUsername, newPassword } = req.body;
+      const { currentPassword, newUsername, newEmail, newPassword } = req.body;
       const { user, token } = await AuthService.updateCredentials(
-        { currentPassword, newUsername, newPassword },
+        { currentPassword, newUsername, newEmail, newPassword },
         req.user
       );
       return ApiResponse.success(res, 'Admin credentials updated successfully', { user, token });
