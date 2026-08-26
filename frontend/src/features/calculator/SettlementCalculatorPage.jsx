@@ -367,6 +367,17 @@ export const SettlementCalculatorPage = () => {
           </span>
         </div>
 
+        {/* Bulk Action Bar placed at the TOP right above table */}
+        {selectedCount > 0 && (
+          <div className="mb-3">
+            <BulkActionBar
+              selectedCount={selectedCount}
+              onClearSelection={clearSelection}
+              onDeleteSelected={() => setShowBulkConfirm(true)}
+            />
+          </div>
+        )}
+
         {loading ? (
           <Skeleton className="h-64 w-full rounded-2xl" />
         ) : error ? (
@@ -459,13 +470,6 @@ export const SettlementCalculatorPage = () => {
           </div>
         )}
       </div>
-
-      {/* Floating Bulk Action Bar */}
-      <BulkActionBar
-        selectedCount={selectedCount}
-        onClearSelection={clearSelection}
-        onDeleteSelected={() => setShowBulkConfirm(true)}
-      />
 
       {/* Single Delete Modal */}
       <ConfirmDialog
