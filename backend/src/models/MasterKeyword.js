@@ -8,11 +8,6 @@ const masterKeywordSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
-    usageCount: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
   },
   {
     timestamps: true,

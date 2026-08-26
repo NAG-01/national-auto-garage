@@ -80,24 +80,10 @@ export const SmartAutocomplete = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSelectKeyword = async (kw) => {
+  const handleSelectKeyword = (kw) => {
     onChange?.({ target: { value: kw.word } });
     onSelect?.(kw.word);
     setIsOpen(false);
-
-    // Track usage in backend silently
-    try {
-      if (kw._id) {
-        await api.put(`/master-keywords/${kw._id}`, { incrementUsage: true });
-        // Update local cache usageCount
-        if (cachedMasterKeywords) {
-          const target = cachedMasterKeywords.find((k) => k._id === kw._id);
-          if (target) target.usageCount = (target.usageCount || 0) + 1;
-        }
-      }
-    } catch (err) {
-      // Ignore background tracking failure
-    }
   };
 
   const handleKeyDown = (e) => {
@@ -175,7 +161,7 @@ export const SmartAutocomplete = ({
                 }`}
               >
                 <div className="flex items-center gap-2 truncate">
-                  <Tag className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />
+                  <Tag className="w-3.5 h-3.5 text-[#0284C7]" />
                   <span className="truncate font-bold">{kw.word}</span>
                 </div>
               </button>

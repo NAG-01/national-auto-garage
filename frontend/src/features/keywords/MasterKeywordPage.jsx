@@ -6,7 +6,6 @@ import {
   Edit3,
   Sparkles,
   CheckCircle2,
-  TrendingUp,
 } from 'lucide-react';
 import api from '../../api/client.js';
 import { PageHeader } from '../../components/layout/PageHeader.jsx';
@@ -106,10 +105,9 @@ export const MasterKeywordPage = () => {
 
     setUpdating(true);
     try {
-      const res = await api.put(`/master-keywords/${editingKeyword._id}`, {
+      await api.put(`/master-keywords/${editingKeyword._id}`, {
         word: editWord.trim(),
       });
-      const updatedData = res.data || res.message || res;
       setKeywords((prev) =>
         prev.map((k) => (k._id === editingKeyword._id ? { ...k, word: editWord.trim() } : k))
       );
@@ -235,7 +233,7 @@ export const MasterKeywordPage = () => {
               Master Keywords Register
             </h3>
             <p className="text-xs text-slate-500 font-medium">
-              Saare configured keywords ki list aur unki typing frequency statistics.
+              Saare configured master keywords ki list.
             </p>
           </div>
 
@@ -280,8 +278,7 @@ export const MasterKeywordPage = () => {
                   checked={isAllSelected}
                   onChange={toggleSelectAll}
                 />
-                <TableHead>Keyword Word</TableHead>
-                <TableHead className="text-right">Usage Frequency</TableHead>
+                <TableHead>Master Keyword Word</TableHead>
                 <TableHead className="text-center">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -302,12 +299,6 @@ export const MasterKeywordPage = () => {
                         <Tag className="w-4 h-4 text-[#0284C7]" />
                         <span>{kw.word}</span>
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right font-bold text-slate-700">
-                      <span className="inline-flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
-                        <TrendingUp className="w-3.5 h-3.5 text-[#0284C7]" />
-                        {kw.usageCount || 0} times selected
-                      </span>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1">

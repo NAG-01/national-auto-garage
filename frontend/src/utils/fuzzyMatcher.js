@@ -62,7 +62,7 @@ const COMMON_ALIASES = {
 /**
  * Smart Fuzzy Matcher for Master Keywords
  * @param {string} query User typed input (e.g. "tayer" or "brek")
- * @param {Array} keywords Array of MasterKeyword objects [{ _id, word, category, usageCount }]
+ * @param {Array} keywords Array of MasterKeyword objects [{ _id, word }]
  * @param {number} maxResults Maximum number of recommendations to return
  */
 export const getSmartSuggestions = (query = '', keywords = [], maxResults = 8) => {
@@ -111,13 +111,9 @@ export const getSmartSuggestions = (query = '', keywords = [], maxResults = 8) =
       }
     }
 
-    // Boost score using usageCount (most frequently selected items rank higher)
-    const usageBonus = Math.min((kw.usageCount || 0) * 0.5, 5);
-    const finalScore = score - usageBonus;
-
     return {
       keyword: kw,
-      score: finalScore,
+      score,
       isMatch: score < 1000,
     };
   });

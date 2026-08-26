@@ -2,7 +2,7 @@ import { MasterKeyword } from '../models/MasterKeyword.js';
 
 /**
  * GET /api/master-keywords
- * Fetch all master keywords sorted by usageCount (desc) and word (asc)
+ * Fetch all master keywords sorted by word (asc)
  */
 export const getMasterKeywords = async (req, res) => {
   try {
@@ -14,7 +14,7 @@ export const getMasterKeywords = async (req, res) => {
     }
 
     const keywords = await MasterKeyword.find(filter)
-      .sort({ usageCount: -1, word: 1 })
+      .sort({ word: 1 })
       .lean();
 
     res.json({
@@ -83,7 +83,7 @@ export const createMasterKeyword = async (req, res) => {
 export const updateMasterKeyword = async (req, res) => {
   try {
     const { id } = req.params;
-    const { word, incrementUsage } = req.body;
+    const { word } = req.body;
 
     const keyword = await MasterKeyword.findById(id);
 
@@ -92,10 +92,6 @@ export const updateMasterKeyword = async (req, res) => {
         success: false,
         message: 'Master keyword not found',
       });
-    }
-
-    if (incrementUsage) {
-      keyword.usageCount = (keyword.usageCount || 0) + 1;
     }
 
     if (word && word.trim()) {

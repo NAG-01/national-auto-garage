@@ -306,10 +306,6 @@ async function runTests() {
     });
     assert(createdKw.word === 'Test Tyre Keyword', 'Master keyword created successfully');
 
-    createdKw.usageCount += 1;
-    await createdKw.save();
-    assert(createdKw.usageCount === 1, 'Master keyword usage frequency updated');
-
     await MasterKeyword.findByIdAndDelete(createdKw._id);
     const kwDeleted = await MasterKeyword.findById(createdKw._id);
     assert(!kwDeleted, 'Master keyword deleted successfully');
