@@ -4,8 +4,9 @@ import {
   Plus,
   IndianRupee,
   Calendar,
-  CreditCard,
   User,
+  Building2,
+  BookOpen,
   Filter,
 } from 'lucide-react';
 import api from '../../api/client.js';
@@ -32,63 +33,46 @@ import { formatINR, formatDate } from '../../utils/formatters.js';
 export const ExpenseListPage = () => {
   const [expenses, setExpenses] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [accountTotals, setAccountTotals] = useState({
+    garage: 0,
+    imran: 0,
+    naim: 0,
+  });
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Filters
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [paidByFilter, setPaidByFilter] = useState('');
+  // Notebook Tab Filter: 'ALL' | 'GARAGE' | 'IMRAN' | 'NAIM'
+  const [activeAccountTab, setActiveAccountTab] = useState('ALL');
   const [page, setPage] = useState(1);
-
-  // Masters
-  const [categories, setCategories] = useState([]);
-  const [partners, setPartners] = useState([]);
 
   // Create Modal & Save Confirm
   const [modalOpen, setModalOpen] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
   const [formData, setFormData] = useState({
-    category: 'RENT',
+    account: 'GARAGE_ACCOUNT', // 'GARAGE_ACCOUNT' | 'PARTNER_A' (Imran) | 'PARTNER_B' (Naim)
+    category: 'MISCELLANEOUS',
     amount: '',
-    date: new Date().toISOString().split('T')[0],
     description: '',
     paymentMethod: 'CASH',
-    paidBy: 'GARAGE_ACCOUNT',
-    referenceNumber: '',
+    date: new Date().toISOString().split('T')[0],
     notes: '',
   });
   const [submitting, setSubmitting] = useState(false);
 
   const toast = useToast();
 
-  const loadSettingsAndPartners = async () => {
-    try {
-      const [settingsRes, partnerRes] = await Promise.all([
-        api.get('/settings'),
-        api.get('/partnership'),
-      ]);
-
-      const catList = settingsRes.data?.settings?.expenseCategories ||
-        settingsRes.data?.expenseCategories ||
-        ['RENT', 'ELECTRICITY', 'SALARY', 'PARTS_SUPPLIES', 'TOOLS_EQUIPMENT', 'TEA_SNACKS', 'TRANSPORT', 'MISC'];
-      setCategories(catList);
-
-      const partnerList = Array.isArray(partnerRes.data) ? partnerRes.data : (partnerRes.data?.partners || []);
-      setPartners(partnerList);
-    } catch (err) {
-      console.error('Failed to load expense masters:', err);
-      setCategories(['RENT', 'ELECTRICITY', 'SALARY', 'PARTS_SUPPLIES', 'TOOLS_EQUIPMENT', 'TEA_SNACKS', 'TRANSPORT', 'MISC']);
-    }
-  };
-
   const fetchExpenses = async () => {
     try {
       setLoading(true);
+      let paidByQuery = '';
+      if (activeAccountTab === 'GARAGE') paidByQuery = 'GARAGE_ACCOUNT';
+      if (activeAccountTab === 'IMRAN') paidByQuery = 'PARTNER_A';
+      if (activeAccountTab === 'NAIM') paidByQuery = 'PARTNER_B';
+
       const res = await api.get('/expenses', {
         params: {
-          category: categoryFilter,
-          paidBy: paidByFilter,
+          paidBy: paidByQuery,
           page,
           limit: 15,
         },
@@ -103,6 +87,10 @@ export const ExpenseListPage = () => {
 
       setExpenses(expList);
       setTotalAmount(payload.totalAmount || res.totalAmount || 0);
+
+      if (payload.accountTotals) {
+        setAccountTotals(payload.accountTotals);
+      }
       setPagination(res.meta || res.pagination || payload.pagination || null);
     } catch (err) {
       console.error('Failed to fetch expenses:', err);
@@ -113,24 +101,19 @@ export const ExpenseListPage = () => {
   };
 
   useEffect(() => {
-    loadSettingsAndPartners();
-  }, []);
-
-  useEffect(() => {
     fetchExpenses();
-  }, [categoryFilter, paidByFilter, page]);
+  }, [activeAccountTab, page]);
 
   const handleFormSubmit = (e) => {
     if (e) e.preventDefault();
     if (!formData.amount || Number(formData.amount) <= 0) {
-      toast.error('Expense amount must be greater than zero.');
+      toast.error('Kripya sahi paise (amount) bhare.');
       return;
     }
     if (!formData.description.trim()) {
-      toast.error('Please enter a description for the expense.');
+      toast.error('Kripya paise kyu liye (detail) bhare.');
       return;
     }
-    // Prompt confirmation before executing save action
     setShowSaveConfirm(true);
   };
 
@@ -139,34 +122,73 @@ export const ExpenseListPage = () => {
     setSubmitting(true);
     try {
       await api.post('/expenses', {
-        ...formData,
+        category: formData.category || 'MISCELLANEOUS',
         amount: Number(formData.amount),
+        description: formData.description.trim(),
+        paidBy: formData.account,
+        paymentMethod: formData.paymentMethod,
+        date: formData.date,
+        notes: formData.notes,
       });
-      toast.success('Operating expense recorded successfully');
+
+      const accountLabel =
+        formData.account === 'PARTNER_A'
+          ? 'Imran Pathan'
+          : formData.account === 'PARTNER_B'
+          ? 'Naim Pathan'
+          : 'Garage';
+
+      toast.success(`Entry ${accountLabel} ke khate me save ho gayi!`);
       setModalOpen(false);
       setFormData({
-        category: categories[0] || 'RENT',
+        account: 'GARAGE_ACCOUNT',
+        category: 'MISCELLANEOUS',
         amount: '',
-        date: new Date().toISOString().split('T')[0],
         description: '',
         paymentMethod: 'CASH',
-        paidBy: 'GARAGE_ACCOUNT',
-        referenceNumber: '',
+        date: new Date().toISOString().split('T')[0],
         notes: '',
       });
       fetchExpenses();
     } catch (err) {
-      toast.error(err.message || 'Failed to record expense.');
+      toast.error(err.message || 'Entry save karne me error aaya.');
     } finally {
       setSubmitting(false);
     }
   };
 
+  // Helper to format Account Label & Styling
+  const getAccountBadge = (paidByKey) => {
+    const key = String(paidByKey || '').toUpperCase();
+    if (key.includes('IMRAN') || key === 'PARTNER_A') {
+      return (
+        <span className="font-bold text-xs bg-rose-50 text-rose-700 px-2.5 py-1 rounded-lg border border-rose-200 inline-flex items-center gap-1">
+          <User className="w-3 h-3 text-rose-600" />
+          Imran Pathan
+        </span>
+      );
+    }
+    if (key.includes('NAIM') || key === 'PARTNER_B') {
+      return (
+        <span className="font-bold text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg border border-indigo-200 inline-flex items-center gap-1">
+          <User className="w-3 h-3 text-indigo-600" />
+          Naim Pathan
+        </span>
+      );
+    }
+    return (
+      <span className="font-bold text-xs bg-slate-900 text-white px-2.5 py-1 rounded-lg shadow-2xs inline-flex items-center gap-1">
+        <Building2 className="w-3 h-3 text-slate-300" />
+        Garage Expense
+      </span>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Operating Expenses (OPEX)"
-        subtitle="Track daily workshop running costs (Rent, Electricity, Technician Salaries, Tools, Transport, etc.) and payment attribution."
+        title="Expense Diary / Notebook (OPEX)"
+        subtitle="3 Accounts: Garage, Imran Pathan, aur Naim Pathan ke paise aur kharche diary ki tarah manage kare."
         actions={
           <Button
             variant="accent"
@@ -174,237 +196,314 @@ export const ExpenseListPage = () => {
             icon={Plus}
             onClick={() => setModalOpen(true)}
           >
-            Record Expense
+            Paise Add Kare (Entry)
           </Button>
         }
       />
 
-      {/* KPI Overview */}
+      {/* 3 Main Notebook Account Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <KpiCard
-          title="Total Period Expenses"
-          value={formatINR(totalAmount)}
-          subtitle="Direct operational running costs"
-          icon={IndianRupee}
-          variant="danger"
-        />
-
-        <KpiCard
-          title="Total Expense Records"
-          value={pagination?.totalRecords || expenses.length || 0}
-          subtitle="Expense vouchers logged"
-          icon={Receipt}
-          variant="default"
-        />
-
-        <KpiCard
-          title="Expense Categories"
-          value={categories.length}
-          subtitle="Rent, power, salaries, tools..."
-          icon={Filter}
-          variant="info"
-        />
-      </div>
-
-      {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-3 rounded-xl border border-slate-200">
-        <div className="flex items-center gap-3 flex-wrap">
-          <Select
-            value={categoryFilter}
-            onChange={(e) => {
-              setCategoryFilter(e.target.value);
-              setPage(1);
-            }}
-            className="w-48 text-xs py-1.5"
-          >
-            <option value="">All Categories</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c.replace('_', ' ')}
-              </option>
-            ))}
-          </Select>
-
-          <Select
-            value={paidByFilter}
-            onChange={(e) => {
-              setPaidByFilter(e.target.value);
-              setPage(1);
-            }}
-            className="w-48 text-xs py-1.5"
-          >
-            <option value="">All Payers</option>
-            <option value="GARAGE_ACCOUNT">Garage Account</option>
-            {partners.map((p) => (
-              <option key={p._id || p.code} value={p.code}>
-                {p.name} (Personal)
-              </option>
-            ))}
-          </Select>
+        {/* Garage Card */}
+        <div
+          onClick={() => setActiveAccountTab('GARAGE')}
+          className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+            activeAccountTab === 'GARAGE'
+              ? 'bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-slate-900/20'
+              : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300 shadow-2xs'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider opacity-80 flex items-center gap-1.5">
+              <Building2 className="w-4 h-4" />
+              Garage Expenses
+            </span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-200">
+              Account 1
+            </span>
+          </div>
+          <div className="text-2xl font-black mt-2 font-mono">
+            {formatINR(accountTotals.garage)}
+          </div>
+          <p className="text-[11px] opacity-75 mt-1">Workshop running costs & bills</p>
         </div>
 
-        {(categoryFilter || paidByFilter) && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setCategoryFilter('');
-              setPaidByFilter('');
-              setPage(1);
-            }}
-          >
-            Clear Filters
-          </Button>
-        )}
+        {/* Imran Pathan Card */}
+        <div
+          onClick={() => setActiveAccountTab('IMRAN')}
+          className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+            activeAccountTab === 'IMRAN'
+              ? 'bg-rose-600 text-white border-rose-600 shadow-md ring-2 ring-rose-600/20'
+              : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300 shadow-2xs'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider opacity-90 flex items-center gap-1.5">
+              <User className="w-4 h-4" />
+              Imran Pathan Expenses
+            </span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-700 text-rose-100">
+              Account 2
+            </span>
+          </div>
+          <div className="text-2xl font-black mt-2 font-mono">
+            {formatINR(accountTotals.imran)}
+          </div>
+          <p className="text-[11px] opacity-85 mt-1">Imran bhai ke paise / entries</p>
+        </div>
+
+        {/* Naim Pathan Card */}
+        <div
+          onClick={() => setActiveAccountTab('NAIM')}
+          className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+            activeAccountTab === 'NAIM'
+              ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-600/20'
+              : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300 shadow-2xs'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider opacity-90 flex items-center gap-1.5">
+              <User className="w-4 h-4" />
+              Naim Pathan Expenses
+            </span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-700 text-indigo-100">
+              Account 3
+            </span>
+          </div>
+          <div className="text-2xl font-black mt-2 font-mono">
+            {formatINR(accountTotals.naim)}
+          </div>
+          <p className="text-[11px] opacity-85 mt-1">Naim bhai ke paise / entries</p>
+        </div>
       </div>
 
-      {/* Expense List */}
+      {/* Notebook Page Tabs Navigation */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => {
+            setActiveAccountTab('ALL');
+            setPage(1);
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            activeAccountTab === 'ALL'
+              ? 'bg-slate-900 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          <BookOpen className="w-4 h-4" />
+          <span>Sabhi Entries (All Records)</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setActiveAccountTab('GARAGE');
+            setPage(1);
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            activeAccountTab === 'GARAGE'
+              ? 'bg-slate-900 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          <Building2 className="w-4 h-4" />
+          <span>1. Garage Page</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setActiveAccountTab('IMRAN');
+            setPage(1);
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            activeAccountTab === 'IMRAN'
+              ? 'bg-rose-600 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          <User className="w-4 h-4" />
+          <span>2. Imran Pathan Page</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setActiveAccountTab('NAIM');
+            setPage(1);
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            activeAccountTab === 'NAIM'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          <User className="w-4 h-4" />
+          <span>3. Naim Pathan Page</span>
+        </button>
+      </div>
+
+      {/* Entry Table (Notebook Page View) */}
       {loading ? (
-        <TableSkeleton rows={6} cols={7} />
+        <TableSkeleton rows={6} cols={6} />
       ) : expenses.length === 0 ? (
         <EmptyState
           icon={Receipt}
-          title="No expenses recorded"
-          description="Record daily workshop utility bills, rent, technician salaries, and operational costs."
-          actionText="Record Expense"
+          title="Is page par koi entry nahi hai"
+          description="Naye paise ya kharcha add karne ke liye 'Paise Add Kare' button dabaye."
+          actionText="Paise Add Kare"
           onAction={() => setModalOpen(true)}
         />
       ) : (
-        <div>
+        <div className="space-y-3">
           <Table>
             <TableHeader>
               <TableRow hover={false}>
+                <TableHead>Tareekh & Samay (Date & Time)</TableHead>
                 <TableHead>Voucher No.</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Paid By</TableHead>
-                <TableHead>Method</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead className="text-right">Date</TableHead>
+                <TableHead>Kiske Liye (Account)</TableHead>
+                <TableHead>Kyu Liye (Detail / Purpose)</TableHead>
+                <TableHead>Payment Mode</TableHead>
+                <TableHead className="text-right">Paise (Amount ₹)</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {expenses.map((exp) => {
-                const isPartnerPaid = exp.paidBy !== 'GARAGE_ACCOUNT';
-                return (
-                  <TableRow key={exp._id} hover={false}>
-                    <TableCell>
-                      <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded">
-                        {exp.expenseNumber || `EXP-${exp._id?.slice(-4)}`}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="default">{exp.category?.replace('_', ' ')}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium text-slate-800 text-xs max-w-sm">
-                        {exp.description}
-                      </div>
-                      {exp.notes && <div className="text-[11px] text-slate-400 mt-0.5">{exp.notes}</div>}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`text-xs font-bold px-2 py-0.5 rounded ${
-                          isPartnerPaid
-                            ? 'bg-slate-900 text-white shadow-xs'
-                            : 'text-slate-700 bg-slate-100 border border-slate-200'
-                        }`}
-                      >
-                        {exp.paidBy?.replace('_', ' ')}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-xs text-slate-600 font-mono">{exp.paymentMethod}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-xs font-extrabold text-rose-600">
-                        {formatINR(exp.amount)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right text-xs text-slate-500 font-medium">
-                      {formatDate(exp.date)}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+              {expenses.map((exp) => (
+                <TableRow key={exp._id} hover={false}>
+                  <TableCell className="text-xs text-slate-600 font-medium whitespace-nowrap">
+                    {formatDate(exp.date || exp.createdAt)}
+                  </TableCell>
+
+                  <TableCell>
+                    <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded">
+                      {exp.expenseNumber || `EXP-${exp._id?.slice(-4)}`}
+                    </span>
+                  </TableCell>
+
+                  <TableCell>{getAccountBadge(exp.paidBy)}</TableCell>
+
+                  <TableCell>
+                    <div className="font-semibold text-slate-900 text-xs max-w-sm">
+                      {exp.description}
+                    </div>
+                    {exp.notes && (
+                      <div className="text-[11px] text-slate-400 mt-0.5">{exp.notes}</div>
+                    )}
+                  </TableCell>
+
+                  <TableCell>
+                    <span className="text-xs text-slate-600 font-mono font-semibold">
+                      {exp.paymentMethod || 'CASH'}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="text-right">
+                    <span className="text-xs font-black text-rose-600 font-mono text-sm">
+                      {formatINR(exp.amount)}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
 
-          {pagination && <Pagination pagination={pagination} onPageChange={(newPage) => setPage(newPage)} />}
+          {pagination && (
+            <Pagination pagination={pagination} onPageChange={(newPage) => setPage(newPage)} />
+          )}
         </div>
       )}
 
-      {/* Record Expense Modal */}
+      {/* Simple Add Expense Modal */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         confirmOnClose={true}
-        title="Record Operating Expense (OPEX)"
-        subtitle="Log workshop utility bills, rent, supplies, or technician salaries"
+        title="Paise / Kharcha Add Kare"
+        subtitle="3 me se ek account chune, kitne paise liye aur kyu liye detail bhare"
         footer={
           <div className="flex items-center justify-end gap-2 w-full">
             <ModalCancelButton disabled={submitting}>Cancel</ModalCancelButton>
             <Button
               type="submit"
-              form="expense-form"
+              form="expense-entry-form"
               variant="accent"
               loading={submitting}
             >
-              Save Expense Record
+              Save Entry
             </Button>
           </div>
         }
       >
-        <form id="expense-form" onSubmit={handleFormSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Select
-              label="Expense Category"
-              required
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            >
-              {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c.replace('_', ' ')}
-                </option>
-              ))}
-            </Select>
+        <form id="expense-entry-form" onSubmit={handleFormSubmit} className="space-y-4">
+          {/* 1. Account Selection (Kiske Liye) */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-extrabold text-slate-900 uppercase tracking-wider">
+              1. Kiske Liye Paise Add Karne Hain? <span className="text-rose-500">*</span>
+            </label>
 
-            <Input
-              label="Expense Amount (₹)"
-              type="number"
-              min="1"
-              step="0.01"
-              required
-              placeholder="e.g. 2400"
-              value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-            />
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, account: 'GARAGE_ACCOUNT' })}
+                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition-all ${
+                  formData.account === 'GARAGE_ACCOUNT'
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-sm ring-2 ring-slate-900/20'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <Building2 className="w-5 h-5" />
+                <span>Garage</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, account: 'PARTNER_A' })}
+                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition-all ${
+                  formData.account === 'PARTNER_A'
+                    ? 'bg-rose-600 text-white border-rose-600 shadow-sm ring-2 ring-rose-600/20'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <User className="w-5 h-5" />
+                <span>Imran Pathan</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, account: 'PARTNER_B' })}
+                className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition-all ${
+                  formData.account === 'PARTNER_B'
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm ring-2 ring-indigo-600/20'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <User className="w-5 h-5" />
+                <span>Naim Pathan</span>
+              </button>
+            </div>
           </div>
 
+          {/* 2. Kyu Liye (Purpose / Detail) */}
           <Input
-            label="Description / Purpose"
+            label="2. Kyu Liye? (Detail / Purpose)"
             required
-            placeholder="e.g. Monthly workshop electricity bill (air compressor + lighting)"
+            placeholder="e.g. Chai nashta, Workshop kiraya, Personal, Petrol, Bill"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Select
-              label="Paid By (Attribution)"
+          {/* 3. Kitne Liye (Amount) & Payment Method */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Input
+              label="3. Kitne Paise Liye? (Amount ₹)"
+              type="number"
+              min="1"
+              step="0.01"
               required
-              value={formData.paidBy}
-              onChange={(e) => setFormData({ ...formData, paidBy: e.target.value })}
-              hint="If paid by a partner, it will be automatically credited during monthly settlement"
-            >
-              <option value="GARAGE_ACCOUNT">Garage Account</option>
-              {partners.map((p) => (
-                <option key={p._id || p.code} value={p.code}>
-                  {p.name} (Personal Account)
-                </option>
-              ))}
-            </Select>
+              placeholder="e.g. 500"
+              value={formData.amount}
+              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+            />
 
             <Select
               label="Payment Method"
@@ -414,30 +513,24 @@ export const ExpenseListPage = () => {
             >
               <option value="CASH">Cash</option>
               <option value="UPI">UPI</option>
-              <option value="BANK_TRANSFER">Bank Transfer / NEFT</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
               <option value="CARD">Card</option>
-              <option value="OTHER">Other</option>
             </Select>
-
-            <Input
-              label="Expense Date"
-              type="date"
-              required
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            />
           </div>
 
+          {/* 4. Date */}
           <Input
-            label="Reference / Bill / Txn Number"
-            placeholder="e.g. ELEC-REC-9814"
-            value={formData.referenceNumber}
-            onChange={(e) => setFormData({ ...formData, referenceNumber: e.target.value })}
+            label="Tareekh (Date)"
+            type="date"
+            required
+            value={formData.date}
+            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
           />
 
+          {/* 5. Additional Notes */}
           <Textarea
-            label="Additional Notes"
-            placeholder="Internal expense details or notes"
+            label="Extra Notes (Optional)"
+            placeholder="Koi extra detail likhni ho to yaha likhe"
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
           />
@@ -449,10 +542,16 @@ export const ExpenseListPage = () => {
         isOpen={showSaveConfirm}
         onClose={() => setShowSaveConfirm(false)}
         onConfirm={executeSaveExpense}
-        title="Save Operating Expense?"
-        message={`Save expense record of ${formatINR(Number(formData.amount || 0))} for "${formData.description}"?`}
-        confirmText="Yes, Save Record"
-        cancelText="Review Form"
+        title="Entry Save Kare?"
+        message={`${
+          formData.account === 'PARTNER_A'
+            ? 'Imran Pathan'
+            : formData.account === 'PARTNER_B'
+            ? 'Naim Pathan'
+            : 'Garage'
+        } ke khate me ${formatINR(Number(formData.amount || 0))} ki entry save kare ("${formData.description}")?`}
+        confirmText="Haan, Entry Save Kare"
+        cancelText="Check Kare"
         variant="success"
         loading={submitting}
       />

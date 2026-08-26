@@ -14,7 +14,7 @@ export class ExpenseController {
   static async list(req, res, next) {
     try {
       const { category, paidBy, startDate, endDate, page, limit } = req.query;
-      const { expenses, totalAmount, pagination } = await ExpenseService.getExpenses({
+      const { expenses, totalAmount, accountTotals, pagination } = await ExpenseService.getExpenses({
         category,
         paidBy,
         startDate,
@@ -22,7 +22,7 @@ export class ExpenseController {
         page,
         limit,
       });
-      return ApiResponse.success(res, 'Expenses retrieved successfully', { expenses, totalAmount }, 200, pagination);
+      return ApiResponse.success(res, 'Expenses retrieved successfully', { expenses, totalAmount, accountTotals }, 200, pagination);
     } catch (err) {
       next(err);
     }

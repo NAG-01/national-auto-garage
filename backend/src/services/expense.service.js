@@ -98,9 +98,40 @@ export class ExpenseService {
     ]);
     const totalAmount = roundMoney(totalAmountAgg[0]?.total || 0);
 
+    // Compute 3 main account totals across all records
+    const accountTotalsAgg = await Expense.aggregate([
+      {
+        $group: {
+          _id: '$paidBy',
+          total: { $sum: '$amount' },
+        },
+      },
+    ]);
+
+    let garageTotal = 0;
+    let imranTotal = 0;
+    let naimTotal = 0;
+
+    accountTotalsAgg.forEach((item) => {
+      const key = String(item._id || '').toUpperCase();
+      const val = roundMoney(item.total || 0);
+      if (key.includes('IMRAN') || key === 'PARTNER_A') {
+        imranTotal += val;
+      } else if (key.includes('NAIM') || key === 'PARTNER_B') {
+        naimTotal += val;
+      } else {
+        garageTotal += val;
+      }
+    });
+
     return {
       expenses,
       totalAmount,
+      accountTotals: {
+        garage: roundMoney(garageTotal),
+        imran: roundMoney(imranTotal),
+        naim: roundMoney(naimTotal),
+      },
       pagination: {
         page: Number(page),
         limit: Number(limit),
