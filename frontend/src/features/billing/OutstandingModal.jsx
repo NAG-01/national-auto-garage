@@ -130,13 +130,14 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      confirmOnClose={true}
       title={isEdit ? 'Baaki Record Edit Karein' : '+ Naya Baaki / Dues Record Add Karein'}
       footer={
         <div className="flex items-center justify-end gap-3 w-full">
           <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
             Cancel
           </Button>
-          <Button type="submit" form="outstanding-dues-form" loading={submitting}>
+          <Button type="submit" form="outstanding-dues-form" variant="accent" loading={submitting}>
             {isEdit ? 'Update Record' : 'Save Record'}
           </Button>
         </div>

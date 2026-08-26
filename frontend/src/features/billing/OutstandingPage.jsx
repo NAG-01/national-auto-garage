@@ -192,7 +192,7 @@ export const OutstandingPage = () => {
         title="Customer Outstanding & Dues Register"
         subtitle="Kiske paas kitne paise baaki hain unka manual text record rakhein (Add, Edit, Delete)"
         actions={
-          <Button icon={Plus} onClick={handleOpenAddModal}>
+          <Button variant="accent" icon={Plus} onClick={handleOpenAddModal}>
             + Naya Baaki / Dues Add Karein
           </Button>
         }
