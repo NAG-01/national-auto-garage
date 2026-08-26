@@ -7,6 +7,8 @@ import {
   User,
   Building2,
   BookOpen,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 import api from '../../api/client.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -42,9 +44,13 @@ export const ExpenseListPage = () => {
   const [activeAccountTab, setActiveAccountTab] = useState('ALL');
   const [page, setPage] = useState(1);
 
-  // Create Modal & Save Confirm
+  // Create & Edit Modal States
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(null);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+
+  // Delete State
+  const [deletingExpense, setDeletingExpense] = useState(null);
 
   const [formData, setFormData] = useState({
     account: 'GARAGE_ACCOUNT', // 'GARAGE_ACCOUNT' | 'PARTNER_A' (Imran) | 'PARTNER_B' (Naim)
@@ -98,13 +104,40 @@ export const ExpenseListPage = () => {
     fetchExpenses();
   }, [activeAccountTab, page]);
 
+  const handleOpenAddModal = () => {
+    setEditingExpense(null);
+    setFormData({
+      account: 'GARAGE_ACCOUNT',
+      amount: '',
+      description: '',
+      date: new Date().toISOString().split('T')[0],
+    });
+    setModalOpen(true);
+  };
+
+  const handleOpenEditModal = (exp) => {
+    setEditingExpense(exp);
+
+    let acct = 'GARAGE_ACCOUNT';
+    const key = String(exp.paidBy || '').toUpperCase();
+    if (key.includes('IMRAN') || key === 'PARTNER_A') acct = 'PARTNER_A';
+    if (key.includes('NAIM') || key === 'PARTNER_B') acct = 'PARTNER_B';
+
+    setFormData({
+      account: acct,
+      amount: String(exp.amount || ''),
+      description: exp.description === 'Expense Entry' ? '' : exp.description || '',
+      date: exp.date ? new Date(exp.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    });
+    setModalOpen(true);
+  };
+
   const handleFormSubmit = (e) => {
     if (e) e.preventDefault();
     if (!formData.amount || Number(formData.amount) <= 0) {
       toast.error('Kripya sahi paise (amount) bhare.');
       return;
     }
-    // Detail is now OPTIONAL as requested!
     setShowSaveConfirm(true);
   };
 
@@ -114,24 +147,38 @@ export const ExpenseListPage = () => {
     try {
       const finalDescription = formData.description.trim() || 'Expense Entry';
 
-      await api.post('/expenses', {
-        category: 'OTHER',
-        amount: Number(formData.amount),
-        description: finalDescription,
-        paidBy: formData.account,
-        paymentMethod: 'CASH',
-        date: formData.date,
-      });
+      if (editingExpense) {
+        // Edit Existing Entry
+        await api.put(`/expenses/${editingExpense._id}`, {
+          amount: Number(formData.amount),
+          description: finalDescription,
+          paidBy: formData.account,
+          date: formData.date,
+        });
+        toast.success('Expense entry successfully update ho gayi!');
+      } else {
+        // Create New Entry
+        await api.post('/expenses', {
+          category: 'OTHER',
+          amount: Number(formData.amount),
+          description: finalDescription,
+          paidBy: formData.account,
+          paymentMethod: 'CASH',
+          date: formData.date,
+        });
 
-      const accountLabel =
-        formData.account === 'PARTNER_A'
-          ? 'Imran Pathan'
-          : formData.account === 'PARTNER_B'
-          ? 'Naim Pathan'
-          : 'Garage';
+        const accountLabel =
+          formData.account === 'PARTNER_A'
+            ? 'Imran Pathan'
+            : formData.account === 'PARTNER_B'
+            ? 'Naim Pathan'
+            : 'Garage';
 
-      toast.success(`Entry ${accountLabel} ke khate me save ho gayi!`);
+        toast.success(`Entry ${accountLabel} ke khate me save ho gayi!`);
+      }
+
       setModalOpen(false);
+      setEditingExpense(null);
       setFormData({
         account: 'GARAGE_ACCOUNT',
         amount: '',
@@ -141,6 +188,21 @@ export const ExpenseListPage = () => {
       fetchExpenses();
     } catch (err) {
       toast.error(err.message || 'Entry save karne me error aaya.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const executeDeleteExpense = async () => {
+    if (!deletingExpense) return;
+    setSubmitting(true);
+    try {
+      await api.delete(`/expenses/${deletingExpense._id}`);
+      toast.success('Expense entry delete ho gayi!');
+      setDeletingExpense(null);
+      fetchExpenses();
+    } catch (err) {
+      toast.error(err.message || 'Entry delete karne me error aaya.');
     } finally {
       setSubmitting(false);
     }
@@ -183,7 +245,7 @@ export const ExpenseListPage = () => {
             variant="accent"
             size="sm"
             icon={Plus}
-            onClick={() => setModalOpen(true)}
+            onClick={handleOpenAddModal}
           >
             Paise Add Kare (Entry)
           </Button>
@@ -334,14 +396,14 @@ export const ExpenseListPage = () => {
 
       {/* Entry Table (Notebook Page View) */}
       {loading ? (
-        <TableSkeleton rows={6} cols={5} />
+        <TableSkeleton rows={6} cols={6} />
       ) : expenses.length === 0 ? (
         <EmptyState
           icon={Receipt}
           title="Is page par koi entry nahi hai"
           description="Naye paise ya kharcha add karne ke liye 'Paise Add Kare' button dabaye."
           actionText="Paise Add Kare"
-          onAction={() => setModalOpen(true)}
+          onAction={handleOpenAddModal}
         />
       ) : (
         <div className="space-y-3">
@@ -353,6 +415,7 @@ export const ExpenseListPage = () => {
                 <TableHead>Kiske Liye (Account)</TableHead>
                 <TableHead>Kyu Liye (Detail / Purpose)</TableHead>
                 <TableHead className="text-right">Paise (Amount ₹)</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -381,6 +444,28 @@ export const ExpenseListPage = () => {
                       {formatINR(exp.amount)}
                     </span>
                   </TableCell>
+
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditModal(exp)}
+                        className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                        title="Edit Entry"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setDeletingExpense(exp)}
+                        className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                        title="Delete Entry"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -392,13 +477,13 @@ export const ExpenseListPage = () => {
         </div>
       )}
 
-      {/* Simple Add Expense Modal */}
+      {/* Add / Edit Expense Modal */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         confirmOnClose={true}
-        title="Paise / Kharcha Add Kare"
-        subtitle="3 me se ek account chune aur kitne paise liye bhare"
+        title={editingExpense ? `Edit Entry: ${editingExpense.expenseNumber}` : 'Paise / Kharcha Add Kare'}
+        subtitle={editingExpense ? 'Is entry ke paise, account ya detail change kare' : '3 me se ek account chune aur kitne paise liye bhare'}
         footer={
           <div className="flex items-center justify-end gap-2 w-full">
             <ModalCancelButton disabled={submitting}>Cancel</ModalCancelButton>
@@ -408,7 +493,7 @@ export const ExpenseListPage = () => {
               variant="accent"
               loading={submitting}
             >
-              Save Entry
+              {editingExpense ? 'Update Entry' : 'Save Entry'}
             </Button>
           </div>
         }
@@ -498,17 +583,30 @@ export const ExpenseListPage = () => {
         isOpen={showSaveConfirm}
         onClose={() => setShowSaveConfirm(false)}
         onConfirm={executeSaveExpense}
-        title="Entry Save Kare?"
+        title={editingExpense ? 'Update Entry?' : 'Entry Save Kare?'}
         message={`${
           formData.account === 'PARTNER_A'
             ? 'Imran Pathan'
             : formData.account === 'PARTNER_B'
             ? 'Naim Pathan'
             : 'Garage'
-        } ke khate me ${formatINR(Number(formData.amount || 0))} ki entry save kare?`}
-        confirmText="Haan, Entry Save Kare"
+        } ke khate me ${formatINR(Number(formData.amount || 0))} ki entry ${editingExpense ? 'update' : 'save'} kare?`}
+        confirmText={editingExpense ? 'Haan, Update Kare' : 'Haan, Save Kare'}
         cancelText="Check Kare"
         variant="success"
+        loading={submitting}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(deletingExpense)}
+        onClose={() => setDeletingExpense(null)}
+        onConfirm={executeDeleteExpense}
+        title="Delete Expense Entry?"
+        message={`Kyah aap sach me voucher ${deletingExpense?.expenseNumber || ''} (${formatINR(deletingExpense?.amount || 0)}) ko delete karna chahte hain? Ye entry permanently delete ho jayegi.`}
+        confirmText="Yes, Delete Entry"
+        cancelText="Cancel"
+        variant="danger"
         loading={submitting}
       />
     </div>

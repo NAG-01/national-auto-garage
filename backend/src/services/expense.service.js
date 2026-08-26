@@ -149,4 +149,62 @@ export class ExpenseService {
     if (!expense) throw ApiError.notFound('Expense not found');
     return expense;
   }
+
+  static async updateExpense(id, updateData, user) {
+    const expense = await Expense.findById(id);
+    if (!expense) throw ApiError.notFound('Expense entry not found');
+
+    if (updateData.amount !== undefined) {
+      const amount = roundMoney(updateData.amount);
+      if (amount <= 0) throw ApiError.badRequest('Expense amount must be positive');
+      expense.amount = amount;
+    }
+
+    if (updateData.description !== undefined) {
+      expense.description = updateData.description.trim() || 'Expense Entry';
+    }
+
+    if (updateData.paidBy !== undefined) {
+      expense.paidBy = updateData.paidBy;
+    }
+
+    if (updateData.date) {
+      expense.date = new Date(updateData.date);
+    }
+
+    if (updateData.notes !== undefined) {
+      expense.notes = updateData.notes;
+    }
+
+    await expense.save();
+
+    await logAudit({
+      userId: user?._id || 'ADMIN',
+      userName: user?.name || user?.username || 'Admin',
+      userRole: user?.role || 'ADMIN',
+      action: 'UPDATE_EXPENSE',
+      entityType: 'EXPENSE',
+      entityId: expense._id,
+      summary: `Updated expense ${expense.expenseNumber} (₹${expense.amount}) paid by ${expense.paidBy}`,
+    });
+
+    return expense;
+  }
+
+  static async deleteExpense(id, user) {
+    const expense = await Expense.findByIdAndDelete(id);
+    if (!expense) throw ApiError.notFound('Expense entry not found');
+
+    await logAudit({
+      userId: user?._id || 'ADMIN',
+      userName: user?.name || user?.username || 'Admin',
+      userRole: user?.role || 'ADMIN',
+      action: 'DELETE_EXPENSE',
+      entityType: 'EXPENSE',
+      entityId: id,
+      summary: `Deleted expense ${expense.expenseNumber} (₹${expense.amount}) paid by ${expense.paidBy}`,
+    });
+
+    return { success: true };
+  }
 }

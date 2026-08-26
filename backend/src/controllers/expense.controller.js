@@ -36,4 +36,22 @@ export class ExpenseController {
       next(err);
     }
   }
+
+  static async update(req, res, next) {
+    try {
+      const expense = await ExpenseService.updateExpense(req.params.id, req.body, req.user);
+      return ApiResponse.success(res, 'Expense updated successfully', expense);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async delete(req, res, next) {
+    try {
+      await ExpenseService.deleteExpense(req.params.id, req.user);
+      return ApiResponse.success(res, 'Expense deleted successfully', null);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
