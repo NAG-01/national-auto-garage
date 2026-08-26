@@ -20,7 +20,6 @@ import { InvoiceCreatePage } from './features/billing/InvoiceCreatePage.jsx';
 import { InvoiceDetailPage } from './features/billing/InvoiceDetailPage.jsx';
 import { OutstandingPage } from './features/billing/OutstandingPage.jsx';
 import { ExpenseListPage } from './features/expenses/ExpenseListPage.jsx';
-import { ReportsPage } from './features/reports/ReportsPage.jsx';
 import { PageSkeleton } from './components/ui/Skeleton.jsx';
 
 const ProtectedRoute = () => {
@@ -114,9 +113,6 @@ export default function App() {
 
         {/* Operating Expenses (OPEX) */}
         <Route path="/expenses" element={<ExpenseListPage />} />
-
-        {/* Workshop Reports & Financial Analytics */}
-        <Route path="/reports" element={<ReportsPage />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

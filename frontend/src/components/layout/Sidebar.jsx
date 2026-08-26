@@ -29,7 +29,6 @@ export const Sidebar = ({ onClose }) => {
     { label: 'Bills', to: '/invoices', icon: FileText },
     { label: 'Customer Outstanding', to: '/outstanding', icon: CreditCard, highlight: true },
     { label: 'Operating Expenses', to: '/expenses', icon: Receipt },
-    { label: 'Reports & Analytics', to: '/reports', icon: BarChart3 },
   ];
 
   const renderLink = (item) => {
