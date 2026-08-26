@@ -1,7 +1,17 @@
 import axios from 'axios';
 
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:5000/api';
+  }
+  return '/api';
+};
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
   },
@@ -26,7 +36,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('nag_token');
       localStorage.removeItem('nag_user');
-      if (window.location.pathname !== '/login') {
+      if (!window.location.hash.includes('login') && window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
     }
