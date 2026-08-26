@@ -115,7 +115,7 @@ export const ExpenseListPage = () => {
       const finalDescription = formData.description.trim() || 'Expense Entry';
 
       await api.post('/expenses', {
-        category: 'MISCELLANEOUS',
+        category: 'OTHER',
         amount: Number(formData.amount),
         description: finalDescription,
         paidBy: formData.account,

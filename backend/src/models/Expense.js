@@ -12,8 +12,8 @@ const expenseSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: EXPENSE_CATEGORIES,
-      required: true,
+      default: 'OTHER',
+      trim: true,
       index: true,
     },
     amount: {
