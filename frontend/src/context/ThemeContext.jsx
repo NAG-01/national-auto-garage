@@ -9,16 +9,8 @@ export const ThemeProvider = ({ children }) => {
     if (savedTheme === 'dark' || savedTheme === 'light') {
       return savedTheme;
     }
-    // 2. OS preference check
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    // 3. Default fallback
+    // Default fallback to LIGHT mode
     return 'light';
-  });
-
-  const [hasManualPreference, setHasManualPreference] = useState(() => {
-    return Boolean(localStorage.getItem('nag_theme'));
   });
 
   useEffect(() => {
@@ -30,30 +22,15 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [theme]);
 
-  // Listen to OS theme changes if user hasn't set a manual preference
-  useEffect(() => {
-    if (hasManualPreference) return;
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => {
-      setThemeState(e.matches ? 'dark' : 'light');
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [hasManualPreference]);
-
   const toggleTheme = () => {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     setThemeState(nextTheme);
-    setHasManualPreference(true);
     localStorage.setItem('nag_theme', nextTheme);
   };
 
   const setTheme = (newTheme) => {
     if (newTheme !== 'light' && newTheme !== 'dark') return;
     setThemeState(newTheme);
-    setHasManualPreference(true);
     localStorage.setItem('nag_theme', newTheme);
   };
 
