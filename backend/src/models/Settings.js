@@ -46,6 +46,27 @@ const settingsSchema = new mongoose.Schema(
       type: String,
       default: 'NAG',
     },
+    // Dynamic UI Labels & Titles
+    portalBadgeText: {
+      type: String,
+      default: 'ADMIN PORTAL',
+    },
+    topbarContextText: {
+      type: String,
+      default: 'Workshop System',
+    },
+    brandNameMain: {
+      type: String,
+      default: 'National Auto',
+    },
+    brandNameSub: {
+      type: String,
+      default: 'Garage Portal',
+    },
+    invoiceFooterNote: {
+      type: String,
+      default: 'Thank you for choosing National Auto Garage! Safe Riding.',
+    },
     inventoryCategories: [
       {
         type: String,

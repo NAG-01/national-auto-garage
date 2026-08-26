@@ -18,7 +18,21 @@ export class SettingsService {
         dateFormat: 'DD/MM/YYYY',
         invoicePrefix: 'INV',
         jobIdPrefix: 'NAG',
+        portalBadgeText: 'ADMIN PORTAL',
+        topbarContextText: 'Workshop System',
+        brandNameMain: 'National Auto',
+        brandNameSub: 'Garage Portal',
+        invoiceFooterNote: 'Thank you for choosing National Auto Garage! Safe Riding.',
       });
+    } else {
+      // Backwards compatibility for existing document
+      let updated = false;
+      if (!settings.portalBadgeText) { settings.portalBadgeText = 'ADMIN PORTAL'; updated = true; }
+      if (!settings.topbarContextText) { settings.topbarContextText = 'Workshop System'; updated = true; }
+      if (!settings.brandNameMain) { settings.brandNameMain = 'National Auto'; updated = true; }
+      if (!settings.brandNameSub) { settings.brandNameSub = 'Garage Portal'; updated = true; }
+      if (!settings.invoiceFooterNote) { settings.invoiceFooterNote = 'Thank you for choosing National Auto Garage! Safe Riding.'; updated = true; }
+      if (updated) await settings.save();
     }
     return settings;
   }

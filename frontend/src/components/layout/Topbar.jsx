@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, ShieldCheck, LogOut, Activity, Plus, Wrench, Package, FileText, Receipt } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useSettings } from '../../context/SettingsContext.jsx';
 
 export const Topbar = ({ onOpenMobileSidebar, onOpenMobileMenu }) => {
   const { logout, user } = useAuth();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const handleOpenMobile = onOpenMobileSidebar || onOpenMobileMenu;
   const [showQuickMenu, setShowQuickMenu] = useState(false);
@@ -37,11 +39,13 @@ export const Topbar = ({ onOpenMobileSidebar, onOpenMobileMenu }) => {
         >
           <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500">
             <Activity className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
-            <span className="group-hover:text-slate-900 transition-colors">Workshop System</span>
+            <span className="group-hover:text-slate-900 transition-colors">
+              {settings?.topbarContextText || 'Workshop System'}
+            </span>
             <span className="text-slate-300">•</span>
           </div>
           <span className="text-xs bg-sky-50 text-[#0284C7] group-hover:bg-[#0284C7] group-hover:text-white font-extrabold px-3 py-1 rounded-full border border-sky-200 uppercase tracking-wider transition-all shadow-2xs">
-            Admin Portal
+            {settings?.portalBadgeText || 'ADMIN PORTAL'}
           </span>
         </Link>
       </div>

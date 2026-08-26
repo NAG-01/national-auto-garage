@@ -13,14 +13,15 @@ import {
   Calculator,
   Tag,
   BookOpen,
+  Sliders,
   LogOut,
-  ShieldCheck,
-  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useSettings } from '../../context/SettingsContext.jsx';
 
 export const Sidebar = ({ onClose }) => {
   const { logout, user } = useAuth();
+  const { settings } = useSettings();
 
   const mainNavItems = [
     { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
@@ -34,6 +35,7 @@ export const Sidebar = ({ onClose }) => {
     { label: 'Operating Expenses', to: '/expenses', icon: Receipt },
     { label: 'Settlement Calculator', to: '/calculator', icon: Calculator },
     { label: 'Smart Keywords Master', to: '/keywords', icon: Tag },
+    { label: 'System Settings', to: '/settings', icon: Sliders },
     { label: 'User Guide & Documentation', to: '/help', icon: BookOpen },
   ];
 
@@ -73,14 +75,14 @@ export const Sidebar = ({ onClose }) => {
         className="h-16 px-5 border-b border-slate-800/80 flex items-center gap-3 bg-[#0B1120] hover:bg-slate-900 transition-colors group cursor-pointer"
       >
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0284C7] to-[#0369A1] group-hover:scale-105 transition-transform flex items-center justify-center text-white font-black text-base shadow-md shadow-sky-900/40 shrink-0">
-          N
+          {settings?.brandNameMain ? settings.brandNameMain.charAt(0).toUpperCase() : 'N'}
         </div>
         <div className="min-w-0">
           <h2 className="text-sm font-black text-white tracking-tight leading-none uppercase truncate group-hover:text-sky-400 transition-colors">
-            National Auto
+            {settings?.brandNameMain || 'National Auto'}
           </h2>
           <span className="text-[10px] font-bold text-sky-400 tracking-widest uppercase mt-1 block">
-            Garage Portal
+            {settings?.brandNameSub || 'Garage Portal'}
           </span>
         </div>
       </Link>

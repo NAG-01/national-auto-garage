@@ -1,234 +1,369 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Shield, UserCheck, Save, History, FileText, CheckCircle2 } from 'lucide-react';
-import api from '../../api/client.js';
-import { useToast } from '../../context/ToastContext.jsx';
-import { PageHeader } from '../../components/layout/PageHeader.jsx';
-import { Button } from '../../components/ui/Button.jsx';
-import { Card } from '../../components/ui/Card.jsx';
-import { Input } from '../../components/ui/Input.jsx';
-import { Badge } from '../../components/ui/Badge.jsx';
 import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-  Pagination,
-} from '../../components/ui/Table.jsx';
-import { TableSkeleton } from '../../components/ui/Skeleton.jsx';
-import { formatDateTime } from '../../utils/formatters.js';
+  Sliders,
+  Building2,
+  Tag,
+  FileText,
+  Save,
+  CheckCircle2,
+  Sparkles,
+  ShieldCheck,
+  RotateCcw,
+  Globe,
+} from 'lucide-react';
+import { PageHeader } from '../../components/layout/PageHeader.jsx';
+import { Card } from '../../components/ui/Card.jsx';
+import { Button } from '../../components/ui/Button.jsx';
+import { Input, Textarea } from '../../components/ui/Input.jsx';
+import { useSettings } from '../../context/SettingsContext.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 export const SettingsPage = () => {
-  const [data, setData] = useState(null);
-  const [auditLogs, setAuditLogs] = useState([]);
-  const [auditPagination, setAuditPagination] = useState(null);
-  const [auditPage, setAuditPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const { settings, updateSettings, loading: settingsLoading } = useSettings();
+  const { showSuccess, showError } = useToast();
 
   const [formData, setFormData] = useState({
+    // Section 1: Dynamic UI Labels & Badges
+    portalBadgeText: '',
+    topbarContextText: '',
+    brandNameMain: '',
+    brandNameSub: '',
+    invoiceFooterNote: '',
+
+    // Section 2: Garage Branding & Information
     garageName: '',
     tagline: '',
     phone: '',
+    alternatePhone: '',
     email: '',
     address: '',
     gstNumber: '',
+
+    // Section 3: Prefixes & Formats
+    currencySymbol: '₹',
+    invoicePrefix: 'INV',
+    jobIdPrefix: 'NAG',
   });
 
-  const toast = useToast();
-
-  const fetchSettingsAndAudit = async () => {
-    try {
-      setLoading(true);
-      const [settingsRes, auditRes] = await Promise.all([
-        api.get('/settings'),
-        api.get('/settings/audit-logs', { params: { page: auditPage, limit: 20 } }),
-      ]);
-      setData(settingsRes.data);
-      setFormData({
-        garageName: settingsRes.data.settings?.garageName || '',
-        tagline: settingsRes.data.settings?.tagline || '',
-        phone: settingsRes.data.settings?.phone || '',
-        email: settingsRes.data.settings?.email || '',
-        address: settingsRes.data.settings?.address || '',
-        gstNumber: settingsRes.data.settings?.gstNumber || '',
-      });
-      setAuditLogs(auditRes.data);
-      setAuditPagination(auditRes.pagination);
-    } catch (err) {
-      console.error('Failed to load settings:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchSettingsAndAudit();
-  }, [auditPage]);
+    if (settings) {
+      setFormData({
+        portalBadgeText: settings.portalBadgeText || 'ADMIN PORTAL',
+        topbarContextText: settings.topbarContextText || 'Workshop System',
+        brandNameMain: settings.brandNameMain || 'National Auto',
+        brandNameSub: settings.brandNameSub || 'Garage Portal',
+        invoiceFooterNote: settings.invoiceFooterNote || 'Thank you for choosing National Auto Garage! Safe Riding.',
 
-  const handleSaveSettings = async (e) => {
+        garageName: settings.garageName || 'National Auto Garage',
+        tagline: settings.tagline || 'Two-Wheeler Service & Repair Specialists',
+        phone: settings.phone || '+91 98765 43210',
+        alternatePhone: settings.alternatePhone || '',
+        email: settings.email || 'contact@nationalautogarage.com',
+        address: settings.address || 'Shop No. 4, Garage Hub, Main Road, City',
+        gstNumber: settings.gstNumber || '',
+
+        currencySymbol: settings.currencySymbol || '₹',
+        invoicePrefix: settings.invoicePrefix || 'INV',
+        jobIdPrefix: settings.jobIdPrefix || 'NAG',
+      });
+    }
+  }, [settings]);
+
+  const handleChange = (field, val) => {
+    setFormData((prev) => ({ ...prev, [field]: val }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      await api.put('/settings', formData);
-      toast.success('Garage profile and settings updated successfully');
+      await updateSettings(formData);
+      showSuccess('System Settings & Dynamic UI Labels updated successfully!');
     } catch (err) {
-      toast.error(err.message);
+      showError(err.message || 'Failed to update settings');
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <TableSkeleton rows={8} cols={4} />;
-
-  const { partners = [], employees = [], serviceTypes = [] } = data || {};
+  const handleResetToDefaults = () => {
+    setFormData({
+      portalBadgeText: 'ADMIN',
+      topbarContextText: 'Workshop System',
+      brandNameMain: 'National Auto',
+      brandNameSub: 'Garage Portal',
+      invoiceFooterNote: 'Thank you for choosing National Auto Garage! Safe Riding.',
+      garageName: 'National Auto Garage',
+      tagline: 'Two-Wheeler Service & Repair Specialists',
+      phone: '+91 98765 43210',
+      alternatePhone: '',
+      email: 'contact@nationalautogarage.com',
+      address: 'Shop No. 4, Garage Hub, Main Road, City',
+      gstNumber: '',
+      currencySymbol: '₹',
+      invoicePrefix: 'INV',
+      jobIdPrefix: 'NAG',
+    });
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto pb-16">
       <PageHeader
-        title="Settings & System Configuration"
-        subtitle="Manage garage branding, partner equity ratios, technician staff, and immutable audit logs."
+        title="System Settings"
+        subtitle="Header Badges, Portal Names, Garage Branding, Contact Details, aur System Prefixes ko bina code badle yahan se dynamic edit karein."
       />
 
-      {/* Garage Profile Settings */}
-      <Card title="1. Garage Information & Invoice Header">
-        <form onSubmit={handleSaveSettings} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Garage Business Name"
-              required
-              value={formData.garageName}
-              onChange={(e) => setFormData({ ...formData, garageName: e.target.value })}
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Main Settings Form (8 cols) */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Card 1: Dynamic Website Titles & Header Badges */}
+          <Card className="p-5 sm:p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+              <Tag className="w-5 h-5 text-[#0284C7]" />
+              <div>
+                <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+                  1. Dynamic UI Badges & Website Titles
+                </h2>
+                <p className="text-xs text-slate-500 font-medium">
+                  Header badges, topbar context, aur sidebar titles ko yahan se live badlein.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Topbar Portal Badge Text"
+                placeholder="e.g. ADMIN or ADMIN PORTAL"
+                value={formData.portalBadgeText}
+                onChange={(e) => handleChange('portalBadgeText', e.target.value)}
+                helpText="Default: ADMIN PORTAL. Topbar header me yahi badge text live dikhega."
+              />
+              <Input
+                label="Topbar Context Text"
+                placeholder="e.g. Workshop System"
+                value={formData.topbarContextText}
+                onChange={(e) => handleChange('topbarContextText', e.target.value)}
+                helpText="Default: Workshop System."
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <Input
+                label="Sidebar Brand Main Name"
+                placeholder="e.g. National Auto"
+                value={formData.brandNameMain}
+                onChange={(e) => handleChange('brandNameMain', e.target.value)}
+              />
+              <Input
+                label="Sidebar Brand Sub-title"
+                placeholder="e.g. Garage Portal"
+                value={formData.brandNameSub}
+                onChange={(e) => handleChange('brandNameSub', e.target.value)}
+              />
+            </div>
+
+            <Textarea
+              label="Invoice Print Footer Note"
+              placeholder="e.g. Thank you for choosing National Auto Garage! Safe Riding."
+              value={formData.invoiceFooterNote}
+              onChange={(e) => handleChange('invoiceFooterNote', e.target.value)}
+              rows={2}
+              helpText="Printed bills ke footer me yahi message print hoga."
+            />
+          </Card>
+
+          {/* Card 2: Garage Branding & Contact Details */}
+          <Card className="p-5 sm:p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+              <Building2 className="w-5 h-5 text-[#0284C7]" />
+              <div>
+                <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+                  2. Garage Branding & Contact Details
+                </h2>
+                <p className="text-xs text-slate-500 font-medium">
+                  Official invoices aur reports me use hone wali garage details.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Garage Name"
+                value={formData.garageName}
+                onChange={(e) => handleChange('garageName', e.target.value)}
+              />
+              <Input
+                label="Business Tagline"
+                value={formData.tagline}
+                onChange={(e) => handleChange('tagline', e.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Input
+                label="Primary Phone"
+                value={formData.phone}
+                onChange={(e) => handleChange('phone', e.target.value)}
+              />
+              <Input
+                label="Alternate Phone"
+                value={formData.alternatePhone}
+                onChange={(e) => handleChange('alternatePhone', e.target.value)}
+              />
+              <Input
+                label="Official Email"
+                value={formData.email}
+                onChange={(e) => handleChange('email', e.target.value)}
+              />
+            </div>
+
+            <Textarea
+              label="Garage Shop Address"
+              value={formData.address}
+              onChange={(e) => handleChange('address', e.target.value)}
+              rows={2}
             />
 
             <Input
-              label="Business Tagline / Subtitle"
-              value={formData.tagline}
-              onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Input
-              label="Primary Contact Phone"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            />
-
-            <Input
-              label="Email Address"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-
-            <Input
-              label="GSTIN / Tax ID"
-              placeholder="e.g. 24AAAAA0000A1Z5"
+              label="GSTIN / Business Registration Number (Optional)"
               value={formData.gstNumber}
-              onChange={(e) => setFormData({ ...formData, gstNumber: e.target.value })}
+              onChange={(e) => handleChange('gstNumber', e.target.value)}
+              placeholder="e.g. 24AAAAA0000A1Z5"
             />
-          </div>
+          </Card>
 
-          <Input
-            label="Workshop Physical Address"
-            value={formData.address}
-            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-          />
+          {/* Card 3: System Prefixes & Formats */}
+          <Card className="p-5 sm:p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+              <Sliders className="w-5 h-5 text-[#0284C7]" />
+              <div>
+                <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+                  3. System ID Prefixes & Currency
+                </h2>
+                <p className="text-xs text-slate-500 font-medium">
+                  Invoices, Job Cards, aur Currency Formatting.
+                </p>
+              </div>
+            </div>
 
-          <div className="flex justify-end pt-2">
-            <Button type="submit" variant="primary" loading={saving} icon={Save}>
-              Save Profile Changes
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Input
+                label="Invoice ID Prefix"
+                value={formData.invoicePrefix}
+                onChange={(e) => handleChange('invoicePrefix', e.target.value)}
+                helpText="e.g. INV ➔ INV-2026-0001"
+              />
+              <Input
+                label="Job Card Prefix"
+                value={formData.jobIdPrefix}
+                onChange={(e) => handleChange('jobIdPrefix', e.target.value)}
+                helpText="e.g. NAG ➔ NAG-2026-0001"
+              />
+              <Input
+                label="Currency Symbol"
+                value={formData.currencySymbol}
+                onChange={(e) => handleChange('currencySymbol', e.target.value)}
+                helpText="Default: ₹"
+              />
+            </div>
+          </Card>
+
+          {/* Action Buttons */}
+          <div className="flex items-center justify-between gap-4 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleResetToDefaults}
+              className="text-xs font-bold"
+            >
+              <RotateCcw className="w-4 h-4 mr-2" /> Preset "ADMIN" Title
+            </Button>
+
+            <Button
+              type="submit"
+              disabled={saving}
+              className="px-6 text-xs font-black bg-[#0284C7] hover:bg-[#0369A1]"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {saving ? 'Saving Changes...' : 'Save Settings'}
             </Button>
           </div>
-        </form>
-      </Card>
-
-      {/* Partner Configuration Overview (Configurable, Section 23) */}
-      <Card title="2. Partner Ownership Equity Configuration" subtitle="Configurable partner ratios (Default 50% / 50%)">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {partners.map((p) => (
-            <div key={p._id} className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="font-bold text-slate-900 text-sm">{p.name}</div>
-                <Badge variant="accent">{p.ownershipPercentage}% Ownership</Badge>
-              </div>
-              <div className="text-xs text-slate-500">
-                Code: <span className="font-mono font-bold text-slate-700">{p.code}</span> • Phone: {p.phone || '—'}
-              </div>
-              <div className="text-xs text-slate-500">Email: {p.email || '—'}</div>
-            </div>
-          ))}
         </div>
-      </Card>
 
-      {/* Technicians & Employees */}
-      <Card title="3. Registered Employees & Mechanics" subtitle="Workshop technicians assigned to service job cards">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {employees.map((emp) => (
-            <div key={emp._id} className="p-3.5 rounded-xl border border-slate-200 bg-white text-xs space-y-1">
-              <div className="flex items-center justify-between">
-                <div className="font-bold text-slate-900">{emp.name}</div>
-                <Badge variant="default">{emp.role}</Badge>
+        {/* Right Live Preview Card (4 cols) */}
+        <div className="lg:col-span-4 space-y-4">
+          <Card className="p-5 border-2 border-sky-100 bg-gradient-to-br from-white to-sky-50/50 shadow-xs space-y-4 sticky top-24">
+            <div className="flex items-center justify-between pb-3 border-b border-sky-100">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-[#0284C7]" />
+                <span className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                  Live UI Preview
+                </span>
               </div>
-              <div className="text-slate-500">Code: {emp.employeeCode}</div>
-              <div className="text-slate-500">Phone: {emp.phone}</div>
+              <span className="text-[10px] font-extrabold bg-sky-100 text-[#0284C7] px-2.5 py-0.5 rounded-full uppercase">
+                Instant Update
+              </span>
             </div>
-          ))}
+
+            {/* Topbar Preview Widget */}
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-extrabold text-slate-400 uppercase">
+                Topbar Header Badge Preview:
+              </span>
+              <div className="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between shadow-2xs">
+                <span className="text-xs font-semibold text-slate-500">
+                  {formData.topbarContextText || 'Workshop System'}
+                </span>
+                <span className="text-xs bg-sky-50 text-[#0284C7] font-black px-3 py-1 rounded-full border border-sky-200 uppercase tracking-wider">
+                  {formData.portalBadgeText || 'ADMIN PORTAL'}
+                </span>
+              </div>
+            </div>
+
+            {/* Sidebar Logo Preview Widget */}
+            <div className="space-y-1.5 pt-2 border-t border-sky-100">
+              <span className="text-[11px] font-extrabold text-slate-400 uppercase">
+                Sidebar Brand Logo Preview:
+              </span>
+              <div className="p-3 bg-[#0F172A] text-white rounded-xl flex items-center gap-3 shadow-md">
+                <div className="w-8 h-8 rounded-lg bg-[#0284C7] font-black text-sm flex items-center justify-center">
+                  {formData.brandNameMain ? formData.brandNameMain.charAt(0).toUpperCase() : 'N'}
+                </div>
+                <div>
+                  <div className="text-xs font-black uppercase text-white leading-tight">
+                    {formData.brandNameMain || 'National Auto'}
+                  </div>
+                  <span className="text-[10px] font-bold text-sky-400 uppercase">
+                    {formData.brandNameSub || 'Garage Portal'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Garage Name Preview */}
+            <div className="space-y-1.5 pt-2 border-t border-sky-100 text-xs">
+              <span className="text-[11px] font-extrabold text-slate-400 uppercase block">
+                Garage Name:
+              </span>
+              <div className="font-extrabold text-slate-900 bg-white p-2.5 rounded-xl border border-slate-200">
+                {formData.garageName || 'National Auto Garage'}
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-sky-50 text-[#0C4A6E] text-xs font-medium space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                <ShieldCheck className="w-4 h-4 text-[#0284C7]" />
+                Zero Code Editing Required
+              </div>
+              <p className="text-[11px]">
+                Aap jo bhi changes karenge wo turant MongoDB database me save ho jayenge aur puri website me bina code edit kiye badal jayenge!
+              </p>
+            </div>
+          </Card>
         </div>
-      </Card>
-
-      {/* Tamper-Proof Audit Logs Trail Viewer */}
-      <Card
-        title="4. Immutable Activity Audit Log"
-        subtitle="Chronological record of status overrides, stock adjustments, invoice generation, payments, and settlements"
-        noPadding
-      >
-        {auditLogs.length === 0 ? (
-          <div className="p-8 text-center text-xs text-slate-400">No audit logs recorded yet.</div>
-        ) : (
-          <div>
-            <Table>
-              <TableHeader>
-                <TableRow hover={false}>
-                  <TableHead>Timestamp</TableHead>
-                  <TableHead>User / Actor</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Entity</TableHead>
-                  <TableHead>Summary / Details</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {auditLogs.map((log) => (
-                  <TableRow key={log._id} hover={false}>
-                    <TableCell className="text-xs text-slate-500 font-mono">
-                      {formatDateTime(log.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-xs font-semibold text-slate-900">{log.userName}</div>
-                      <div className="text-[10px] text-slate-400 capitalize">{log.userRole?.toLowerCase()}</div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-                        {log.action}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-xs text-slate-600 font-mono">{log.entityType}</span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-xs text-slate-800 max-w-md">{log.summary}</div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-
-            <Pagination pagination={auditPagination} onPageChange={(newPage) => setAuditPage(newPage)} />
-          </div>
-        )}
-      </Card>
+      </form>
     </div>
   );
 };
