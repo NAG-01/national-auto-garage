@@ -83,26 +83,30 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor with Vercel Cloud Fallback Mode
+// Response interceptor with Full CRUD Vercel Cloud Data Persistence
 api.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const config = error.config;
     const url = config?.url || '';
+    const method = (config?.method || 'get').toLowerCase();
     const isCloud = isCloudHosted();
     const isNetworkOr404Err = !error.response || error.response.status === 404 || error.response.status === 405;
 
     // Handle Standalone Vercel Cloud Fallback
     if (isCloud || isNetworkOr404Err) {
-      console.warn(`[Vercel Mode] Processing request locally: ${url}`);
+      console.warn(`[Vercel Cloud Interceptor] Processing ${method.toUpperCase()} request: ${url}`);
+      let payload = {};
+      try {
+        payload = config.data ? JSON.parse(config.data) : {};
+      } catch (e) {}
 
       // 1. AUTH LOGIN
       if (url.includes('/auth/login')) {
-        const body = JSON.parse(config.data || '{}');
         const userObj = {
           id: 'admin_demo_id',
-          username: body.username || 'admin',
-          email: body.email || 'admin@nationalautogarage.com',
+          username: payload.username || 'admin',
+          email: payload.email || 'admin@nationalautogarage.com',
           role: 'ADMIN',
         };
         return {
@@ -127,8 +131,8 @@ api.interceptors.response.use(
 
       // 3. SETTINGS
       if (url.includes('/settings')) {
-        if (config.method === 'put' || config.method === 'post') {
-          const updated = { ...defaultSettings, ...JSON.parse(config.data || '{}') };
+        if (method === 'put' || method === 'post') {
+          const updated = { ...defaultSettings, ...payload };
           setMockData('settings', updated);
           return { success: true, settings: updated, data: updated };
         }
@@ -150,12 +154,59 @@ api.interceptors.response.use(
         };
       }
 
-      // 5. INVENTORY & CATEGORIES
+      // 5. INVENTORY & CATEGORIES (FULL CRUD)
       if (url.includes('/inventory/categories')) {
         return { success: true, data: defaultSettings.inventoryCategories };
       }
       if (url.includes('/inventory')) {
-        const inventory = getMockData('inventory', initialInventory);
+        let inventory = getMockData('inventory', initialInventory);
+
+        // POST: Create New Item
+        if (method === 'post' && !url.includes('/stock') && !url.includes('/adjust')) {
+          const newItem = {
+            _id: 'inv_' + Date.now(),
+            status: 'ACTIVE',
+            stockQuantity: Number(payload.stockQuantity || 0),
+            minStockThreshold: Number(payload.minStockThreshold || 5),
+            sellingPrice: Number(payload.sellingPrice || 0),
+            costPrice: Number(payload.costPrice || 0),
+            isServicePart: Boolean(payload.isServicePart ?? true),
+            ...payload,
+          };
+          inventory = [newItem, ...inventory];
+          setMockData('inventory', inventory);
+          return { success: true, product: newItem, data: newItem };
+        }
+
+        // PUT / PATCH: Update Item or Quick Stock Adjust (+ / -)
+        if (method === 'put' || method === 'patch') {
+          const urlParts = url.split('/');
+          const itemId = urlParts[urlParts.length - 1];
+          inventory = inventory.map((item) => {
+            if (item._id === itemId || url.includes(item._id)) {
+              if (url.includes('/stock') || payload.delta !== undefined) {
+                const newQty = Math.max(0, item.stockQuantity + (payload.delta || 0));
+                return { ...item, stockQuantity: newQty };
+              }
+              return { ...item, ...payload };
+            }
+            return item;
+          });
+          setMockData('inventory', inventory);
+          const updatedItem = inventory.find((i) => i._id === itemId) || inventory[0];
+          return { success: true, product: updatedItem, data: updatedItem };
+        }
+
+        // DELETE: Remove Item
+        if (method === 'delete') {
+          const urlParts = url.split('/');
+          const itemId = urlParts[urlParts.length - 1];
+          inventory = inventory.filter((item) => item._id !== itemId);
+          setMockData('inventory', inventory);
+          return { success: true, message: 'Item deleted successfully' };
+        }
+
+        // GET: Read Items List
         const lowStock = inventory.filter((i) => i.stockQuantity > 0 && i.stockQuantity <= (i.minStockThreshold || 5)).length;
         const outOfStock = inventory.filter((i) => i.stockQuantity === 0).length;
         return {
@@ -179,38 +230,96 @@ api.interceptors.response.use(
         };
       }
 
-      // 6. JOBS
+      // 6. JOBS (FULL CRUD)
       if (url.includes('/jobs')) {
-        const jobs = getMockData('jobs', []);
+        let jobs = getMockData('jobs', []);
+        if (method === 'post') {
+          const newJob = {
+            _id: 'job_' + Date.now(),
+            jobId: 'NAG-' + String(jobs.length + 1).padStart(4, '0'),
+            status: 'PENDING',
+            createdAt: new Date().toISOString(),
+            ...payload,
+          };
+          jobs = [newJob, ...jobs];
+          setMockData('jobs', jobs);
+          return { success: true, jobCard: newJob, data: newJob };
+        }
         return { success: true, data: jobs, jobs };
       }
 
-      // 7. INVOICES / BILLING
+      // 7. INVOICES / BILLING (FULL CRUD)
       if (url.includes('/invoices')) {
-        const invoices = getMockData('invoices', []);
+        let invoices = getMockData('invoices', []);
+        if (method === 'post') {
+          const newInvoice = {
+            _id: 'inv_bill_' + Date.now(),
+            invoiceNumber: 'INV-' + String(invoices.length + 1).padStart(4, '0'),
+            createdAt: new Date().toISOString(),
+            status: 'UNPAID',
+            ...payload,
+          };
+          invoices = [newInvoice, ...invoices];
+          setMockData('invoices', invoices);
+          return { success: true, invoice: newInvoice, data: newInvoice };
+        }
         return { success: true, data: invoices, invoices };
       }
 
-      // 8. EXPENSES
+      // 8. EXPENSES (FULL CRUD)
       if (url.includes('/expenses')) {
-        const expenses = getMockData('expenses', []);
+        let expenses = getMockData('expenses', []);
+        if (method === 'post') {
+          const newExp = {
+            _id: 'exp_' + Date.now(),
+            expenseId: 'EXP-' + String(expenses.length + 1).padStart(4, '0'),
+            date: new Date().toISOString(),
+            ...payload,
+          };
+          expenses = [newExp, ...expenses];
+          setMockData('expenses', expenses);
+          return { success: true, expense: newExp, data: newExp };
+        }
         return { success: true, data: expenses, expenses };
       }
 
-      // 9. DUES & RECEIVABLES
+      // 9. DUES (FULL CRUD)
       if (url.includes('/dues')) {
-        const dues = getMockData('dues', []);
+        let dues = getMockData('dues', []);
+        if (method === 'post') {
+          const newDue = {
+            _id: 'due_' + Date.now(),
+            dueId: 'DUE-' + String(dues.length + 1).padStart(4, '0'),
+            createdAt: new Date().toISOString(),
+            ...payload,
+          };
+          dues = [newDue, ...dues];
+          setMockData('dues', dues);
+          return { success: true, dueRecord: newDue, data: newDue };
+        }
         return { success: true, data: dues, dues };
       }
 
-      // 10. KEYWORDS & SUPPLIERS
-      if (url.includes('/keywords')) {
-        const keywords = getMockData('keywords', []);
-        return { success: true, data: keywords, keywords };
-      }
+      // 10. SUPPLIERS & KEYWORDS
       if (url.includes('/suppliers')) {
-        const suppliers = getMockData('suppliers', []);
+        let suppliers = getMockData('suppliers', []);
+        if (method === 'post') {
+          const newSup = { _id: 'sup_' + Date.now(), ...payload };
+          suppliers = [newSup, ...suppliers];
+          setMockData('suppliers', suppliers);
+          return { success: true, supplier: newSup, data: newSup };
+        }
         return { success: true, data: suppliers, suppliers };
+      }
+      if (url.includes('/keywords')) {
+        let keywords = getMockData('keywords', []);
+        if (method === 'post') {
+          const newKw = { _id: 'kw_' + Date.now(), ...payload };
+          keywords = [newKw, ...keywords];
+          setMockData('keywords', keywords);
+          return { success: true, keyword: newKw, data: newKw };
+        }
+        return { success: true, data: keywords, keywords };
       }
 
       return { success: true, data: [] };
