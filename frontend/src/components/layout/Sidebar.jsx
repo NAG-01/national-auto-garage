@@ -2,8 +2,6 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Users,
-  Bike,
   Wrench,
   Flame,
   Package,
@@ -14,7 +12,6 @@ import {
   Briefcase,
   Receipt,
   BarChart3,
-  Layers,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -34,10 +31,6 @@ export const Sidebar = ({ onClose }) => {
     { label: 'Operating Expenses', to: '/expenses', icon: Receipt },
     { label: 'Partnership', to: '/partnership', icon: Briefcase },
     { label: 'Reports & Analytics', to: '/reports', icon: BarChart3 },
-  ];
-
-  const devNavItems = [
-    { label: 'Design System Showcase', to: '/design-system', icon: Layers },
   ];
 
   const renderLink = (item) => {
@@ -90,13 +83,6 @@ export const Sidebar = ({ onClose }) => {
             Workshop Operations
           </div>
           <div className="space-y-0.5">{mainNavItems.map(renderLink)}</div>
-        </div>
-
-        <div>
-          <div className="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Design & System
-          </div>
-          <div className="space-y-0.5">{devNavItems.map(renderLink)}</div>
         </div>
       </div>
 
