@@ -226,7 +226,7 @@ export const SettingsPage = () => {
     }
     setSendingOtp(true);
     try {
-      const res = await api.post('/request-email-otp', { newEmail: newEmail.trim() });
+      const res = await api.post('/auth/request-email-otp', { newEmail: newEmail.trim() });
       const payload = res.data || res;
       if (payload && payload.otp) {
         setGeneratedOtpHint(payload.otp);
@@ -250,7 +250,7 @@ export const SettingsPage = () => {
 
     setVerifyingOtp(true);
     try {
-      const res = await api.post('/verify-email-otp', {
+      const res = await api.post('/auth/verify-email-otp', {
         otpCode: inputOtp.trim(),
         newEmail: newEmail.trim(),
       });
