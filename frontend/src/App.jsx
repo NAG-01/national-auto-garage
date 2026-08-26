@@ -27,7 +27,7 @@ import { UserGuidePage } from './features/guide/UserGuidePage.jsx';
 import { SettingsPage } from './features/settings/SettingsPage.jsx';
 import { PageSkeleton } from './components/ui/Skeleton.jsx';
 
-const ProtectedRoute = () => {
+const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -43,7 +43,7 @@ const ProtectedRoute = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <Outlet />;
+  return children ? children : <Outlet />;
 };
 
 export default function App() {
