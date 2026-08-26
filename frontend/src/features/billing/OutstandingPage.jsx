@@ -230,7 +230,7 @@ export const OutstandingPage = () => {
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="text-orange-950 bg-orange-100 px-2.5 py-1 rounded border border-orange-300 font-mono font-bold text-xs">
+                    <span className="text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 font-mono font-bold text-xs">
                       {formatINR(r.pendingAmount)}
                     </span>
                   </TableCell>

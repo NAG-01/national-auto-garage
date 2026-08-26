@@ -31,7 +31,7 @@ export const Button = React.forwardRef(
       primary:
         'bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-slate-900 border border-transparent shadow-sm',
       accent:
-        'bg-orange-600 text-white hover:bg-orange-700 focus-visible:ring-orange-500 border border-transparent shadow-sm',
+        'bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-slate-900 border border-transparent shadow-sm',
       secondary:
         'bg-slate-100 text-slate-800 hover:bg-slate-200 focus-visible:ring-slate-400 border border-slate-200',
       outline:

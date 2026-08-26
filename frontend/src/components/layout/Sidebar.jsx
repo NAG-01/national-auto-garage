@@ -43,7 +43,7 @@ export const Sidebar = ({ onClose }) => {
         className={({ isActive }) =>
           `flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 group ${
             isActive
-              ? 'bg-orange-500/10 text-orange-600 font-bold border-l-4 border-orange-600 shadow-sm'
+              ? 'bg-slate-900 text-white font-bold shadow-sm'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
           }`
         }
@@ -51,7 +51,7 @@ export const Sidebar = ({ onClose }) => {
         <Icon className="w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-105" />
         <span className="truncate">{item.label}</span>
         {item.highlight && (
-          <span className="ml-auto text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-bold">
+          <span className="ml-auto text-[10px] bg-slate-800 text-white px-1.5 py-0.5 rounded font-bold">
             Due
           </span>
         )}
@@ -70,7 +70,7 @@ export const Sidebar = ({ onClose }) => {
           <h2 className="text-sm font-extrabold text-slate-900 tracking-tight leading-none uppercase">
             National Auto
           </h2>
-          <span className="text-[10px] font-bold text-orange-600 tracking-widest uppercase mt-0.5 block">
+          <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase mt-0.5 block">
             Garage Workshop
           </span>
         </div>

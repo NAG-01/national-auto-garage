@@ -152,8 +152,8 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
       >
         <form id="outstanding-dues-form" onSubmit={handleFormSubmit} className="space-y-4">
           {/* Form Top Banner */}
-          <div className="p-3 bg-orange-50 border border-orange-200 rounded-xl text-xs text-orange-900 font-medium flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-orange-600 flex-shrink-0" />
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-slate-700 flex-shrink-0" />
             <span>Customer ke khate me baaki paise aur bike details enter karein.</span>
           </div>
 
