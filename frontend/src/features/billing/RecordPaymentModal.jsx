@@ -60,9 +60,18 @@ export const RecordPaymentModal = ({ isOpen, onClose, bill, onSuccess }) => {
       isOpen={isOpen}
       onClose={onClose}
       title={`Record Payment — ${bill?.billNumber || 'Invoice'}`}
-      size="md"
+      footer={
+        <div className="flex items-center justify-end gap-3 w-full">
+          <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            Cancel
+          </Button>
+          <Button type="submit" form="record-payment-form" variant="accent" loading={loading} icon={CheckCircle2}>
+            Record Payment
+          </Button>
+        </div>
+      }
     >
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <form id="record-payment-form" onSubmit={handleSubmit} className="space-y-4" noValidate>
         {/* Outstanding Banner */}
         <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs">
           <span className="font-semibold text-amber-900">Current Outstanding Balance:</span>
@@ -110,16 +119,6 @@ export const RecordPaymentModal = ({ isOpen, onClose, bill, onSuccess }) => {
           <span className={`font-bold ${remainingAfterPayment === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
             {formatINR(remainingAfterPayment)}
           </span>
-        </div>
-
-        {/* Modal Actions */}
-        <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
-          <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button type="submit" variant="accent" loading={loading} icon={CheckCircle2}>
-            Record Payment
-          </Button>
         </div>
       </form>
     </Modal>

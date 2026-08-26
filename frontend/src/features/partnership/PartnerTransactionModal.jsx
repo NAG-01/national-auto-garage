@@ -50,8 +50,22 @@ export const PartnerTransactionModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Record Partner Transaction" size="md">
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Record Partner Transaction"
+      footer={
+        <div className="flex items-center justify-end gap-3 w-full">
+          <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            Cancel
+          </Button>
+          <Button type="submit" form="partner-tx-form" variant="accent" loading={loading} icon={CheckCircle2}>
+            Record Transaction
+          </Button>
+        </div>
+      }
+    >
+      <form id="partner-tx-form" onSubmit={handleSubmit} className="space-y-4" noValidate>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Select
             label="Partner Name *"
@@ -105,15 +119,6 @@ export const PartnerTransactionModal = ({ isOpen, onClose, onSuccess }) => {
             : type === 'OUT_OF_POCKET_EXPENSE'
             ? `Credits ₹${amount || 0} back to ${partner}'s monthly payout.`
             : `Records ₹${amount || 0} capital injected into garage account.`}
-        </div>
-
-        <div className="flex items-center justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button type="submit" variant="accent" loading={loading} icon={CheckCircle2}>
-            Record Transaction
-          </Button>
         </div>
       </form>
     </Modal>
