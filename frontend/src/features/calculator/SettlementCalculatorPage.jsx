@@ -22,7 +22,7 @@ import { ErrorState } from '../../components/ui/ErrorState.jsx';
 import { ConfirmDialog } from '../../components/ui/Modal.jsx';
 import { useTableSelection } from '../../hooks/useTableSelection.js';
 import { BulkActionBar } from '../../components/ui/BulkActionBar.jsx';
-import { Table, TableHeadCheckbox, TableCellCheckbox } from '../../components/ui/Table.jsx';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableHeadCheckbox, TableCellCheckbox } from '../../components/ui/Table.jsx';
 import { formatINR, formatDate } from '../../utils/formatters.js';
 
 export const SettlementCalculatorPage = () => {
@@ -168,10 +168,10 @@ export const SettlementCalculatorPage = () => {
       {/* Grid: Inputs Form & Live Output Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Form: Inputs (7 cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-[#172033] p-4 sm:p-6 border border-slate-200 dark:border-[#263449] rounded-2xl shadow-2xs">
-          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-[#263449]">
-            <Calculator className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <h2 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+        <div className="lg:col-span-7 bg-white p-4 sm:p-6 border border-[#BAE6FD] rounded-2xl shadow-2xs">
+          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[#E0F2FE]">
+            <Calculator className="w-5 h-5 text-[#0284C7]" />
+            <h2 className="text-xs sm:text-sm font-extrabold text-[#0C4A6E] uppercase tracking-wider">
               1. Hisaab Input Details
             </h2>
           </div>
@@ -179,7 +179,7 @@ export const SettlementCalculatorPage = () => {
           <form onSubmit={handleSave} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-[#0C4A6E] mb-1">
                   Total Profit / Collections (Kul Aavak ₹) <span className="text-rose-500">*</span>
                 </label>
                 <Input
@@ -194,7 +194,7 @@ export const SettlementCalculatorPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-[#0C4A6E] mb-1">
                   Garage Expenses (Kul Kharcha ₹)
                 </label>
                 <Input
@@ -208,9 +208,9 @@ export const SettlementCalculatorPage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-[#263449]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[#E0F2FE]">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-[#0C4A6E] mb-1">
                   Naim Pathan Advance (Uthaaye Paise ₹)
                 </label>
                 <Input
@@ -224,7 +224,7 @@ export const SettlementCalculatorPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-[#0C4A6E] mb-1">
                   Imran Pathan Advance (Uthaaye Paise ₹)
                 </label>
                 <Input
@@ -239,7 +239,7 @@ export const SettlementCalculatorPage = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-[#0C4A6E] mb-1">
                 Notes / Month Details (Optional)
               </label>
               <Input
@@ -275,77 +275,77 @@ export const SettlementCalculatorPage = () => {
         </div>
 
         {/* Right Output Panel: Live Results (5 cols) */}
-        <div className="lg:col-span-5 bg-white dark:bg-[#172033] border border-slate-200 dark:border-[#263449] rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white border border-[#BAE6FD] rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100 dark:border-[#263449]">
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#E0F2FE]">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <h2 className="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-slate-900 dark:text-slate-100">
+                <Sparkles className="w-4 h-4 text-[#0284C7]" />
+                <h2 className="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-[#0C4A6E]">
                   2. Live Payout Summary
                 </h2>
               </div>
-              <span className="text-[10px] bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-extrabold px-2.5 py-1 rounded-full uppercase">
+              <span className="text-[10px] bg-[#E0F2FE] text-[#0284C7] border border-[#BAE6FD] font-extrabold px-2.5 py-1 rounded-full uppercase">
                 Live Math
               </span>
             </div>
 
             <div className="space-y-3.5">
               {/* Net Profit Summary */}
-              <div className="bg-[#4F46E5] dark:bg-[#0B1120] text-white p-4 rounded-xl shadow-2xs border border-indigo-600 dark:border-slate-800">
-                <div className="text-[11px] font-bold text-indigo-100 dark:text-slate-400 uppercase tracking-wider">
+              <div className="bg-[#0284C7] text-white p-4 rounded-xl shadow-2xs border border-[#0369A1]">
+                <div className="text-[11px] font-bold text-sky-100 uppercase tracking-wider">
                   Net Workshop Profit
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-white mt-1 tracking-tight">
                   {formatINR(netProfit)}
                 </div>
-                <div className="text-[11px] font-semibold text-indigo-100 dark:text-slate-300 mt-2 flex items-center justify-between border-t border-indigo-400/40 dark:border-slate-800 pt-2">
+                <div className="text-[11px] font-semibold text-sky-100 mt-2 flex items-center justify-between border-t border-sky-400/40 pt-2">
                   <span>Revenue: {formatINR(revVal)}</span>
-                  <span className="text-rose-200 dark:text-rose-300">Expenses: -{formatINR(expVal)}</span>
+                  <span className="text-rose-200">Expenses: -{formatINR(expVal)}</span>
                 </div>
               </div>
 
               {/* Partner 1: Naim Pathan */}
-              <div className="bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 p-4 rounded-xl shadow-2xs space-y-1">
+              <div className="bg-[#F0F9FF] border border-[#BAE6FD] p-4 rounded-xl shadow-2xs space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5 uppercase">
-                    <UserCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Naim Pathan
+                  <span className="text-xs font-extrabold text-[#0C4A6E] flex items-center gap-1.5 uppercase">
+                    <UserCheck className="w-4 h-4 text-[#0284C7]" /> Naim Pathan
                   </span>
-                  <span className="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded uppercase">
+                  <span className="text-[10px] font-bold bg-[#0284C7] text-white px-2 py-0.5 rounded uppercase">
                     50% Share
                   </span>
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight pt-0.5">
+                <div className="text-2xl sm:text-3xl font-black text-[#0284C7] tracking-tight pt-0.5">
                   {formatINR(naimFinalPayout)}
                 </div>
-                <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center justify-between border-t border-emerald-200/80 dark:border-emerald-900/50 pt-1.5 mt-1">
+                <div className="text-xs font-semibold text-[#0369A1] flex items-center justify-between border-t border-[#BAE6FD] pt-1.5 mt-1">
                   <span>50% Share: {formatINR(naimBaseShare)}</span>
-                  <span className="text-rose-600 dark:text-rose-400 font-bold">Advance: -{formatINR(naimAdvVal)}</span>
+                  <span className="text-rose-600 font-bold">Advance: -{formatINR(naimAdvVal)}</span>
                 </div>
               </div>
 
               {/* Partner 2: Imran Pathan */}
-              <div className="bg-indigo-50/90 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/60 p-4 rounded-xl shadow-2xs space-y-1">
+              <div className="bg-[#E0F2FE] border border-[#7DD3FC] p-4 rounded-xl shadow-2xs space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold text-indigo-900 dark:text-indigo-200 flex items-center gap-1.5 uppercase">
-                    <UserCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Imran Pathan
+                  <span className="text-xs font-extrabold text-[#0C4A6E] flex items-center gap-1.5 uppercase">
+                    <UserCheck className="w-4 h-4 text-[#0284C7]" /> Imran Pathan
                   </span>
-                  <span className="text-[10px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded uppercase">
+                  <span className="text-[10px] font-bold bg-[#0284C7] text-white px-2 py-0.5 rounded uppercase">
                     50% Share
                   </span>
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-indigo-700 dark:text-indigo-400 tracking-tight pt-0.5">
+                <div className="text-2xl sm:text-3xl font-black text-[#0284C7] tracking-tight pt-0.5">
                   {formatINR(imranFinalPayout)}
                 </div>
-                <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center justify-between border-t border-indigo-200/80 dark:border-indigo-900/50 pt-1.5 mt-1">
+                <div className="text-xs font-semibold text-[#0369A1] flex items-center justify-between border-t border-[#7DD3FC] pt-1.5 mt-1">
                   <span>50% Share: {formatINR(imranBaseShare)}</span>
-                  <span className="text-rose-600 dark:text-rose-400 font-bold">Advance: -{formatINR(imranAdvVal)}</span>
+                  <span className="text-rose-600 font-bold">Advance: -{formatINR(imranAdvVal)}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#263449] text-[11px] font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 flex-shrink-0" />
+          <div className="mt-4 pt-3 border-t border-[#E0F2FE] text-[11px] font-medium text-[#0369A1] flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-[#0284C7] flex-shrink-0" />
             <span>Upar number likhte hi hisaab turant badal jayega. Record save karne ke liye Save dabayein.</span>
           </div>
         </div>
@@ -355,14 +355,14 @@ export const SettlementCalculatorPage = () => {
       <div className="pt-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
+            <h3 className="text-base font-extrabold text-[#0C4A6E]">
               Saved Calculation History
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <p className="text-xs text-[#0369A1] font-medium">
               Tareekh aur samay ke saath saare purane calculations ka safe permanent record.
             </p>
           </div>
-          <span className="self-start sm:self-auto text-xs font-extrabold bg-[#4F46E5] dark:bg-[#6366F1] text-white px-3 py-1.5 rounded-xl shadow-xs">
+          <span className="self-start sm:self-auto text-xs font-extrabold bg-[#0284C7] text-white px-3 py-1.5 rounded-xl shadow-xs">
             Total Saved: {records.length}
           </span>
         </div>
@@ -385,10 +385,10 @@ export const SettlementCalculatorPage = () => {
         ) : error ? (
           <ErrorState message={error} onRetry={fetchHistory} />
         ) : records.length === 0 ? (
-          <div className="p-8 sm:p-12 text-center border border-dashed border-slate-300 dark:border-[#263449] bg-white dark:bg-[#172033] rounded-2xl shadow-2xs">
-            <Calculator className="w-10 h-10 text-slate-400 dark:text-slate-500 mx-auto mb-3" />
-            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Koi Purana Hisaab Record Nahi Hai</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+          <div className="p-8 sm:p-12 text-center border border-dashed border-[#BAE6FD] bg-white rounded-2xl shadow-2xs">
+            <Calculator className="w-10 h-10 text-[#0284C7] mx-auto mb-3" />
+            <h4 className="text-sm font-bold text-[#0C4A6E]">Koi Purana Hisaab Record Nahi Hai</h4>
+            <p className="text-xs text-[#0369A1] mt-1 max-w-sm mx-auto">
               Upar calculator me detail bharkar "Hisaab Save Karein" dabayein to record yahan save ho jayega.
             </p>
           </div>
@@ -416,44 +416,44 @@ export const SettlementCalculatorPage = () => {
                 return (
                   <TableRow
                     key={rec._id}
-                    className={active ? 'bg-slate-50 dark:bg-slate-800/50 font-medium' : ''}
+                    className={active ? 'bg-[#E0F2FE] font-medium' : ''}
                   >
                     <TableCellCheckbox
                       checked={active}
                       onChange={() => toggleSelect(rec._id)}
                     />
-                    <TableCell className="font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                    <TableCell className="font-bold text-[#0C4A6E] whitespace-nowrap">
                       {formatDate(rec.date)}
                     </TableCell>
-                    <TableCell className="text-right font-bold text-slate-900 dark:text-slate-100">
+                    <TableCell className="text-right font-bold text-[#0C4A6E]">
                       {formatINR(rec.totalRevenue)}
                     </TableCell>
-                    <TableCell className="text-right font-bold text-rose-600 dark:text-rose-400">
+                    <TableCell className="text-right font-bold text-rose-600">
                       -{formatINR(rec.garageExpenses)}
                     </TableCell>
-                    <TableCell className="text-right font-black text-slate-900 dark:text-slate-100">
+                    <TableCell className="text-right font-black text-[#0C4A6E]">
                       {formatINR(rec.netProfit)}
                     </TableCell>
-                    <TableCell className="text-right font-black text-emerald-600 dark:text-emerald-400">
+                    <TableCell className="text-right font-black text-[#0284C7]">
                       {formatINR(rec.naimFinalPayout)}
-                      <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-normal">
+                      <span className="block text-[10px] text-[#0369A1] font-normal">
                         (Adv: {formatINR(rec.naimAdvance)})
                       </span>
                     </TableCell>
-                    <TableCell className="text-right font-black text-indigo-600 dark:text-indigo-400">
+                    <TableCell className="text-right font-black text-[#0284C7]">
                       {formatINR(rec.imranFinalPayout)}
-                      <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-normal">
+                      <span className="block text-[10px] text-[#0369A1] font-normal">
                         (Adv: {formatINR(rec.imranAdvance)})
                       </span>
                     </TableCell>
-                    <TableCell className="text-slate-600 dark:text-slate-300 max-w-xs truncate">
+                    <TableCell className="text-[#0369A1] max-w-xs truncate">
                       {rec.notes || '—'}
                     </TableCell>
                     <TableCell className="text-center">
                       <button
                         type="button"
                         onClick={() => setDeleteId(rec._id)}
-                        className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors"
+                        className="p-1.5 text-[#0369A1] hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
                         title="Delete Calculation Record"
                       >
                         <Trash2 className="w-4 h-4" />

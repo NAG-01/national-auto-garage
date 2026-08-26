@@ -4,29 +4,29 @@ import { Button } from './Button.jsx';
 
 export const Table = ({ children, className = '' }) => {
   return (
-    <div className="w-full overflow-x-auto rounded-2xl border border-slate-200 dark:border-[#263449] bg-white dark:bg-[#172033] shadow-2xs transition-colors duration-200">
-      <table className={`w-full text-left text-sm text-slate-600 dark:text-slate-300 ${className}`}>{children}</table>
+    <div className="w-full overflow-x-auto rounded-2xl border border-[#BAE6FD] bg-white shadow-2xs">
+      <table className={`w-full text-left text-sm text-[#0C4A6E] ${className}`}>{children}</table>
     </div>
   );
 };
 
 export const TableHeader = ({ children }) => {
   return (
-    <thead className="bg-[#F8FAFC] dark:bg-[#111827] border-b border-slate-200 dark:border-[#263449] text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+    <thead className="bg-[#F0F9FF] border-b border-[#BAE6FD] text-xs font-extrabold text-[#0C4A6E] uppercase tracking-wider">
       {children}
     </thead>
   );
 };
 
 export const TableBody = ({ children }) => {
-  return <tbody className="divide-y divide-slate-100 dark:divide-[#263449]">{children}</tbody>;
+  return <tbody className="divide-y divide-[#E0F2FE]">{children}</tbody>;
 };
 
 export const TableRow = ({ children, onClick, className = '', hover = true }) => {
   return (
     <tr
       onClick={onClick}
-      className={`transition-colors ${hover ? 'hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]' : ''} ${
+      className={`transition-colors ${hover ? 'hover:bg-[#F0F9FF]' : ''} ${
         onClick ? 'cursor-pointer' : ''
       } ${className}`}
     >
@@ -40,7 +40,7 @@ export const TableHead = ({ children, className = '' }) => {
 };
 
 export const TableCell = ({ children, className = '' }) => {
-  return <td className={`px-4 py-3.5 whitespace-nowrap text-slate-800 dark:text-slate-200 ${className}`}>{children}</td>;
+  return <td className={`px-4 py-3.5 whitespace-nowrap text-[#0C4A6E] font-medium ${className}`}>{children}</td>;
 };
 
 export const TableHeadCheckbox = ({ checked, onChange }) => {
@@ -50,7 +50,7 @@ export const TableHeadCheckbox = ({ checked, onChange }) => {
         type="checkbox"
         checked={Boolean(checked)}
         onChange={onChange}
-        className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer bg-white dark:bg-slate-800"
+        className="w-4 h-4 rounded border-[#7DD3FC] text-[#0284C7] focus:ring-[#0284C7] cursor-pointer bg-white"
       />
     </th>
   );
@@ -63,7 +63,7 @@ export const TableCellCheckbox = ({ checked, onChange }) => {
         type="checkbox"
         checked={Boolean(checked)}
         onChange={onChange}
-        className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer bg-white dark:bg-slate-800"
+        className="w-4 h-4 rounded border-[#7DD3FC] text-[#0284C7] focus:ring-[#0284C7] cursor-pointer bg-white"
       />
     </td>
   );
@@ -75,10 +75,10 @@ export const Pagination = ({ pagination, onPageChange }) => {
   const { page, totalPages, totalRecords } = pagination;
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 dark:border-[#263449] bg-slate-50/50 dark:bg-[#111827]/50 rounded-b-2xl text-xs text-slate-500 dark:text-slate-400">
+    <div className="flex items-center justify-between px-4 py-3 border-t border-[#BAE6FD] bg-[#F0F9FF] rounded-b-2xl text-xs text-[#0369A1]">
       <div>
-        Showing page <span className="font-extrabold text-slate-700 dark:text-slate-200">{page}</span> of{' '}
-        <span className="font-extrabold text-slate-700 dark:text-slate-200">{totalPages}</span> ({totalRecords} total items)
+        Showing page <span className="font-extrabold text-[#0C4A6E]">{page}</span> of{' '}
+        <span className="font-extrabold text-[#0C4A6E]">{totalPages}</span> ({totalRecords} total items)
       </div>
       <div className="flex items-center gap-1.5">
         <Button
