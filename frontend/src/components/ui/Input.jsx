@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
+import { SmartAutocomplete } from './SmartAutocomplete.jsx';
 
 export const Input = React.forwardRef(
   (
@@ -17,6 +18,7 @@ export const Input = React.forwardRef(
       onChange,
       onKeyDown,
       onlyNumbers = false,
+      autoSuggest = true,
       ...props
     },
     ref
@@ -28,7 +30,34 @@ export const Input = React.forwardRef(
       type === 'number' ||
       type === 'tel' ||
       type === 'phone' ||
+      type === 'password' ||
+      type === 'date' ||
       (label && (label.toLowerCase().includes('mobile') || label.toLowerCase().includes('phone') || label.toLowerCase().includes('qty') || label.toLowerCase().includes('price') || label.toLowerCase().includes('amount')));
+
+    // If text type and autoSuggest is enabled, render SmartAutocomplete
+    if (type === 'text' && !isNumericType && autoSuggest) {
+      return (
+        <div className="w-full">
+          <SmartAutocomplete
+            id={inputId}
+            label={label}
+            error={error}
+            required={required}
+            disabled={disabled}
+            icon={Icon}
+            value={props.value ?? ''}
+            onChange={onChange}
+            placeholder={props.placeholder}
+            className={className}
+          />
+          {error ? (
+            <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>
+          ) : hint ? (
+            <p className="mt-1 text-xs text-slate-500">{hint}</p>
+          ) : null}
+        </div>
+      );
+    }
 
     const inputMode = props.inputMode || (isNumericType ? (type === 'number' ? 'decimal' : 'numeric') : undefined);
     const pattern = props.pattern || (isNumericType ? '[0-9]*' : undefined);
@@ -265,10 +294,25 @@ export const SearchInput = React.forwardRef(
       loading = false,
       className = '',
       disabled = false,
+      autoSuggest = true,
       ...props
     },
     ref
   ) => {
+    if (autoSuggest) {
+      return (
+        <div className={`w-full ${className}`}>
+          <SmartAutocomplete
+            icon={Search}
+            value={value ?? ''}
+            onChange={onChange}
+            placeholder={placeholder}
+            disabled={disabled}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className={`relative rounded-xl shadow-2xs w-full ${className}`}>
         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
