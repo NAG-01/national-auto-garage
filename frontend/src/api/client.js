@@ -18,7 +18,18 @@ const isCloudHosted = () => {
   );
 };
 
-// Mock Storage Helpers for Standalone Vercel Hosting
+// Initial Full Garage Seed Dataset for Standalone Cloud Hosting
+const initialInventory = [
+  { _id: 'inv_1', name: 'Castrol Activ 4T 20W-40 Engine Oil (1L)', partNumber: 'OIL-20W40-1L', category: 'Engine Oil', stockQuantity: 25, minStockThreshold: 5, sellingPrice: 380, costPrice: 310, status: 'ACTIVE', isServicePart: true },
+  { _id: 'inv_2', name: 'Front Brake Pad / Shoe (Hero Splendor / Passion)', partNumber: 'BP-HERO-01', category: 'Brake Pads', stockQuantity: 3, minStockThreshold: 5, sellingPrice: 180, costPrice: 130, status: 'ACTIVE', isServicePart: true },
+  { _id: 'inv_3', name: 'NGK Spark Plug CPR8EA-9', partNumber: 'SP-NGK-8EA', category: 'Spark Plugs', stockQuantity: 18, minStockThreshold: 5, sellingPrice: 120, costPrice: 85, status: 'ACTIVE', isServicePart: true },
+  { _id: 'inv_4', name: 'Drive Chain & Sprocket Kit (Bajaj Pulsar 150)', partNumber: 'CS-PULSAR-150', category: 'Chain & Sprockets', stockQuantity: 8, minStockThreshold: 3, sellingPrice: 1450, costPrice: 1100, status: 'ACTIVE', isServicePart: true },
+  { _id: 'inv_5', name: 'Air Filter Element (Honda Activa 5G/6G)', partNumber: 'AF-ACTIVA-5G', category: 'Filters', stockQuantity: 14, minStockThreshold: 5, sellingPrice: 220, costPrice: 160, status: 'ACTIVE', isServicePart: true },
+  { _id: 'inv_6', name: 'TVS Eurogrip Tyre 90/90-12 Tubeless', partNumber: 'TY-TVS-909012', category: 'Tyres', stockQuantity: 0, minStockThreshold: 2, sellingPrice: 1250, costPrice: 980, status: 'ACTIVE', isServicePart: false },
+  { _id: 'inv_7', name: 'Clutch Cable (TVS Apache RTR 160)', partNumber: 'CB-APACHE-CL', category: 'General Parts', stockQuantity: 10, minStockThreshold: 3, sellingPrice: 160, costPrice: 110, status: 'ACTIVE', isServicePart: true },
+  { _id: 'inv_8', name: 'Motul Chain Lube Spray (400ml)', partNumber: 'LB-MOTUL-400', category: 'General Parts', stockQuantity: 15, minStockThreshold: 4, sellingPrice: 490, costPrice: 380, status: 'ACTIVE', isServicePart: false },
+];
+
 const getMockData = (key, defaultVal) => {
   try {
     const saved = localStorage.getItem(`nag_mock_${key}`);
@@ -119,18 +130,15 @@ api.interceptors.response.use(
         if (config.method === 'put' || config.method === 'post') {
           const updated = { ...defaultSettings, ...JSON.parse(config.data || '{}') };
           setMockData('settings', updated);
-          return { success: true, settings: updated };
+          return { success: true, settings: updated, data: updated };
         }
         const settings = getMockData('settings', defaultSettings);
-        return { success: true, settings };
+        return { success: true, settings, data: settings };
       }
 
       // 4. DASHBOARD METRICS
       if (url.includes('/dashboard/metrics')) {
-        const inventory = getMockData('inventory', [
-          { _id: '1', name: 'Castrol 20W40 1L', partNumber: 'OIL-001', stockQuantity: 12, minStockThreshold: 5, sellingPrice: 380, category: 'Engine Oil' },
-          { _id: '2', name: 'Front Brake Pad Hero Splendor', partNumber: 'BP-102', stockQuantity: 3, minStockThreshold: 5, sellingPrice: 150, category: 'Brake Pads' },
-        ]);
+        const inventory = getMockData('inventory', initialInventory);
         const lowStockParts = inventory.filter((i) => i.stockQuantity <= (i.minStockThreshold || 5));
         return {
           success: true,
@@ -142,21 +150,70 @@ api.interceptors.response.use(
         };
       }
 
-      // 5. DATA COLLECTIONS
-      if (url.includes('/inventory')) {
-        return getMockData('inventory', [
-          { _id: '1', name: 'Castrol 20W40 1L', partNumber: 'OIL-001', stockQuantity: 12, minStockThreshold: 5, sellingPrice: 380, category: 'Engine Oil' },
-          { _id: '2', name: 'Front Brake Pad Hero Splendor', partNumber: 'BP-102', stockQuantity: 3, minStockThreshold: 5, sellingPrice: 150, category: 'Brake Pads' },
-        ]);
+      // 5. INVENTORY & CATEGORIES
+      if (url.includes('/inventory/categories')) {
+        return { success: true, data: defaultSettings.inventoryCategories };
       }
-      if (url.includes('/jobs')) return getMockData('jobs', []);
-      if (url.includes('/invoices')) return getMockData('invoices', []);
-      if (url.includes('/expenses')) return getMockData('expenses', []);
-      if (url.includes('/dues')) return getMockData('dues', []);
-      if (url.includes('/keywords')) return getMockData('keywords', []);
-      if (url.includes('/suppliers')) return getMockData('suppliers', []);
+      if (url.includes('/inventory')) {
+        const inventory = getMockData('inventory', initialInventory);
+        const lowStock = inventory.filter((i) => i.stockQuantity > 0 && i.stockQuantity <= (i.minStockThreshold || 5)).length;
+        const outOfStock = inventory.filter((i) => i.stockQuantity === 0).length;
+        return {
+          success: true,
+          data: {
+            products: inventory,
+            summary: {
+              totalProducts: inventory.length,
+              activeProducts: inventory.length,
+              lowStockCount: lowStock,
+              outOfStockCount: outOfStock,
+            },
+          },
+          products: inventory,
+          summary: {
+            totalProducts: inventory.length,
+            activeProducts: inventory.length,
+            lowStockCount: lowStock,
+            outOfStockCount: outOfStock,
+          },
+        };
+      }
 
-      return [];
+      // 6. JOBS
+      if (url.includes('/jobs')) {
+        const jobs = getMockData('jobs', []);
+        return { success: true, data: jobs, jobs };
+      }
+
+      // 7. INVOICES / BILLING
+      if (url.includes('/invoices')) {
+        const invoices = getMockData('invoices', []);
+        return { success: true, data: invoices, invoices };
+      }
+
+      // 8. EXPENSES
+      if (url.includes('/expenses')) {
+        const expenses = getMockData('expenses', []);
+        return { success: true, data: expenses, expenses };
+      }
+
+      // 9. DUES & RECEIVABLES
+      if (url.includes('/dues')) {
+        const dues = getMockData('dues', []);
+        return { success: true, data: dues, dues };
+      }
+
+      // 10. KEYWORDS & SUPPLIERS
+      if (url.includes('/keywords')) {
+        const keywords = getMockData('keywords', []);
+        return { success: true, data: keywords, keywords };
+      }
+      if (url.includes('/suppliers')) {
+        const suppliers = getMockData('suppliers', []);
+        return { success: true, data: suppliers, suppliers };
+      }
+
+      return { success: true, data: [] };
     }
 
     if (error.response?.status === 401) {
