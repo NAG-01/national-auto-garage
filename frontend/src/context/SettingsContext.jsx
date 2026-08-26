@@ -14,6 +14,8 @@ export const SettingsProvider = ({ children }) => {
     currencySymbol: '₹',
     invoicePrefix: 'INV',
     jobIdPrefix: 'NAG',
+    duesPrefix: 'DUE',
+    expensePrefix: 'EXP',
     portalBadgeText: 'ADMIN PORTAL',
     topbarContextText: 'Workshop System',
     brandNameMain: 'National Auto',
@@ -25,8 +27,9 @@ export const SettingsProvider = ({ children }) => {
   const fetchSettings = useCallback(async () => {
     try {
       const res = await api.get('/settings');
-      if (res.data) {
-        setSettings((prev) => ({ ...prev, ...res.data }));
+      const payload = res.data || res;
+      if (payload) {
+        setSettings((prev) => ({ ...prev, ...payload }));
       }
     } catch (err) {
       console.warn('Failed to load settings from server, using defaults.', err);
@@ -41,10 +44,11 @@ export const SettingsProvider = ({ children }) => {
 
   const updateSettings = async (newSettingsData) => {
     const res = await api.put('/settings', newSettingsData);
-    if (res.data) {
-      setSettings((prev) => ({ ...prev, ...res.data }));
+    const payload = res.data || res;
+    if (payload) {
+      setSettings((prev) => ({ ...prev, ...payload }));
     }
-    return res.data;
+    return payload;
   };
 
   return (

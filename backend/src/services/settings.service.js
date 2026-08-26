@@ -18,6 +18,8 @@ export class SettingsService {
         dateFormat: 'DD/MM/YYYY',
         invoicePrefix: 'INV',
         jobIdPrefix: 'NAG',
+        duesPrefix: 'DUE',
+        expensePrefix: 'EXP',
         portalBadgeText: 'ADMIN PORTAL',
         topbarContextText: 'Workshop System',
         brandNameMain: 'National Auto',
@@ -32,19 +34,20 @@ export class SettingsService {
       if (!settings.brandNameMain) { settings.brandNameMain = 'National Auto'; updated = true; }
       if (!settings.brandNameSub) { settings.brandNameSub = 'Garage Portal'; updated = true; }
       if (!settings.invoiceFooterNote) { settings.invoiceFooterNote = 'Thank you for choosing National Auto Garage! Safe Riding.'; updated = true; }
+      if (!settings.duesPrefix) { settings.duesPrefix = 'DUE'; updated = true; }
+      if (!settings.expensePrefix) { settings.expensePrefix = 'EXP'; updated = true; }
       if (updated) await settings.save();
     }
     return settings;
   }
 
   static async updateSettings(data) {
-    let settings = await Settings.findOne();
-    if (!settings) {
-      settings = new Settings(data);
-    } else {
-      Object.assign(settings, data);
-    }
-    await settings.save();
+    const { _id, id, createdAt, updatedAt, __v, ...cleanData } = data;
+    let settings = await Settings.findOneAndUpdate(
+      {},
+      { $set: cleanData },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
     return settings;
   }
 

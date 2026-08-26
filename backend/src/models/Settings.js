@@ -46,6 +46,14 @@ const settingsSchema = new mongoose.Schema(
       type: String,
       default: 'NAG',
     },
+    duesPrefix: {
+      type: String,
+      default: 'DUE',
+    },
+    expensePrefix: {
+      type: String,
+      default: 'EXP',
+    },
     // Dynamic UI Labels & Titles
     portalBadgeText: {
       type: String,
