@@ -131,8 +131,18 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
       isOpen={isOpen}
       onClose={onClose}
       title={isEdit ? 'Baaki Record Edit Karein' : '+ Naya Baaki / Dues Record Add Karein'}
+      footer={
+        <div className="flex items-center justify-end gap-3 w-full">
+          <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button type="submit" form="outstanding-dues-form" loading={submitting}>
+            {isEdit ? 'Update Record' : 'Save Record'}
+          </Button>
+        </div>
+      }
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form id="outstanding-dues-form" onSubmit={handleSubmit} className="space-y-4">
         {/* Form Top Banner */}
         <div className="p-3 bg-orange-50 border border-orange-200 rounded-xl text-xs text-orange-900 font-medium flex items-center gap-2">
           <DollarSign className="w-4 h-4 text-orange-600 flex-shrink-0" />
@@ -225,15 +235,6 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
             value={formData.notes}
             onChange={handleChange}
           />
-        </div>
-
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-          <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
-            Cancel
-          </Button>
-          <Button type="submit" loading={submitting}>
-            {isEdit ? 'Update Record' : 'Save Record'}
-          </Button>
         </div>
       </form>
     </Modal>
