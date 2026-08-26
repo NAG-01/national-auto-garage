@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, User, Phone, Bike, MapPin, DollarSign, FileText } from 'lucide-react';
-import { Modal, ModalCancelButton } from '../../components/ui/Modal.jsx';
+import { Modal, ModalCancelButton, ConfirmDialog } from '../../components/ui/Modal.jsx';
 import { Input } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -22,6 +22,7 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
 
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
   useEffect(() => {
     if (record) {
@@ -50,6 +51,7 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
       });
     }
     setErrors({});
+    setShowSaveConfirm(false);
   }, [record, isOpen]);
 
   const handleChange = (e) => {
@@ -93,10 +95,13 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
+    setShowSaveConfirm(true);
+  };
 
+  const executeSave = async () => {
     setSubmitting(true);
     try {
       const payload = {
@@ -111,12 +116,13 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
 
       if (isEdit) {
         await api.put(`/outstanding/${record._id}`, payload);
-        toast.success('Baaki dues record successfully update ho gaya!');
+        toast.success(`Customer ${formData.customerName} ka record update ho gaya!`);
       } else {
         await api.post('/outstanding', payload);
-        toast.success('Naya baaki dues record add ho gaya!');
+        toast.success(`Customer ${formData.customerName} ka naya baaki record save ho gaya!`);
       }
 
+      setShowSaveConfirm(false);
       onSuccess();
       onClose();
     } catch (err) {
@@ -127,117 +133,134 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      confirmOnClose={true}
-      title={isEdit ? 'Baaki Record Edit Karein' : '+ Naya Baaki / Dues Record Add Karein'}
-      footer={
-        <div className="flex items-center justify-end gap-3 w-full">
-          <ModalCancelButton disabled={submitting}>
-            Cancel
-          </ModalCancelButton>
-          <Button type="submit" form="outstanding-dues-form" variant="accent" loading={submitting}>
-            {isEdit ? 'Update Record' : 'Save Record'}
-          </Button>
-        </div>
-      }
-    >
-      <form id="outstanding-dues-form" onSubmit={handleSubmit} className="space-y-4">
-        {/* Form Top Banner */}
-        <div className="p-3 bg-orange-50 border border-orange-200 rounded-xl text-xs text-orange-900 font-medium flex items-center gap-2">
-          <DollarSign className="w-4 h-4 text-orange-600 flex-shrink-0" />
-          <span>Customer ke khate me baaki paise aur bike details enter karein.</span>
-        </div>
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        confirmOnClose={true}
+        title={isEdit ? 'Baaki Record Edit Karein' : '+ Naya Baaki / Dues Record Add Karein'}
+        footer={
+          <div className="flex items-center justify-end gap-3 w-full">
+            <ModalCancelButton disabled={submitting}>
+              Cancel
+            </ModalCancelButton>
+            <Button type="submit" form="outstanding-dues-form" variant="accent" loading={submitting}>
+              {isEdit ? 'Update Record' : 'Save Record'}
+            </Button>
+          </div>
+        }
+      >
+        <form id="outstanding-dues-form" onSubmit={handleFormSubmit} className="space-y-4">
+          {/* Form Top Banner */}
+          <div className="p-3 bg-orange-50 border border-orange-200 rounded-xl text-xs text-orange-900 font-medium flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-orange-600 flex-shrink-0" />
+            <span>Customer ke khate me baaki paise aur bike details enter karein.</span>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Tareekh (Date)"
+              type="date"
+              name="date"
+              icon={Calendar}
+              value={formData.date}
+              onChange={handleChange}
+              required
+              error={errors.date}
+            />
+
+            <Input
+              label="Customer Name"
+              name="customerName"
+              icon={User}
+              placeholder="Customer ka naam likhein"
+              value={formData.customerName}
+              onChange={handleChange}
+              required
+              error={errors.customerName}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Mobile Number (Only 10 digits)"
+              type="tel"
+              name="mobileNumber"
+              icon={Phone}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              onlyNumbers={true}
+              maxLength={10}
+              placeholder="10-digit mobile number"
+              value={formData.mobileNumber}
+              onChange={handleChange}
+              required
+              error={errors.mobileNumber}
+            />
+
+            <Input
+              label="Bike Name"
+              name="bikeName"
+              icon={Bike}
+              placeholder="e.g. Honda Activa 6G / Splendor"
+              value={formData.bikeName}
+              onChange={handleChange}
+              required
+              error={errors.bikeName}
+            />
+          </div>
+
           <Input
-            label="Tareekh (Date)"
-            type="date"
-            name="date"
-            icon={Calendar}
-            value={formData.date}
+            label="Address (Pata)"
+            name="address"
+            icon={MapPin}
+            placeholder="e.g. Shop No. 4, Main Road, City"
+            value={formData.address}
             onChange={handleChange}
-            required
-            error={errors.date}
           />
 
-          <Input
-            label="Customer Name"
-            name="customerName"
-            icon={User}
-            placeholder="Customer ka naam likhein"
-            value={formData.customerName}
-            onChange={handleChange}
-            required
-            error={errors.customerName}
-          />
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Baaki Amount (₹)"
+              type="tel"
+              name="pendingAmount"
+              icon={DollarSign}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              onlyNumbers={true}
+              placeholder="Kitne paise baaki hain (e.g. 1500)"
+              value={formData.pendingAmount}
+              onChange={handleChange}
+              required
+              error={errors.pendingAmount}
+            />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Mobile Number (Only 10 digits)"
-            type="tel"
-            name="mobileNumber"
-            icon={Phone}
-            inputMode="numeric"
-            pattern="[0-9]*"
-            onlyNumbers={true}
-            maxLength={10}
-            placeholder="10-digit mobile number"
-            value={formData.mobileNumber}
-            onChange={handleChange}
-            required
-            error={errors.mobileNumber}
-          />
+            <Input
+              label="Details / Notes (Optional)"
+              name="notes"
+              icon={FileText}
+              placeholder="e.g. Service & spare parts baaki"
+              value={formData.notes}
+              onChange={handleChange}
+            />
+          </div>
+        </form>
+      </Modal>
 
-          <Input
-            label="Bike Name"
-            name="bikeName"
-            icon={Bike}
-            placeholder="e.g. Honda Activa 6G / Splendor"
-            value={formData.bikeName}
-            onChange={handleChange}
-            required
-            error={errors.bikeName}
-          />
-        </div>
-
-        <Input
-          label="Address (Pata)"
-          name="address"
-          icon={MapPin}
-          placeholder="e.g. Shop No. 4, Main Road, City"
-          value={formData.address}
-          onChange={handleChange}
+      {/* Save Confirmation Dialog */}
+      {showSaveConfirm && (
+        <ConfirmDialog
+          isOpen={showSaveConfirm}
+          onClose={() => setShowSaveConfirm(false)}
+          onConfirm={executeSave}
+          title={isEdit ? 'Update Baaki Record?' : 'Save Naya Baaki Record?'}
+          message={`Kya aap Customer "${formData.customerName}" (Bike: ${formData.bikeName}) ke ₹${formData.pendingAmount} baaki dues record ko ${isEdit ? 'update' : 'save'} karna chahte hain?`}
+          confirmText={isEdit ? 'Yes, Update Record' : 'Yes, Save Record'}
+          cancelText="Keep Editing"
+          variant="success"
+          loading={submitting}
         />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Baaki Amount (₹)"
-            type="tel"
-            name="pendingAmount"
-            icon={DollarSign}
-            inputMode="numeric"
-            pattern="[0-9]*"
-            onlyNumbers={true}
-            placeholder="Kitne paise baaki hain (e.g. 1500)"
-            value={formData.pendingAmount}
-            onChange={handleChange}
-            required
-            error={errors.pendingAmount}
-          />
-
-          <Input
-            label="Details / Notes (Optional)"
-            name="notes"
-            icon={FileText}
-            placeholder="e.g. Service & spare parts baaki"
-            value={formData.notes}
-            onChange={handleChange}
-          />
-        </div>
-      </form>
-    </Modal>
+      )}
+    </>
   );
 };
