@@ -385,12 +385,10 @@ export const SettlementCalculatorPage = () => {
               <Table className="min-w-[750px]">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 text-left text-[11px] font-extrabold text-slate-600 uppercase tracking-wider">
-                    <th className="py-3 px-4 w-10">
-                      <TableHeadCheckbox
-                        checked={isAllSelected}
-                        onChange={toggleSelectAll}
-                      />
-                    </th>
+                    <TableHeadCheckbox
+                      checked={isAllSelected}
+                      onChange={toggleSelectAll}
+                    />
                     <th className="py-3 px-4">Date & Time</th>
                     <th className="py-3 px-4">Calc #</th>
                     <th className="py-3 px-4 text-right">Revenue</th>
@@ -412,12 +410,10 @@ export const SettlementCalculatorPage = () => {
                           active ? 'bg-slate-50 font-medium' : ''
                         }`}
                       >
-                        <td className="py-3.5 px-4">
-                          <TableCellCheckbox
-                            checked={active}
-                            onChange={() => toggleSelect(rec._id)}
-                          />
-                        </td>
+                        <TableCellCheckbox
+                          checked={active}
+                          onChange={() => toggleSelect(rec._id)}
+                        />
                         <td className="py-3.5 px-4 font-bold text-slate-900 whitespace-nowrap">
                           {formatDate(rec.date)}
                         </td>
