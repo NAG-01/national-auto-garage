@@ -1,5 +1,4 @@
 import { Settings } from '../models/Settings.js';
-import { AuditLog } from '../models/AuditLog.js';
 import { ServiceType } from '../models/ServiceType.js';
 import { Employee } from '../models/Employee.js';
 import { EXPENSE_CATEGORIES } from '../config/constants.js';
@@ -19,52 +18,39 @@ export class SettingsService {
         dateFormat: 'DD/MM/YYYY',
         invoicePrefix: 'INV',
         jobIdPrefix: 'NAG',
-        inventoryCategories: ['Engine Parts', 'Brake Systems', 'Electrical & Lighting', 'Filters & Plugs', 'Oils & Lubricants', 'Tyres & Tubes', 'Chains & Sprockets', 'Accessories'],
-        expenseCategories: EXPENSE_CATEGORIES,
-        paymentMethods: ['CASH', 'UPI', 'CARD', 'BANK_TRANSFER', 'OTHER'],
       });
     }
+    return settings;
+  }
 
-    const serviceTypes = await ServiceType.find();
-    const employees = await Employee.find();
+  static async updateSettings(data) {
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = new Settings(data);
+    } else {
+      Object.assign(settings, data);
+    }
+    await settings.save();
+    return settings;
+  }
+
+  static async getSystemMetadata() {
+    const settings = await this.getSettings();
+    const serviceTypes = await ServiceType.find({ isActive: true }).sort({ category: 1, name: 1 });
+    const employees = await Employee.find({ isActive: true }).sort({ name: 1 });
 
     return {
       settings,
       serviceTypes,
       employees,
+      expenseCategories: EXPENSE_CATEGORIES,
     };
   }
 
-  static async updateSettings(updateData) {
-    let settings = await Settings.findOne();
-    if (!settings) {
-      settings = await Settings.create(updateData);
-    } else {
-      Object.assign(settings, updateData);
-      await settings.save();
-    }
-    return settings;
-  }
-
-  static async getAuditLogs({ entityType = '', action = '', page = 1, limit = 50 }) {
-    const query = {};
-    if (entityType) query.entityType = entityType;
-    if (action) query.action = action;
-
-    const skip = (page - 1) * limit;
-    const [logs, totalRecords] = await Promise.all([
-      AuditLog.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
-      AuditLog.countDocuments(query),
-    ]);
-
+  static async getAuditLogs() {
     return {
-      logs,
-      pagination: {
-        page: Number(page),
-        limit: Number(limit),
-        totalRecords,
-        totalPages: Math.ceil(totalRecords / limit),
-      },
+      logs: [],
+      pagination: { page: 1, limit: 50, totalRecords: 0, totalPages: 0 },
     };
   }
 }

@@ -3,7 +3,6 @@ import { Customer } from '../models/Customer.js';
 import { Vehicle } from '../models/Vehicle.js';
 import { Product } from '../models/Product.js';
 import { InventoryMovement } from '../models/InventoryMovement.js';
-import { Inspection } from '../models/Inspection.js';
 import { ApiError } from '../utils/apiError.js';
 import { generateNextSequence } from '../utils/sequenceGenerator.js';
 import { roundMoney, normalizeRegNumber } from '../utils/currency.js';
@@ -396,21 +395,14 @@ export class JobCardService {
     return job;
   }
 
-  static async saveInspection(jobId, data, user) {
+  static async saveInspection(jobId, data) {
     if (data && Array.isArray(data.items)) {
       data.items = data.items.map((it) => ({
         ...it,
         item: it.item || it.category || it.name || 'Check Item',
       }));
     }
-    let inspection = await Inspection.findOne({ jobId });
-    if (inspection) {
-      Object.assign(inspection, data);
-      await inspection.save();
-    } else {
-      inspection = await Inspection.create({ jobId, ...data });
-    }
-    return inspection;
+    return { jobId, ...data, saved: true };
   }
 
   static async updateStatus(id, data, user) {

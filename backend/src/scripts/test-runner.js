@@ -8,7 +8,6 @@ import { Vehicle } from '../models/Vehicle.js';
 import { Part } from '../models/Part.js';
 import { ServiceType } from '../models/ServiceType.js';
 import { ServiceJob } from '../models/ServiceJob.js';
-import { Inspection } from '../models/Inspection.js';
 import { Bill } from '../models/Bill.js';
 import { Payment } from '../models/Payment.js';
 import { Expense } from '../models/Expense.js';

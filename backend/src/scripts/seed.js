@@ -13,7 +13,6 @@ import { Product } from '../models/Product.js';
 import { Customer } from '../models/Customer.js';
 import { Vehicle } from '../models/Vehicle.js';
 import { ServiceJob } from '../models/ServiceJob.js';
-import { Inspection } from '../models/Inspection.js';
 import { Expense } from '../models/Expense.js';
 import { Bill } from '../models/Bill.js';
 import { Payment } from '../models/Payment.js';
@@ -45,7 +44,6 @@ export async function seedDatabase() {
     Customer.deleteMany({}),
     Vehicle.deleteMany({}),
     ServiceJob.deleteMany({}),
-    Inspection.deleteMany({}),
     Expense.deleteMany({}),
     Bill.deleteMany({}),
     Payment.deleteMany({}),
@@ -277,18 +275,6 @@ export async function seedDatabase() {
     partsSubtotal: 420,
     totalAmount: 1020,
     estimatedTotal: 1020,
-  });
-
-  await Inspection.create({
-    jobId: job1._id,
-    items: [
-      { item: 'Engine Oil Level', category: 'ENGINE_OIL', condition: INSPECTION_CONDITIONS.GOOD, notes: 'Smooth idle' },
-      { item: 'Brake Pads', category: 'BRAKES', condition: INSPECTION_CONDITIONS.FAIR, notes: 'Front brake pad worn' },
-      { item: 'General Oil Quality', category: 'GENERAL', condition: INSPECTION_CONDITIONS.POOR, notes: 'Black degraded oil' },
-      { item: 'Tire Pressure', category: 'TIRES', condition: INSPECTION_CONDITIONS.GOOD, notes: '32 PSI front / 36 PSI rear' },
-    ],
-    overallCondition: 'Overall good condition, needs oil change and brake tuning.',
-    inspectedBy: mech1._id,
   });
 
   // Job 2: Completed and Delivered with Invoice and Payment

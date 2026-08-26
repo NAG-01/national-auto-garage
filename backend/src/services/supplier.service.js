@@ -3,7 +3,6 @@ import { SupplierOrder } from '../models/SupplierOrder.js';
 import { ApiError } from '../utils/apiError.js';
 import { generateNextSequence } from '../utils/sequenceGenerator.js';
 import { normalizePhone } from '../utils/currency.js';
-import { AuditLog } from '../models/AuditLog.js';
 
 export class SupplierService {
   static async createSupplier(supplierData, user) {

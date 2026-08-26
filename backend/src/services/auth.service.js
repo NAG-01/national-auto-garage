@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
 import { ApiError } from '../utils/apiError.js';
-import { AuditLog } from '../models/AuditLog.js';
 
 export class AuthService {
   static generateToken(user) {
@@ -42,16 +41,6 @@ export class AuthService {
     await user.save();
 
     const token = this.generateToken(user);
-
-    // Audit log
-    await AuditLog.create({
-      action: 'LOGIN',
-      entity: 'User',
-      entityId: user._id.toString(),
-      user: user.username,
-      summary: `Admin user '${user.username}' logged in successfully`,
-      metadata: { ipAddress },
-    });
 
     const userProfile = {
       id: user._id,

@@ -6,7 +6,6 @@ import { INVENTORY_MOVEMENT_TYPES, SUPPLIER_ORDER_STATUSES } from '../config/con
 import { ApiError } from '../utils/apiError.js';
 import { generateNextSequence } from '../utils/sequenceGenerator.js';
 import { roundMoney } from '../utils/currency.js';
-import { AuditLog } from '../models/AuditLog.js';
 
 export class SupplierOrderService {
   static async createOrder(orderData, user) {
