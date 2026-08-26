@@ -26,7 +26,9 @@ import { useToast } from '../../context/ToastContext.jsx';
 
 export const SettingsPage = () => {
   const { settings, updateSettings, loading: settingsLoading } = useSettings();
-  const { showSuccess, showError } = useToast();
+  const toast = useToast();
+  const showSuccess = toast.showSuccess || toast.success || console.log;
+  const showError = toast.showError || toast.error || console.error;
 
   const [activeTab, setActiveTab] = useState('ui'); // 'ui' | 'branding' | 'prefixes' | 'mechanics'
 

@@ -8,6 +8,7 @@ export const Input = React.forwardRef(
       label,
       error,
       hint,
+      helpText,
       icon: Icon,
       rightElement,
       type = 'text',
@@ -24,6 +25,7 @@ export const Input = React.forwardRef(
     ref
   ) => {
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+    const displayHint = helpText || hint;
 
     const isNumericType =
       onlyNumbers ||
@@ -52,8 +54,8 @@ export const Input = React.forwardRef(
           />
           {error ? (
             <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>
-          ) : hint ? (
-            <p className="mt-1 text-xs text-slate-500">{hint}</p>
+          ) : displayHint ? (
+            <p className="mt-1 text-xs text-slate-500 font-medium">{displayHint}</p>
           ) : null}
         </div>
       );
@@ -108,25 +110,23 @@ export const Input = React.forwardRef(
             inputMode={inputMode}
             pattern={pattern}
             disabled={disabled}
-            onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={`w-full rounded-xl border text-sm text-slate-900 font-medium placeholder:text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed ${paddingClass} ${
+            onChange={handleChange}
+            className={`w-full rounded-xl border text-sm text-slate-900 font-medium placeholder:text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] disabled:bg-slate-100 disabled:cursor-not-allowed ${
               error
-                ? 'border-rose-400 focus:ring-rose-500 focus:border-rose-500 bg-rose-50/20'
+                ? 'border-rose-400 focus:ring-rose-500 bg-rose-50/20'
                 : 'border-slate-300 bg-white hover:border-slate-400'
-            } ${className}`}
+            } ${paddingClass} ${className}`}
             {...props}
           />
           {rightElement && (
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-              {rightElement}
-            </div>
+            <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center">{rightElement}</div>
           )}
         </div>
         {error ? (
           <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>
-        ) : hint ? (
-          <p className="mt-1 text-xs text-slate-500">{hint}</p>
+        ) : displayHint ? (
+          <p className="mt-1 text-xs text-slate-500 font-medium">{displayHint}</p>
         ) : null}
       </div>
     );
@@ -135,55 +135,21 @@ export const Input = React.forwardRef(
 Input.displayName = 'Input';
 
 export const CurrencyInput = React.forwardRef(
-  (
-    {
-      label,
-      error,
-      hint,
-      className = '',
-      required = false,
-      disabled = false,
-      id,
-      ...props
-    },
-    ref
-  ) => {
-    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
-
+  ({ label, error, hint, helpText, value, onChange, className = '', ...props }, ref) => {
     return (
-      <div className="w-full">
-        {label && (
-          <label htmlFor={inputId} className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
-            {label} {required && <span className="text-rose-500">*</span>}
-          </label>
-        )}
-        <div className="relative rounded-xl shadow-2xs">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none font-black text-[#0284C7] text-sm select-none">
-            ₹
-          </div>
-          <input
-            ref={ref}
-            id={inputId}
-            type="number"
-            inputMode="decimal"
-            pattern="[0-9]*"
-            min="0"
-            step="any"
-            disabled={disabled}
-            className={`w-full rounded-xl border text-sm text-slate-900 font-bold pl-8 pr-3.5 py-2 h-10 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed ${
-              error
-                ? 'border-rose-400 focus:ring-rose-500 focus:border-rose-500 bg-rose-50/20'
-                : 'border-slate-300 bg-white hover:border-slate-400'
-            } ${className}`}
-            {...props}
-          />
-        </div>
-        {error ? (
-          <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>
-        ) : hint ? (
-          <p className="mt-1 text-xs text-slate-500">{hint}</p>
-        ) : null}
-      </div>
+      <Input
+        ref={ref}
+        type="text"
+        onlyNumbers={true}
+        label={label}
+        error={error}
+        hint={hint || helpText}
+        value={value}
+        onChange={onChange}
+        rightElement={<span className="text-xs font-bold text-slate-400 select-none">₹ INR</span>}
+        className={className}
+        {...props}
+      />
     );
   }
 );
@@ -195,6 +161,7 @@ export const Select = React.forwardRef(
       label,
       error,
       hint,
+      helpText,
       children,
       className = '',
       required = false,
@@ -205,6 +172,7 @@ export const Select = React.forwardRef(
     ref
   ) => {
     const selectId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+    const displayHint = helpText || hint;
 
     return (
       <div className="w-full">
@@ -228,8 +196,8 @@ export const Select = React.forwardRef(
         </select>
         {error ? (
           <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>
-        ) : hint ? (
-          <p className="mt-1 text-xs text-slate-500">{hint}</p>
+        ) : displayHint ? (
+          <p className="mt-1 text-xs text-slate-500 font-medium">{displayHint}</p>
         ) : null}
       </div>
     );
@@ -243,6 +211,7 @@ export const Textarea = React.forwardRef(
       label,
       error,
       hint,
+      helpText,
       rows = 3,
       className = '',
       required = false,
@@ -253,6 +222,7 @@ export const Textarea = React.forwardRef(
     ref
   ) => {
     const textareaId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+    const displayHint = helpText || hint;
 
     return (
       <div className="w-full">
@@ -275,8 +245,8 @@ export const Textarea = React.forwardRef(
         />
         {error ? (
           <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>
-        ) : hint ? (
-          <p className="mt-1 text-xs text-slate-500">{hint}</p>
+        ) : displayHint ? (
+          <p className="mt-1 text-xs text-slate-500 font-medium">{displayHint}</p>
         ) : null}
       </div>
     );
@@ -295,6 +265,7 @@ export const SearchInput = React.forwardRef(
       className = '',
       disabled = false,
       autoSuggest = true,
+      helpText,
       ...props
     },
     ref
