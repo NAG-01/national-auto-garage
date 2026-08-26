@@ -1,4 +1,5 @@
 import { AuthService } from '../services/auth.service.js';
+import { EmailTokenService } from '../services/emailToken.service.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 
 export class AuthController {
@@ -45,21 +46,21 @@ export class AuthController {
     }
   }
 
-  static async requestEmailOTP(req, res, next) {
+  static async requestEmailMagicLink(req, res, next) {
     try {
       const { newEmail } = req.body;
-      const result = await AuthService.requestEmailChangeOTP(newEmail, req.user._id);
-      return ApiResponse.success(res, 'Email OTP sent successfully', result);
+      const result = await EmailTokenService.sendMagicLink(req.user._id, newEmail);
+      return ApiResponse.success(res, 'Gmail confirmation link sent successfully', result);
     } catch (err) {
       next(err);
     }
   }
 
-  static async verifyEmailOTP(req, res, next) {
+  static async verifyEmailToken(req, res, next) {
     try {
-      const { otpCode, newEmail } = req.body;
-      const { user, token } = await AuthService.verifyEmailOTPAndChangeUsername(otpCode, newEmail, req.user._id);
-      return ApiResponse.success(res, 'Username & Email updated successfully', { user, token });
+      const { token } = req.query;
+      const result = await EmailTokenService.verifyMagicToken(token);
+      return ApiResponse.success(res, 'Email verified successfully', result);
     } catch (err) {
       next(err);
     }

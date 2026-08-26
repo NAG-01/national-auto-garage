@@ -13,8 +13,8 @@ router.get('/me', authenticate, AuthController.me);
 router.post('/verify-password', authenticate, AuthController.verifyPassword);
 router.put('/update-password', authenticate, AuthController.updatePassword);
 
-// Email OTP Username Change Endpoints
-router.post('/request-email-otp', authenticate, AuthController.requestEmailOTP);
-router.post('/verify-email-otp', authenticate, AuthController.verifyEmailOTP);
+// Real Gmail Magic Verification Link Endpoints
+router.post('/request-email-magic-link', authenticate, AuthController.requestEmailMagicLink);
+router.get('/verify-email-token', AuthController.verifyEmailToken);
 
 export default router;

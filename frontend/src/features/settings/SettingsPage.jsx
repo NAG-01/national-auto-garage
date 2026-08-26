@@ -217,8 +217,11 @@ export const SettingsPage = () => {
     }
   };
 
-  // EMAIL OTP FLOW 1: Request 6-Digit Code
-  const handleRequestEmailOtp = async (e) => {
+  // GMAIL MAGIC LINK FLOW: Send Verification Link to Inbox
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [sentMagicLinkUrl, setSentMagicLinkUrl] = useState('');
+
+  const handleSendGmailMagicLink = async (e) => {
     e.preventDefault();
     if (!newEmail || !newEmail.trim()) {
       showError('Please enter a valid Email address.');
@@ -226,15 +229,17 @@ export const SettingsPage = () => {
     }
     setSendingOtp(true);
     try {
-      const res = await api.post('/auth/request-email-otp', { newEmail: newEmail.trim() });
+      const res = await api.post('/auth/request-email-magic-link', { newEmail: newEmail.trim() });
       const payload = res.data || res;
-      if (payload && payload.otp) {
-        setGeneratedOtpHint(payload.otp);
-        setOtpModalOpen(true);
-        showSuccess(`Confirmation OTP sent to ${newEmail.trim()}! Please check your email.`);
+      if (payload) {
+        setMagicLinkSent(true);
+        if (payload.magicLink) {
+          setSentMagicLinkUrl(payload.magicLink);
+        }
+        showSuccess(`Verification email sent to ${newEmail.trim()}! Please check your Gmail Inbox.`);
       }
     } catch (err) {
-      showError(err.message || 'Failed to send OTP code');
+      showError(err.message || 'Failed to send verification link');
     } finally {
       setSendingOtp(false);
     }
@@ -657,9 +662,9 @@ export const SettingsPage = () => {
             </Card>
           )}
 
-          {/* DEDICATED TAB 5: Change Admin Email / Username with OTP Confirmation */}
+          {/* DEDICATED TAB 5: Change Admin Email / Username with Gmail Verification Link */}
           {activeTab === 'username' && (
-            <form onSubmit={handleRequestEmailOtp}>
+            <form onSubmit={handleSendGmailMagicLink}>
               <Card className="p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6 bg-white">
                 <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
                   <div className="p-3 rounded-2xl bg-sky-50 text-[#0284C7] border border-sky-200 shrink-0">
@@ -667,39 +672,66 @@ export const SettingsPage = () => {
                   </div>
                   <div>
                     <h2 className="text-base font-black text-slate-900 tracking-tight">
-                      Change Admin Email & Username (Email OTP Verification)
+                      Change Admin Email & Username (Gmail Magic Verification Link)
                     </h2>
                     <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      Apna Naya Email address enter karein. Email par OTP jayega aur verification ke baad change ho jayega.
+                      Apna Naya Email address enter karein. Gmail par confirmation link jayega aur link click karne se confirm ho jayega.
                     </p>
                   </div>
                 </div>
 
                 <div className="bg-sky-50/80 p-4 rounded-2xl border border-sky-200 text-sky-950 text-xs font-medium space-y-1">
                   <div className="font-extrabold flex items-center gap-1.5 text-sky-900">
-                    <ShieldCheck className="w-4 h-4 text-[#0284C7]" /> Email Confirmation Security
+                    <ShieldCheck className="w-4 h-4 text-[#0284C7]" /> Real Gmail Inbox Verification
                   </div>
                   <p className="text-[11px] leading-relaxed text-sky-800">
-                    Security ke liye, Naya Email/Username tabhi active hoga jab aap <strong>6-digit Email OTP Code</strong> verify karenge.
+                    Security ke liye, Naya Email/Username tabhi active hoga jab aap apne Gmail inbox me bheje gaye <strong>Magic Link</strong> par click karenge.
                   </p>
                 </div>
+
+                {magicLinkSent && (
+                  <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-5 rounded-2xl space-y-3 shadow-lg">
+                    <div className="flex items-center gap-2 font-black text-sm text-white">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-200" /> Verification Email Sent to {newEmail}!
+                    </div>
+                    <p className="text-xs text-emerald-100 font-medium leading-relaxed">
+                      We sent a confirmation link to <strong>{newEmail}</strong>. Please check your Gmail Inbox and click the link to confirm and activate your new email.
+                    </p>
+
+                    {sentMagicLinkUrl && (
+                      <div className="pt-2 border-t border-emerald-400/40 space-y-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-100 block">
+                          DIRECT GMAIL VERIFICATION LINK:
+                        </span>
+                        <a
+                          href={sentMagicLinkUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-emerald-800 text-xs font-black hover:bg-emerald-50 shadow-md transition-all active:scale-95"
+                        >
+                          <Mail className="w-4 h-4 text-emerald-600" /> Click Here to Confirm Email Change
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="space-y-6 max-w-lg">
                   <Input
                     type="email"
-                    label="New Admin Email Address / Username *"
-                    placeholder="e.g. naim@nag.com or admin@nationalautogarage.com"
+                    label="New Admin Gmail Address / Username *"
+                    placeholder="e.g. naimpathan@gmail.com or admin@nationalautogarage.com"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     icon={Mail}
                     required
-                    helpText="Apna Naya Official Admin Email Address enter karein."
+                    helpText="Apna Naya Official Admin Gmail Address enter karein."
                   />
                 </div>
 
                 <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200">
                   <span className="text-xs text-slate-500 font-medium hidden sm:inline">
-                    A 6-digit confirmation code will be sent to your email.
+                    A confirmation link will be sent to your Gmail inbox.
                   </span>
                   <Button
                     type="submit"
@@ -707,7 +739,7 @@ export const SettingsPage = () => {
                     className="px-8 py-3 text-xs font-black bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-lg shadow-sky-900/20"
                   >
                     <Send className="w-4 h-4 mr-2" />
-                    {sendingOtp ? 'Sending OTP Code...' : 'Send Email Confirmation OTP'}
+                    {sendingOtp ? 'Sending Gmail Link...' : 'Send Gmail Verification Link'}
                   </Button>
                 </div>
               </Card>

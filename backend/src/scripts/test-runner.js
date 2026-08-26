@@ -48,16 +48,18 @@ async function runTests() {
   await connectDB();
 
   try {
-    // 1. Ensure test admin exists
-    let admin = await User.findOne({ email: 'admin@nag.com' });
+    const passwordHash = await bcrypt.hash('admin123', 10);
+    let admin = await User.findOne({ username: 'admin' });
     if (!admin) {
-      const passwordHash = await bcrypt.hash('password123', 10);
       admin = await User.create({
-        name: 'System Admin',
+        username: 'admin',
         email: 'admin@nag.com',
         passwordHash,
         role: 'ADMIN',
       });
+    } else {
+      admin.passwordHash = passwordHash;
+      await admin.save();
     }
 
     let srvType = await ServiceType.findOne({ code: 'SRV_GEN' });

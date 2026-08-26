@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
 import { AppShell } from './components/layout/AppShell.jsx';
 import { LoginPage } from './features/auth/LoginPage.jsx';
+import { VerifyEmailPage } from './features/auth/VerifyEmailPage.jsx';
 import { DashboardPage } from './features/dashboard/DashboardPage.jsx';
 import { InventoryListPage } from './features/inventory/InventoryListPage.jsx';
 import { ProductDetailPage } from './features/inventory/ProductDetailPage.jsx';
@@ -42,56 +43,32 @@ const ProtectedRoute = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return (
-    <AppShell>
-      <Outlet />
-    </AppShell>
-  );
-};
-
-const PublicOnlyRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
-        <PageSkeleton />
-      </div>
-    );
-  }
-
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
+  return <Outlet />;
 };
 
 export default function App() {
   return (
     <Routes>
-      {/* Public Login Route */}
+      {/* Public Unauthenticated Routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
+
+      {/* Protected Authenticated Routes wrapped in AppShell */}
       <Route
-        path="/login"
         element={
-          <PublicOnlyRoute>
-            <LoginPage />
-          </PublicOnlyRoute>
+          <ProtectedRoute>
+            <AppShell />
+          </ProtectedRoute>
         }
-      />
-
-      {/* Protected Routes inside AppShell */}
-      <Route element={<ProtectedRoute />}>
+      >
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
-        {/* Dashboard */}
         <Route path="/dashboard" element={<DashboardPage />} />
 
-        {/* Products & Inventory */}
+        {/* Spare Parts Inventory */}
         <Route path="/inventory" element={<InventoryListPage />} />
         <Route path="/inventory/:id" element={<ProductDetailPage />} />
 
-        {/* Suppliers & Supplier Orders */}
+        {/* Suppliers & Purchase Orders */}
         <Route path="/suppliers" element={<SupplierListPage />} />
         <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
         <Route path="/supplier-orders" element={<SupplierOrderListPage />} />
