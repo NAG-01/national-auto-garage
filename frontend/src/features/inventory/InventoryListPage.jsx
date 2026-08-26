@@ -257,14 +257,29 @@ export const InventoryListPage = () => {
         </div>
       </div>
 
-      {/* Search & Category Controls + Single Clean Add Item Button */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+      {/* Control Bar: Search & Category Filter Tabs */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="max-w-md w-full">
+          <SearchInput
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            onClear={() => {
+              setSearch('');
+              setPage(1);
+            }}
+            placeholder="Search parts by name, SKU, or OEM number..."
+          />
+        </div>
+
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
           {[
             { label: 'All Items', value: 'ACTIVE' },
-            { label: 'In Stock', value: 'IN_STOCK' },
             { label: 'Low Stock', value: 'LOW_STOCK' },
             { label: 'Out of Stock', value: 'OUT_OF_STOCK' },
+            { label: 'Archive / Inactive', value: 'INACTIVE' },
           ].map((tab) => (
             <button
               key={tab.value}
@@ -274,8 +289,8 @@ export const InventoryListPage = () => {
               }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 statusFilter === tab.value
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                  ? 'bg-[#4F46E5] text-white shadow-xs dark:bg-[#6366F1]'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               {tab.label}

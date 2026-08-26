@@ -262,8 +262,8 @@ export const ExpenseListPage = () => {
       );
     }
     return (
-      <span className="font-bold text-xs bg-slate-900 text-white px-2.5 py-1 rounded-lg shadow-2xs inline-flex items-center gap-1">
-        <Building2 className="w-3 h-3 text-slate-300" />
+      <span className="font-bold text-xs bg-[#4F46E5] dark:bg-[#6366F1] text-white px-2.5 py-1 rounded-xl shadow-2xs inline-flex items-center gap-1">
+        <Building2 className="w-3 h-3 text-indigo-100" />
         Garage Expense
       </span>
     );
@@ -293,8 +293,8 @@ export const ExpenseListPage = () => {
           onClick={() => setActiveAccountTab('GARAGE')}
           className={`p-4 rounded-2xl border transition-all cursor-pointer ${
             activeAccountTab === 'GARAGE'
-              ? 'bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-slate-900/20'
-              : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300 shadow-2xs'
+              ? 'bg-[#4F46E5] text-white border-[#4F46E5] shadow-md dark:bg-[#6366F1] dark:border-[#6366F1]'
+              : 'bg-white dark:bg-[#172033] text-slate-900 dark:text-slate-100 border-slate-200 dark:border-[#263449] hover:border-slate-300 shadow-2xs'
           }`}
         >
           <div className="flex items-center justify-between">
@@ -371,8 +371,8 @@ export const ExpenseListPage = () => {
           }}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
             activeAccountTab === 'ALL'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-[#4F46E5] text-white shadow-sm dark:bg-[#6366F1]'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
           }`}
         >
           <BookOpen className="w-4 h-4" />
@@ -387,8 +387,8 @@ export const ExpenseListPage = () => {
           }}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
             activeAccountTab === 'GARAGE'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-[#4F46E5] text-white shadow-sm dark:bg-[#6366F1]'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
           }`}
         >
           <Building2 className="w-4 h-4" />
@@ -567,8 +567,8 @@ export const ExpenseListPage = () => {
                 onClick={() => setFormData({ ...formData, account: 'GARAGE_ACCOUNT' })}
                 className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition-all ${
                   formData.account === 'GARAGE_ACCOUNT'
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-sm ring-2 ring-slate-900/20'
-                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    ? 'bg-[#4F46E5] text-white border-[#4F46E5] shadow-sm dark:bg-[#6366F1]'
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <Building2 className="w-5 h-5" />

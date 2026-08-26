@@ -284,23 +284,23 @@ export const SettlementCalculatorPage = () => {
                   2. Live Payout Summary
                 </h2>
               </div>
-              <span className="text-[10px] bg-slate-900 dark:bg-slate-800 text-white font-extrabold px-2.5 py-1 rounded-full uppercase">
+              <span className="text-[10px] bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-extrabold px-2.5 py-1 rounded-full uppercase">
                 Live Math
               </span>
             </div>
 
             <div className="space-y-3.5">
               {/* Net Profit Summary */}
-              <div className="bg-slate-900 dark:bg-[#0B1120] text-white p-4 rounded-xl shadow-2xs border border-slate-800 dark:border-slate-800">
-                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="bg-[#4F46E5] dark:bg-[#0B1120] text-white p-4 rounded-xl shadow-2xs border border-indigo-600 dark:border-slate-800">
+                <div className="text-[11px] font-bold text-indigo-100 dark:text-slate-400 uppercase tracking-wider">
                   Net Workshop Profit
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-white mt-1 tracking-tight">
                   {formatINR(netProfit)}
                 </div>
-                <div className="text-[11px] font-semibold text-slate-300 mt-2 flex items-center justify-between border-t border-slate-800 pt-2">
+                <div className="text-[11px] font-semibold text-indigo-100 dark:text-slate-300 mt-2 flex items-center justify-between border-t border-indigo-400/40 dark:border-slate-800 pt-2">
                   <span>Revenue: {formatINR(revVal)}</span>
-                  <span className="text-rose-300">Expenses: -{formatINR(expVal)}</span>
+                  <span className="text-rose-200 dark:text-rose-300">Expenses: -{formatINR(expVal)}</span>
                 </div>
               </div>
 
