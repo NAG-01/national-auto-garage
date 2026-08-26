@@ -37,19 +37,6 @@ export class ExpenseService {
       createdBy: user?._id || 'ADMIN',
     });
 
-    // If paid by a partner out of pocket, automatically log a PartnerTransaction
-    if (expenseData.paidBy && expenseData.paidBy !== 'GARAGE_ACCOUNT') {
-      const partnerKey = expenseData.paidBy.toUpperCase().includes('IMRAN') ? PARTNERS.IMRAN : PARTNERS.NAIM;
-      await PartnerService.recordPartnerTransaction({
-        partner: partnerKey,
-        type: PARTNER_TRANSACTION_TYPES.OUT_OF_POCKET_EXPENSE,
-        amount,
-        reason: `Paid workshop expense (${expense.category}): ${expense.description}`,
-        date: expense.date,
-        notes: `Expense Voucher: ${expense.expenseNumber}`,
-      }, user);
-    }
-
     await logAudit({
       userId: user?._id || 'ADMIN',
       userName: user?.name || user?.username || 'Admin',
