@@ -20,6 +20,7 @@ import { InvoiceCreatePage } from './features/billing/InvoiceCreatePage.jsx';
 import { InvoiceDetailPage } from './features/billing/InvoiceDetailPage.jsx';
 import { OutstandingPage } from './features/billing/OutstandingPage.jsx';
 import { ExpenseListPage } from './features/expenses/ExpenseListPage.jsx';
+import { SettlementCalculatorPage } from './features/calculator/SettlementCalculatorPage.jsx';
 import { PageSkeleton } from './components/ui/Skeleton.jsx';
 
 const ProtectedRoute = () => {
@@ -113,6 +114,9 @@ export default function App() {
 
         {/* Operating Expenses (OPEX) */}
         <Route path="/expenses" element={<ExpenseListPage />} />
+
+        {/* Settlement Calculator & History Register */}
+        <Route path="/calculator" element={<SettlementCalculatorPage />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

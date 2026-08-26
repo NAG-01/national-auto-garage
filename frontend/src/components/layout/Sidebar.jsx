@@ -9,9 +9,8 @@ import {
   ShoppingCart,
   FileText,
   CreditCard,
-  Briefcase,
   Receipt,
-  BarChart3,
+  Calculator,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -29,6 +28,7 @@ export const Sidebar = ({ onClose }) => {
     { label: 'Bills', to: '/invoices', icon: FileText },
     { label: 'Customer Outstanding', to: '/outstanding', icon: CreditCard, highlight: true },
     { label: 'Operating Expenses', to: '/expenses', icon: Receipt },
+    { label: 'Settlement Calculator', to: '/calculator', icon: Calculator },
   ];
 
   const renderLink = (item) => {
