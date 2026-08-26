@@ -12,9 +12,11 @@ import {
 } from 'lucide-react';
 import api from '../../api/client.js';
 import { useToast } from '../../context/ToastContext.jsx';
+import { useTableSelection } from '../../hooks/useTableSelection.js';
 import { PageHeader } from '../../components/layout/PageHeader.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { Input } from '../../components/ui/Input.jsx';
+import { BulkActionBar } from '../../components/ui/BulkActionBar.jsx';
 import { Modal, ModalCancelButton, ConfirmDialog } from '../../components/ui/Modal.jsx';
 import {
   Table,
@@ -23,6 +25,8 @@ import {
   TableRow,
   TableHead,
   TableCell,
+  TableHeadCheckbox,
+  TableCellCheckbox,
   Pagination,
 } from '../../components/ui/Table.jsx';
 import { EmptyState } from '../../components/ui/EmptyState.jsx';
@@ -44,13 +48,25 @@ export const ExpenseListPage = () => {
   const [activeAccountTab, setActiveAccountTab] = useState('ALL');
   const [page, setPage] = useState(1);
 
+  // Reusable Table Selection Hook
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    toggleSelect,
+    toggleSelectAll,
+    clearSelection,
+  } = useTableSelection(expenses);
+
   // Create & Edit Modal States
   const [modalOpen, setModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
-  // Delete State
+  // Single & Bulk Delete Confirmation Dialog States
   const [deletingExpense, setDeletingExpense] = useState(null);
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
 
   const [formData, setFormData] = useState({
     account: 'GARAGE_ACCOUNT', // 'GARAGE_ACCOUNT' | 'PARTNER_A' (Imran) | 'PARTNER_B' (Naim)
@@ -102,6 +118,7 @@ export const ExpenseListPage = () => {
 
   useEffect(() => {
     fetchExpenses();
+    clearSelection();
   }, [activeAccountTab, page]);
 
   const handleOpenAddModal = () => {
@@ -193,16 +210,33 @@ export const ExpenseListPage = () => {
     }
   };
 
-  const executeDeleteExpense = async () => {
+  const executeSingleDeleteExpense = async () => {
     if (!deletingExpense) return;
     setSubmitting(true);
     try {
       await api.delete(`/expenses/${deletingExpense._id}`);
-      toast.success('Expense entry delete ho gayi!');
+      toast.success('Expense entry database se permanently delete ho gayi!');
       setDeletingExpense(null);
+      clearSelection();
       fetchExpenses();
     } catch (err) {
       toast.error(err.message || 'Entry delete karne me error aaya.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const executeBulkDeleteExpenses = async () => {
+    if (selectedCount === 0) return;
+    setSubmitting(true);
+    try {
+      const res = await api.post('/expenses/bulk-delete', { ids: selectedIds });
+      toast.success(`${selectedCount} expense entries database se permanently delete ho gayi!`);
+      setShowBulkDeleteConfirm(false);
+      clearSelection();
+      fetchExpenses();
+    } catch (err) {
+      toast.error(err.message || 'Bulk delete karne me error aaya.');
     } finally {
       setSubmitting(false);
     }
@@ -394,9 +428,18 @@ export const ExpenseListPage = () => {
         </button>
       </div>
 
+      {/* Floating Reusable Bulk Action Bar */}
+      <BulkActionBar
+        selectedCount={selectedCount}
+        onClear={clearSelection}
+        onDelete={() => setShowBulkDeleteConfirm(true)}
+        entityName="expense entries"
+        deleting={submitting}
+      />
+
       {/* Entry Table (Notebook Page View) */}
       {loading ? (
-        <TableSkeleton rows={6} cols={6} />
+        <TableSkeleton rows={6} cols={7} />
       ) : expenses.length === 0 ? (
         <EmptyState
           icon={Receipt}
@@ -410,6 +453,10 @@ export const ExpenseListPage = () => {
           <Table>
             <TableHeader>
               <TableRow hover={false}>
+                <TableHeadCheckbox
+                  checked={isAllSelected}
+                  onChange={toggleSelectAll}
+                />
                 <TableHead>Tareekh & Samay (Date & Time)</TableHead>
                 <TableHead>Voucher No.</TableHead>
                 <TableHead>Kiske Liye (Account)</TableHead>
@@ -420,7 +467,16 @@ export const ExpenseListPage = () => {
             </TableHeader>
             <TableBody>
               {expenses.map((exp) => (
-                <TableRow key={exp._id} hover={false}>
+                <TableRow
+                  key={exp._id}
+                  hover={true}
+                  className={isSelected(exp._id) ? 'bg-slate-50' : ''}
+                >
+                  <TableCellCheckbox
+                    checked={isSelected(exp._id)}
+                    onChange={() => toggleSelect(exp._id)}
+                  />
+
                   <TableCell className="text-xs text-slate-600 font-medium whitespace-nowrap">
                     {formatDate(exp.date || exp.createdAt)}
                   </TableCell>
@@ -597,14 +653,27 @@ export const ExpenseListPage = () => {
         loading={submitting}
       />
 
-      {/* Delete Confirmation Dialog */}
+      {/* Single Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={Boolean(deletingExpense)}
         onClose={() => setDeletingExpense(null)}
-        onConfirm={executeDeleteExpense}
+        onConfirm={executeSingleDeleteExpense}
         title="Delete Expense Entry?"
-        message={`Kyah aap sach me voucher ${deletingExpense?.expenseNumber || ''} (${formatINR(deletingExpense?.amount || 0)}) ko delete karna chahte hain? Ye entry permanently delete ho jayegi.`}
+        message={`Kya aap sach me voucher ${deletingExpense?.expenseNumber || ''} (${formatINR(deletingExpense?.amount || 0)}) ko database se permanently delete karna chahte hain? Database size kam rakhne ke liye ye entry turant delete ho jayegi.`}
         confirmText="Yes, Delete Entry"
+        cancelText="Cancel"
+        variant="danger"
+        loading={submitting}
+      />
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showBulkDeleteConfirm}
+        onClose={() => setShowBulkDeleteConfirm(false)}
+        onConfirm={executeBulkDeleteExpenses}
+        title={`Bulk Delete ${selectedCount} Expense Entries?`}
+        message={`Kya aap sach me selected ${selectedCount} expense entries ko database se permanently delete karna chahte hain? Database size kam rakhne ke liye saari selected entries MongoDB se turant hard delete ho jayengi.`}
+        confirmText={`Yes, Permanently Delete ${selectedCount} Items`}
         cancelText="Cancel"
         variant="danger"
         loading={submitting}

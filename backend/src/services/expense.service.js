@@ -207,4 +207,23 @@ export class ExpenseService {
 
     return { success: true };
   }
+
+  static async bulkDeleteExpenses(ids = [], user) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw ApiError.badRequest('No item IDs provided for bulk delete');
+    }
+
+    const result = await Expense.deleteMany({ _id: { $in: ids } });
+
+    await logAudit({
+      userId: user?._id || 'ADMIN',
+      userName: user?.name || user?.username || 'Admin',
+      userRole: user?.role || 'ADMIN',
+      action: 'BULK_DELETE_EXPENSES',
+      entityType: 'EXPENSE',
+      summary: `Bulk deleted ${result.deletedCount} expense entries from database`,
+    });
+
+    return { deletedCount: result.deletedCount };
+  }
 }

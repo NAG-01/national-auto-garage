@@ -54,4 +54,14 @@ export class ExpenseController {
       next(err);
     }
   }
+
+  static async bulkDelete(req, res, next) {
+    try {
+      const { ids } = req.body;
+      const result = await ExpenseService.bulkDeleteExpenses(ids, req.user);
+      return ApiResponse.success(res, `${result.deletedCount} expense entries deleted permanently from database`, result);
+    } catch (err) {
+      next(err);
+    }
+  }
 }

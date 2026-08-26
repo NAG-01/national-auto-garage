@@ -43,6 +43,32 @@ export const TableCell = ({ children, className = '' }) => {
   return <td className={`px-4 py-3.5 whitespace-nowrap text-slate-800 ${className}`}>{children}</td>;
 };
 
+export const TableHeadCheckbox = ({ checked, onChange }) => {
+  return (
+    <th className="w-10 px-3 py-3.5 whitespace-nowrap text-center">
+      <input
+        type="checkbox"
+        checked={Boolean(checked)}
+        onChange={onChange}
+        className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
+      />
+    </th>
+  );
+};
+
+export const TableCellCheckbox = ({ checked, onChange }) => {
+  return (
+    <td className="w-10 px-3 py-3.5 whitespace-nowrap text-center" onClick={(e) => e.stopPropagation()}>
+      <input
+        type="checkbox"
+        checked={Boolean(checked)}
+        onChange={onChange}
+        className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
+      />
+    </td>
+  );
+};
+
 export const Pagination = ({ pagination, onPageChange }) => {
   if (!pagination || pagination.totalPages <= 1) return null;
 
