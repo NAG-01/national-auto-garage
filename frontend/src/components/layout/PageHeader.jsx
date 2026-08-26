@@ -14,7 +14,7 @@ export const PageHeader = ({
     <div className={`mb-6 md:mb-8 ${className}`}>
       {/* Breadcrumb Navigation */}
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav aria-label="Breadcrumb" className="mb-2 flex items-center gap-1.5 text-xs text-[#0369A1]">
+        <nav aria-label="Breadcrumb" className="mb-2 flex items-center gap-1.5 text-xs text-slate-500">
           {breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1;
             return (
@@ -22,16 +22,16 @@ export const PageHeader = ({
                 {crumb.to && !isLast ? (
                   <Link
                     to={crumb.to}
-                    className="hover:text-[#0C4A6E] transition-colors font-medium hover:underline"
+                    className="hover:text-slate-900 transition-colors font-medium hover:underline"
                   >
                     {crumb.label}
                   </Link>
                 ) : (
-                  <span className={isLast ? 'text-[#0C4A6E] font-semibold' : ''}>
+                  <span className={isLast ? 'text-slate-900 font-semibold' : ''}>
                     {crumb.label}
                   </span>
                 )}
-                {!isLast && <ChevronRight className="w-3.5 h-3.5 text-[#7DD3FC] flex-shrink-0" />}
+                {!isLast && <ChevronRight className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />}
               </React.Fragment>
             );
           })}
@@ -43,12 +43,12 @@ export const PageHeader = ({
         <div>
           <div className="flex items-center gap-2.5">
             <span className="w-1.5 h-6 rounded-full bg-[#0284C7] inline-block" />
-            <h1 className="text-xl sm:text-2xl font-black text-[#0C4A6E] tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               {title}
             </h1>
           </div>
           {subtitle && (
-            <p className="text-xs sm:text-sm text-[#0369A1] font-medium mt-1 pl-4">
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1 pl-4">
               {subtitle}
             </p>
           )}

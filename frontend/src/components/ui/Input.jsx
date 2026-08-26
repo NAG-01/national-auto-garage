@@ -50,25 +50,25 @@ export const Input = React.forwardRef(
       onChange?.(e);
     };
 
-    let paddingClass = 'px-3 py-2 h-10';
+    let paddingClass = 'px-3.5 py-2 h-10';
     if (Icon && rightElement) {
       paddingClass = 'pl-10 pr-10 py-2 h-10';
     } else if (Icon) {
-      paddingClass = 'pl-10 pr-3 py-2 h-10';
+      paddingClass = 'pl-10 pr-3.5 py-2 h-10';
     } else if (rightElement) {
-      paddingClass = 'pl-3 pr-10 py-2 h-10';
+      paddingClass = 'pl-3.5 pr-10 py-2 h-10';
     }
 
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block text-xs font-extrabold text-[#0C4A6E] uppercase tracking-wider mb-1.5">
+          <label htmlFor={inputId} className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
             {label} {required && <span className="text-rose-500">*</span>}
           </label>
         )}
         <div className="relative rounded-xl shadow-2xs">
           {Icon && (
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#0369A1]">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
               <Icon className="w-4 h-4" />
             </div>
           )}
@@ -81,10 +81,10 @@ export const Input = React.forwardRef(
             disabled={disabled}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className={`w-full rounded-xl border text-sm text-[#0C4A6E] font-medium placeholder:text-[#64748B] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] disabled:bg-[#F0F9FF] disabled:text-[#64748B] disabled:cursor-not-allowed ${paddingClass} ${
+            className={`w-full rounded-xl border text-sm text-slate-900 font-medium placeholder:text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed ${paddingClass} ${
               error
                 ? 'border-rose-400 focus:ring-rose-500 focus:border-rose-500 bg-rose-50/20'
-                : 'border-[#BAE6FD] bg-white hover:border-[#7DD3FC]'
+                : 'border-slate-300 bg-white hover:border-slate-400'
             } ${className}`}
             {...props}
           />
@@ -97,7 +97,7 @@ export const Input = React.forwardRef(
         {error ? (
           <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>
         ) : hint ? (
-          <p className="mt-1 text-xs text-[#0369A1]">{hint}</p>
+          <p className="mt-1 text-xs text-slate-500">{hint}</p>
         ) : null}
       </div>
     );
@@ -124,12 +124,12 @@ export const CurrencyInput = React.forwardRef(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block text-xs font-extrabold text-[#0C4A6E] uppercase tracking-wider mb-1.5">
+          <label htmlFor={inputId} className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
             {label} {required && <span className="text-rose-500">*</span>}
           </label>
         )}
         <div className="relative rounded-xl shadow-2xs">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none font-extrabold text-[#0284C7] text-sm select-none">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none font-black text-[#0284C7] text-sm select-none">
             ₹
           </div>
           <input
@@ -141,10 +141,10 @@ export const CurrencyInput = React.forwardRef(
             min="0"
             step="any"
             disabled={disabled}
-            className={`w-full rounded-xl border text-sm text-[#0C4A6E] font-bold pl-8 pr-3 py-2 h-10 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] disabled:bg-[#F0F9FF] disabled:text-[#64748B] disabled:cursor-not-allowed ${
+            className={`w-full rounded-xl border text-sm text-slate-900 font-bold pl-8 pr-3.5 py-2 h-10 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed ${
               error
                 ? 'border-rose-400 focus:ring-rose-500 focus:border-rose-500 bg-rose-50/20'
-                : 'border-[#BAE6FD] bg-white hover:border-[#7DD3FC]'
+                : 'border-slate-300 bg-white hover:border-slate-400'
             } ${className}`}
             {...props}
           />
@@ -152,7 +152,7 @@ export const CurrencyInput = React.forwardRef(
         {error ? (
           <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>
         ) : hint ? (
-          <p className="mt-1 text-xs text-[#0369A1]">{hint}</p>
+          <p className="mt-1 text-xs text-slate-500">{hint}</p>
         ) : null}
       </div>
     );
@@ -180,7 +180,7 @@ export const Select = React.forwardRef(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={selectId} className="block text-xs font-extrabold text-[#0C4A6E] uppercase tracking-wider mb-1.5">
+          <label htmlFor={selectId} className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
             {label} {required && <span className="text-rose-500">*</span>}
           </label>
         )}
@@ -188,10 +188,10 @@ export const Select = React.forwardRef(
           ref={ref}
           id={selectId}
           disabled={disabled}
-          className={`w-full rounded-xl border text-sm text-[#0C4A6E] font-semibold h-10 px-3 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] disabled:bg-[#F0F9FF] disabled:cursor-not-allowed ${
+          className={`w-full rounded-xl border text-sm text-slate-900 font-semibold h-10 px-3.5 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] disabled:bg-slate-100 disabled:cursor-not-allowed ${
             error
               ? 'border-rose-400 focus:ring-rose-500 bg-rose-50/20'
-              : 'border-[#BAE6FD] bg-white hover:border-[#7DD3FC]'
+              : 'border-slate-300 bg-white hover:border-slate-400'
           } ${className}`}
           {...props}
         >
@@ -200,7 +200,7 @@ export const Select = React.forwardRef(
         {error ? (
           <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>
         ) : hint ? (
-          <p className="mt-1 text-xs text-[#0369A1]">{hint}</p>
+          <p className="mt-1 text-xs text-slate-500">{hint}</p>
         ) : null}
       </div>
     );
@@ -228,7 +228,7 @@ export const Textarea = React.forwardRef(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={textareaId} className="block text-xs font-extrabold text-[#0C4A6E] uppercase tracking-wider mb-1.5">
+          <label htmlFor={textareaId} className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
             {label} {required && <span className="text-rose-500">*</span>}
           </label>
         )}
@@ -237,17 +237,17 @@ export const Textarea = React.forwardRef(
           id={textareaId}
           rows={rows}
           disabled={disabled}
-          className={`w-full rounded-xl border text-sm text-[#0C4A6E] font-medium placeholder:text-[#64748B] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] px-3 py-2 disabled:bg-[#F0F9FF] disabled:cursor-not-allowed ${
+          className={`w-full rounded-xl border text-sm text-slate-900 font-medium placeholder:text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] px-3.5 py-2 disabled:bg-slate-100 disabled:cursor-not-allowed ${
             error
               ? 'border-rose-400 focus:ring-rose-500 bg-rose-50/20'
-              : 'border-[#BAE6FD] bg-white hover:border-[#7DD3FC]'
+              : 'border-slate-300 bg-white hover:border-slate-400'
           } ${className}`}
           {...props}
         />
         {error ? (
           <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>
         ) : hint ? (
-          <p className="mt-1 text-xs text-[#0369A1]">{hint}</p>
+          <p className="mt-1 text-xs text-slate-500">{hint}</p>
         ) : null}
       </div>
     );
@@ -271,7 +271,7 @@ export const SearchInput = React.forwardRef(
   ) => {
     return (
       <div className={`relative rounded-xl shadow-2xs w-full ${className}`}>
-        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#0284C7]">
+        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
           <Search className="w-4 h-4" />
         </div>
         <input
@@ -281,7 +281,7 @@ export const SearchInput = React.forwardRef(
           onChange={onChange}
           disabled={disabled}
           placeholder={placeholder}
-          className="w-full rounded-xl border border-[#BAE6FD] bg-white h-10 pl-10 pr-10 text-sm text-[#0C4A6E] font-medium placeholder:text-[#64748B] hover:border-[#7DD3FC] focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] transition-colors disabled:bg-[#F0F9FF]"
+          className="w-full rounded-xl border border-slate-300 bg-white h-10 pl-10 pr-10 text-sm text-slate-900 font-medium placeholder:text-slate-400 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0284C7] focus:border-[#0284C7] transition-colors disabled:bg-slate-100"
           {...props}
         />
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -291,7 +291,7 @@ export const SearchInput = React.forwardRef(
             <button
               type="button"
               onClick={onClear}
-              className="p-1 rounded-lg text-[#0369A1] hover:text-[#0C4A6E] hover:bg-[#E0F2FE] transition-colors"
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>

@@ -13,17 +13,17 @@ export const Badge = ({
   };
 
   const variantStyles = {
-    default: 'bg-[#F0F9FF] text-[#0C4A6E] border-[#BAE6FD]',
+    default: 'bg-slate-100 text-slate-700 border-slate-200',
     success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     warning: 'bg-amber-50 text-amber-800 border-amber-200',
     danger: 'bg-rose-50 text-rose-700 border-rose-200',
-    info: 'bg-[#E0F2FE] text-[#0284C7] border-[#BAE6FD]',
+    info: 'bg-sky-50 text-[#0284C7] border-sky-200',
     accent: 'bg-amber-50 text-[#D97706] border-amber-200',
     purple: 'bg-purple-50 text-purple-700 border-purple-200',
   };
 
   const dotColors = {
-    default: 'bg-[#0284C7]',
+    default: 'bg-slate-500',
     success: 'bg-emerald-500',
     warning: 'bg-[#F59E0B]',
     danger: 'bg-rose-500',
@@ -36,7 +36,7 @@ export const Badge = ({
     <span
       className={`inline-flex items-center gap-1.5 rounded-lg border select-none ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
     >
-      {dot && <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotColors[variant] || 'bg-[#0284C7]'}`} />}
+      {dot && <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotColors[variant] || 'bg-slate-500'}`} />}
       {children}
     </span>
   );

@@ -13,21 +13,21 @@ export const Card = ({
 }) => {
   return (
     <div
-      className={`bg-white rounded-2xl border border-[#BAE6FD] text-[#0C4A6E] shadow-2xs overflow-hidden transition-shadow duration-150 ${className}`}
+      className={`bg-white rounded-2xl border border-slate-200 text-slate-900 shadow-xs overflow-hidden transition-shadow duration-150 ${className}`}
       {...props}
     >
       {(title || action) && (
-        <div className="px-5 py-4 border-b border-[#E0F2FE] flex items-center justify-between gap-4">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-4">
           <div>
-            {title && <h3 className="text-base font-extrabold text-[#0C4A6E] tracking-tight">{title}</h3>}
-            {subtitle && <p className="text-xs text-[#0369A1] font-medium mt-0.5">{subtitle}</p>}
+            {title && <h3 className="text-base font-extrabold text-slate-900 tracking-tight">{title}</h3>}
+            {subtitle && <p className="text-xs text-slate-500 font-medium mt-0.5">{subtitle}</p>}
           </div>
           {action && <div className="flex items-center gap-2">{action}</div>}
         </div>
       )}
       <div className={noPadding ? '' : 'p-5'}>{children}</div>
       {footer && (
-        <div className="px-5 py-3 bg-[#F0F9FF] border-t border-[#E0F2FE] text-xs text-[#0369A1] font-medium">
+        <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 text-xs text-slate-500 font-medium">
           {footer}
         </div>
       )}
@@ -48,7 +48,7 @@ export const CalloutCard = ({
       Icon: AlertTriangle,
     },
     info: {
-      bg: 'bg-[#E0F2FE] border-[#BAE6FD] text-[#0C4A6E]',
+      bg: 'bg-sky-50 border-sky-200 text-sky-900',
       iconBg: 'text-[#0284C7]',
       Icon: Info,
     },
