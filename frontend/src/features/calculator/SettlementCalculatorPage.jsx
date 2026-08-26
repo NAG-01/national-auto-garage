@@ -155,7 +155,7 @@ export const SettlementCalculatorPage = () => {
     <div className="space-y-6 max-w-7xl mx-auto pb-12 px-2 sm:px-4">
       <PageHeader
         title="Settlement Calculator"
-        subtitle="Standalone tool to calculate monthly profit distribution and partner payouts without affecting live workshop data."
+        subtitle="Dono partners ke mahine ke hisaab aur final paise nikalne ke liye simple calculator tool."
       />
 
       {successMessage && (
@@ -346,7 +346,7 @@ export const SettlementCalculatorPage = () => {
 
           <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-medium text-slate-500 flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-            <span>Values update live as you type above. Click Save to log entry.</span>
+            <span>Upar number likhte hi hisaab turant badal jayega. Record save karne ke liye Save dabayein.</span>
           </div>
         </div>
       </div>
@@ -390,7 +390,6 @@ export const SettlementCalculatorPage = () => {
                       onChange={toggleSelectAll}
                     />
                     <th className="py-3 px-4">Date & Time</th>
-                    <th className="py-3 px-4">Calc #</th>
                     <th className="py-3 px-4 text-right">Revenue</th>
                     <th className="py-3 px-4 text-right">Expenses</th>
                     <th className="py-3 px-4 text-right">Net Profit</th>
@@ -416,9 +415,6 @@ export const SettlementCalculatorPage = () => {
                         />
                         <td className="py-3.5 px-4 font-bold text-slate-900 whitespace-nowrap">
                           {formatDate(rec.date)}
-                        </td>
-                        <td className="py-3.5 px-4 font-bold text-slate-700 uppercase">
-                          {rec.calculationNumber}
                         </td>
                         <td className="py-3.5 px-4 text-right font-bold text-slate-900">
                           {formatINR(rec.totalRevenue)}
