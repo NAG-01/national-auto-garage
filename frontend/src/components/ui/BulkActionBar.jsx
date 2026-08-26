@@ -17,7 +17,7 @@ export const BulkActionBar = ({
   return (
     <div className="bg-slate-900 text-white p-3 sm:px-4 sm:py-3.5 rounded-2xl shadow-xl border border-slate-800 flex flex-wrap items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
       <div className="flex items-center gap-2.5">
-        <div className="w-8 h-8 rounded-xl bg-slate-800 text-rose-400 flex items-center justify-center font-bold text-xs shrink-0">
+        <div className="w-8 h-8 rounded-xl bg-slate-800 text-rose-400 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
           <CheckSquare className="w-4 h-4" />
         </div>
         <div className="leading-tight">
@@ -34,17 +34,15 @@ export const BulkActionBar = ({
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        <Button
+        <button
           type="button"
-          variant="outline"
-          size="sm"
           onClick={onClear}
           disabled={deleting}
-          className="text-xs text-slate-300 border-slate-700 hover:bg-slate-800 hover:text-white px-2.5 py-1.5"
+          className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold px-3 py-1.5 rounded-xl transition-all inline-flex items-center gap-1 shadow-2xs disabled:opacity-50"
         >
-          <X className="w-3.5 h-3.5 mr-1" />
-          Clear
-        </Button>
+          <X className="w-3.5 h-3.5 text-slate-400" />
+          <span>Clear</span>
+        </button>
 
         <Button
           type="button"
