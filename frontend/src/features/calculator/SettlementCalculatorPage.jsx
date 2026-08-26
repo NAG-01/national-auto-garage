@@ -19,7 +19,7 @@ import { Button } from '../../components/ui/Button.jsx';
 import { Input } from '../../components/ui/Input.jsx';
 import { Skeleton } from '../../components/ui/Skeleton.jsx';
 import { ErrorState } from '../../components/ui/ErrorState.jsx';
-import { ConfirmDialog } from '../../components/ui/ConfirmDialog.jsx';
+import { ConfirmDialog } from '../../components/ui/Modal.jsx';
 import { useTableSelection } from '../../hooks/useTableSelection.js';
 import { BulkActionBar } from '../../components/ui/BulkActionBar.jsx';
 import { Table, TableHeadCheckbox, TableCellCheckbox } from '../../components/ui/Table.jsx';
