@@ -19,29 +19,29 @@ export const Button = React.forwardRef(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
+      'inline-flex items-center justify-center font-bold rounded-xl transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
 
     const sizeStyles = {
       sm: 'h-8 px-3 text-xs gap-1.5 min-w-[2rem]',
-      md: 'h-10 px-4 text-sm gap-2 min-w-[2.5rem]',
-      lg: 'h-12 px-5 text-base gap-2.5 min-w-[3rem]',
+      md: 'h-10 px-4 text-xs sm:text-sm gap-2 min-w-[2.5rem]',
+      lg: 'h-12 px-5 text-sm sm:text-base gap-2.5 min-w-[3rem]',
     };
 
     const variantStyles = {
       primary:
-        'bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500 border border-transparent shadow-sm shadow-indigo-100',
+        'bg-[#4F46E5] hover:bg-[#4338CA] dark:bg-[#6366F1] dark:hover:bg-[#818CF8] text-white focus-visible:ring-indigo-500 border border-transparent shadow-xs',
       accent:
-        'bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500 border border-transparent shadow-sm shadow-indigo-100',
+        'bg-[#4F46E5] hover:bg-[#4338CA] dark:bg-[#6366F1] dark:hover:bg-[#818CF8] text-white focus-visible:ring-indigo-500 border border-transparent shadow-xs',
       secondary:
-        'bg-slate-100 text-slate-800 hover:bg-slate-200 focus-visible:ring-slate-400 border border-slate-200',
+        'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 focus-visible:ring-slate-400 border border-slate-200 dark:border-slate-700',
       outline:
-        'bg-white text-slate-700 hover:bg-slate-50 border border-slate-300 focus-visible:ring-slate-400 shadow-sm hover:border-slate-400',
+        'bg-white dark:bg-[#172033] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#1E293B] border border-slate-300 dark:border-[#334155] focus-visible:ring-indigo-500 shadow-2xs',
       ghost:
-        'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-300',
+        'bg-transparent text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white focus-visible:ring-slate-400',
       danger:
-        'bg-rose-600 text-white hover:bg-rose-700 focus-visible:ring-rose-500 border border-transparent shadow-sm',
+        'bg-[#E11D48] hover:bg-[#BE123C] dark:bg-[#F43F5E] dark:hover:bg-[#E11D48] text-white focus-visible:ring-rose-500 border border-transparent shadow-xs',
       success:
-        'bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-emerald-500 border border-transparent shadow-sm',
+        'bg-[#059669] hover:bg-[#047857] dark:bg-[#10B981] dark:hover:bg-[#059669] text-white focus-visible:ring-emerald-500 border border-transparent shadow-xs',
     };
 
     return (

@@ -28,8 +28,8 @@ export const Modal = ({
   children,
   maxWidth = 'max-w-xl',
   footer,
-  closeOnBackdrop = false, // Default false: Prevents accidental closing when clicking outside
-  confirmOnClose = false,  // Asks permission confirmation before closing
+  closeOnBackdrop = false,
+  confirmOnClose = false,
 }) => {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
@@ -71,26 +71,26 @@ export const Modal = ({
       <div className="fixed inset-0 z-50 overflow-y-auto">
         {/* Backdrop Overlay */}
         <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity animate-in fade-in"
+          className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity animate-in fade-in"
           onClick={handleBackdropClick}
         />
 
         {/* Modal Dialog */}
         <div className="flex min-h-full items-center justify-center p-2 sm:p-4 text-center">
           <div
-            className={`relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full ${maxWidth} max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95`}
+            className={`relative transform overflow-hidden rounded-2xl bg-white dark:bg-[#172033] text-left shadow-2xl border border-slate-200 dark:border-[#263449] transition-all w-full ${maxWidth} max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between shrink-0">
+            <div className="px-5 py-3.5 border-b border-slate-100 dark:border-[#263449] flex items-center justify-between shrink-0">
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900">{title}</h3>
-                {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100">{title}</h3>
+                {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>}
               </div>
               <button
                 type="button"
                 onClick={handleAttemptClose}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                className="p-1 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title="Close"
               >
                 <X className="w-5 h-5" />
@@ -98,11 +98,11 @@ export const Modal = ({
             </div>
 
             {/* Content */}
-            <div className="px-5 py-4 overflow-y-auto flex-1">{children}</div>
+            <div className="px-5 py-4 overflow-y-auto flex-1 text-slate-800 dark:text-slate-200">{children}</div>
 
             {/* Footer */}
             {footer && (
-              <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end gap-2.5 shrink-0">
+              <div className="px-5 py-3.5 bg-slate-50 dark:bg-[#111827] border-t border-slate-100 dark:border-[#263449] flex justify-end gap-2.5 shrink-0">
                 {typeof footer === 'function' ? footer({ requestClose: handleAttemptClose }) : footer}
               </div>
             )}
@@ -154,24 +154,24 @@ export const ConfirmDialog = ({
       {/* Dialog */}
       <div className="flex min-h-full items-center justify-center p-4 text-center">
         <div
-          className="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full max-w-md my-8 animate-in fade-in zoom-in-95 p-6"
+          className="relative transform overflow-hidden rounded-2xl bg-white dark:bg-[#172033] border border-slate-200 dark:border-[#263449] text-left shadow-2xl transition-all w-full max-w-md my-8 animate-in fade-in zoom-in-95 p-6"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-start gap-4">
             <div
               className={`p-3 rounded-2xl flex-shrink-0 ${
                 variant === 'danger'
-                  ? 'bg-rose-100 text-rose-600'
+                  ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
                   : variant === 'success'
-                  ? 'bg-emerald-100 text-emerald-600'
-                  : 'bg-amber-100 text-amber-600'
+                  ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                  : 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
               }`}
             >
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 mb-1">{title}</h3>
-              <p className="text-xs font-medium text-slate-600 leading-relaxed">{message}</p>
+              <h3 className="text-lg font-extrabold text-slate-900 dark:text-slate-100 mb-1">{title}</h3>
+              <p className="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed">{message}</p>
             </div>
           </div>
 

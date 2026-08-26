@@ -41,15 +41,15 @@ export const Sidebar = ({ onClose }) => {
         className={({ isActive }) =>
           `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 group ${
             isActive
-              ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-100'
-              : 'text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/70'
+              ? 'bg-[#4F46E5] dark:bg-[#6366F1] text-white font-extrabold shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80'
           }`
         }
       >
         <Icon className="w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-105" />
         <span className="truncate">{item.label}</span>
         {item.highlight && (
-          <span className="ml-auto text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded font-bold shadow-2xs">
+          <span className="ml-auto text-[10px] bg-rose-600 dark:bg-rose-500 text-white px-1.5 py-0.5 rounded font-bold shadow-2xs">
             Due
           </span>
         )}
@@ -58,17 +58,17 @@ export const Sidebar = ({ onClose }) => {
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200 flex flex-col h-full select-none">
+    <aside className="w-64 bg-white dark:bg-[#0F172A] border-r border-slate-200 dark:border-[#263449] flex flex-col h-full select-none transition-colors duration-200">
       {/* Brand Header */}
-      <div className="h-16 px-5 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-600 flex items-center justify-center text-white font-black text-base shadow-md shadow-indigo-200">
+      <div className="h-16 px-5 border-b border-slate-100 dark:border-[#263449] flex items-center gap-3 bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="w-9 h-9 rounded-xl bg-[#4F46E5] dark:bg-[#6366F1] flex items-center justify-center text-white font-black text-base shadow-sm">
           N
         </div>
         <div>
-          <h2 className="text-sm font-extrabold text-slate-900 tracking-tight leading-none uppercase">
+          <h2 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight leading-none uppercase">
             National Auto
           </h2>
-          <span className="text-[10px] font-bold text-indigo-600 tracking-widest uppercase mt-0.5 block">
+          <span className="text-[10px] font-extrabold text-[#4F46E5] dark:text-[#818CF8] tracking-widest uppercase mt-0.5 block">
             Garage Workshop
           </span>
         </div>
@@ -77,7 +77,7 @@ export const Sidebar = ({ onClose }) => {
       {/* Navigation Sections */}
       <div className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
         <div>
-          <div className="px-3 pb-1.5 text-[10px] font-extrabold text-indigo-600/80 uppercase tracking-wider">
+          <div className="px-3 pb-2 text-[10px] font-extrabold text-slate-400 dark:text-slate-400 uppercase tracking-wider">
             Workshop Operations
           </div>
           <div className="space-y-1">{mainNavItems.map(renderLink)}</div>
@@ -85,16 +85,16 @@ export const Sidebar = ({ onClose }) => {
       </div>
 
       {/* System Admin Status & Logout Footer */}
-      <div className="p-3 border-t border-slate-100 bg-slate-50/60 space-y-2">
-        <div className="flex items-center gap-2.5 p-2 rounded-lg bg-white border border-slate-200/80 shadow-2xs">
-          <div className="w-7 h-7 rounded-lg bg-slate-900 text-white font-bold text-xs flex items-center justify-center">
+      <div className="p-3 border-t border-slate-100 dark:border-[#263449] bg-slate-50/60 dark:bg-slate-900/60 space-y-2">
+        <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white dark:bg-[#172033] border border-slate-200/80 dark:border-[#263449] shadow-2xs">
+          <div className="w-7 h-7 rounded-lg bg-[#4F46E5] dark:bg-[#6366F1] text-white font-bold text-xs flex items-center justify-center">
             {user?.username ? user.username.charAt(0).toUpperCase() : 'A'}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-bold text-slate-900 truncate">
+            <div className="text-xs font-extrabold text-slate-900 dark:text-slate-100 truncate">
               {user?.username ? `@${user.username}` : 'System Admin'}
             </div>
-            <div className="text-[10px] text-slate-500 flex items-center gap-1">
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               Admin Session Active
             </div>
@@ -107,7 +107,7 @@ export const Sidebar = ({ onClose }) => {
             if (onClose) onClose();
             logout();
           }}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-900/50 transition-colors"
         >
           <LogOut className="w-3.5 h-3.5" />
           Sign Out of Workshop
