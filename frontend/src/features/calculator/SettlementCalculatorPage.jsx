@@ -168,7 +168,7 @@ export const SettlementCalculatorPage = () => {
       {/* Grid: Inputs Form & Live Output Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Form: Inputs (7 cols) */}
-        <Card className="lg:col-span-7 p-4 sm:p-6 border border-slate-200 shadow-xs bg-white rounded-2xl">
+        <div className="lg:col-span-7 bg-white p-4 sm:p-6 border border-slate-200 rounded-2xl shadow-xs">
           <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
             <Calculator className="w-5 h-5 text-slate-800" />
             <h2 className="text-xs sm:text-sm font-extrabold text-slate-900 uppercase tracking-wider">
@@ -272,80 +272,80 @@ export const SettlementCalculatorPage = () => {
               </Button>
             </div>
           </form>
-        </Card>
+        </div>
 
-        {/* Right Output Panel: Live Results (5 cols) */}
-        <div className="lg:col-span-5 bg-slate-900 text-white rounded-2xl border border-slate-800 p-5 sm:p-6 shadow-xl flex flex-col justify-between">
+        {/* Right Output Panel: Live Results (5 cols) — Clean Light Card Theme */}
+        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <h2 className="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-amber-400">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <h2 className="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-slate-900">
                   2. Live Payout Summary
                 </h2>
               </div>
-              <span className="text-[10px] bg-slate-800 text-emerald-400 font-extrabold px-2.5 py-1 rounded-full uppercase border border-slate-700">
+              <span className="text-[10px] bg-slate-900 text-white font-extrabold px-2.5 py-1 rounded-full uppercase">
                 Live Math
               </span>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               {/* Net Profit Summary */}
-              <div className="bg-slate-950 p-4.5 rounded-2xl border border-slate-800 shadow-inner">
-                <div className="text-[10px] sm:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+              <div className="bg-slate-900 text-white p-4 rounded-xl shadow-xs">
+                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                   Net Workshop Profit
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-white mt-1 tracking-tight">
                   {formatINR(netProfit)}
                 </div>
-                <div className="text-[11px] font-extrabold text-slate-300 mt-2.5 flex items-center justify-between border-t border-slate-800/80 pt-2">
+                <div className="text-[11px] font-semibold text-slate-300 mt-2 flex items-center justify-between border-t border-slate-800 pt-2">
                   <span>Revenue: {formatINR(revVal)}</span>
-                  <span className="text-rose-400 font-bold">Expenses: -{formatINR(expVal)}</span>
+                  <span className="text-rose-300">Expenses: -{formatINR(expVal)}</span>
                 </div>
               </div>
 
               {/* Partner 1: Naim Pathan */}
-              <div className="bg-emerald-950 border-2 border-emerald-500/80 p-4.5 rounded-2xl shadow-sm space-y-2">
+              <div className="bg-emerald-50/90 border border-emerald-200 p-4 rounded-xl shadow-2xs space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-emerald-300 flex items-center gap-1.5 uppercase tracking-wide">
-                    <UserCheck className="w-4 h-4 text-emerald-400" /> Naim Pathan
+                  <span className="text-xs font-extrabold text-emerald-900 flex items-center gap-1.5 uppercase">
+                    <UserCheck className="w-4 h-4 text-emerald-600" /> Naim Pathan
                   </span>
-                  <span className="text-[10px] font-black bg-emerald-900 text-emerald-200 px-2.5 py-1 rounded-lg uppercase border border-emerald-700">
+                  <span className="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded uppercase">
                     50% Share
                   </span>
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                <div className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight pt-0.5">
                   {formatINR(naimFinalPayout)}
                 </div>
-                <div className="text-[11px] font-extrabold text-emerald-300 flex items-center justify-between border-t border-emerald-900 pt-2">
+                <div className="text-xs font-semibold text-slate-600 flex items-center justify-between border-t border-emerald-200/80 pt-1.5 mt-1">
                   <span>50% Share: {formatINR(naimBaseShare)}</span>
-                  <span className="text-rose-300 font-bold">Advance: -{formatINR(naimAdvVal)}</span>
+                  <span className="text-rose-600 font-bold">Advance: -{formatINR(naimAdvVal)}</span>
                 </div>
               </div>
 
               {/* Partner 2: Imran Pathan */}
-              <div className="bg-indigo-950 border-2 border-indigo-500/80 p-4.5 rounded-2xl shadow-sm space-y-2">
+              <div className="bg-indigo-50/90 border border-indigo-200 p-4 rounded-xl shadow-2xs space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-indigo-300 flex items-center gap-1.5 uppercase tracking-wide">
-                    <UserCheck className="w-4 h-4 text-indigo-400" /> Imran Pathan
+                  <span className="text-xs font-extrabold text-indigo-900 flex items-center gap-1.5 uppercase">
+                    <UserCheck className="w-4 h-4 text-indigo-600" /> Imran Pathan
                   </span>
-                  <span className="text-[10px] font-black bg-indigo-900 text-indigo-200 px-2.5 py-1 rounded-lg uppercase border border-indigo-700">
+                  <span className="text-[10px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded uppercase">
                     50% Share
                   </span>
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                <div className="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tight pt-0.5">
                   {formatINR(imranFinalPayout)}
                 </div>
-                <div className="text-[11px] font-extrabold text-indigo-300 flex items-center justify-between border-t border-indigo-900 pt-2">
+                <div className="text-xs font-semibold text-slate-600 flex items-center justify-between border-t border-indigo-200/80 pt-1.5 mt-1">
                   <span>50% Share: {formatINR(imranBaseShare)}</span>
-                  <span className="text-rose-300 font-bold">Advance: -{formatINR(imranAdvVal)}</span>
+                  <span className="text-rose-600 font-bold">Advance: -{formatINR(imranAdvVal)}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-slate-800 text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+          <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-medium text-slate-500 flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
             <span>Values update live as you type above. Click Save to log entry.</span>
           </div>
         </div>
@@ -372,13 +372,13 @@ export const SettlementCalculatorPage = () => {
         ) : error ? (
           <ErrorState message={error} onRetry={fetchHistory} />
         ) : records.length === 0 ? (
-          <Card className="p-8 sm:p-12 text-center border border-dashed border-slate-300 bg-slate-50/50 rounded-2xl">
+          <div className="p-8 sm:p-12 text-center border border-dashed border-slate-300 bg-white rounded-2xl shadow-2xs">
             <Calculator className="w-10 h-10 text-slate-400 mx-auto mb-3" />
             <h4 className="text-sm font-bold text-slate-700">Koi Purana Hisaab Record Nahi Hai</h4>
             <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
               Upar calculator me detail bharkar "Hisaab Save Karein" dabayein to record yahan save ho jayega.
             </p>
-          </Card>
+          </div>
         ) : (
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
