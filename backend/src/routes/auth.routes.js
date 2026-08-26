@@ -8,5 +8,6 @@ const router = Router();
 
 router.post('/login', validate(loginSchema), AuthController.login);
 router.get('/me', authenticate, AuthController.me);
+router.put('/update-credentials', authenticate, AuthController.updateCredentials);
 
 export default router;

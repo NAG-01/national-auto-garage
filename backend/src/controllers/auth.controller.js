@@ -7,7 +7,7 @@ export class AuthController {
       const { username, email, password } = req.body;
       const identifier = username || email;
       const ipAddress = req.ip || req.connection?.remoteAddress || '';
-      
+
       const { user, token } = await AuthService.login(identifier, password, ipAddress);
 
       return ApiResponse.success(res, 'Admin authenticated successfully', { user, token });
@@ -20,6 +20,19 @@ export class AuthController {
     try {
       const user = await AuthService.getCurrentUser(req.user._id);
       return ApiResponse.success(res, 'Admin profile retrieved', { user });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async updateCredentials(req, res, next) {
+    try {
+      const { currentPassword, newUsername, newPassword } = req.body;
+      const { user, token } = await AuthService.updateCredentials(
+        { currentPassword, newUsername, newPassword },
+        req.user
+      );
+      return ApiResponse.success(res, 'Admin credentials updated successfully', { user, token });
     } catch (err) {
       next(err);
     }
