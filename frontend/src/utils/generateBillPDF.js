@@ -5,22 +5,25 @@ import { logoBase64 } from '../assets/logoData.js';
 const drawTopBorder = (doc) => {
   // Top Black section (left part)
   doc.setFillColor(15, 23, 42); // Black / Dark Slate
-  doc.polygon([[0, 0], [115, 0], [105, 5], [0, 5]], 'F');
+  doc.rect(0, 0, 105, 5, 'F');
+  doc.triangle(105, 0, 115, 0, 105, 5, 'F');
 
   // Top Red section (right part)
   doc.setFillColor(220, 38, 38); // Crimson Red #dc2626
-  doc.polygon([[105, 5], [115, 0], [210, 0], [210, 5]], 'F');
+  doc.rect(115, 0, 95, 5, 'F');
+  doc.triangle(105, 5, 115, 0, 115, 5, 'F');
 };
 
 const drawBottomBorder = (doc) => {
-  const y = 292;
   // Bottom Black section (left part)
   doc.setFillColor(15, 23, 42);
-  doc.polygon([[0, 292], [145, 292], [155, 297], [0, 297]], 'F');
+  doc.rect(0, 292, 145, 5, 'F');
+  doc.triangle(145, 292, 155, 297, 145, 297, 'F');
 
   // Bottom Red section (right part)
   doc.setFillColor(220, 38, 38);
-  doc.polygon([[145, 292], [210, 292], [210, 297], [155, 297]], 'F');
+  doc.rect(155, 292, 55, 5, 'F');
+  doc.triangle(145, 292, 155, 292, 155, 297, 'F');
 };
 
 // Helper to draw phone icon
