@@ -1,31 +1,48 @@
 import { jsPDF } from 'jspdf';
+import { logoBase64 } from '../assets/logoData.js';
 
 // Helper to draw angled top/bottom borders (Black & Red diagonal split)
 const drawTopBorder = (doc) => {
   // Top Black section (left part)
   doc.setFillColor(15, 23, 42); // Black / Dark Slate
-  doc.triangle(0, 0, 115, 0, 105, 5, 'F');
-  doc.rect(0, 0, 105, 5, 'F');
+  doc.polygon([[0, 0], [115, 0], [105, 5], [0, 5]], 'F');
 
   // Top Red section (right part)
   doc.setFillColor(220, 38, 38); // Crimson Red #dc2626
-  doc.triangle(105, 5, 115, 0, 210, 0, 'F');
-  doc.rect(115, 0, 95, 5, 'F');
-  doc.triangle(105, 5, 210, 0, 210, 5, 'F');
+  doc.polygon([[105, 5], [115, 0], [210, 0], [210, 5]], 'F');
 };
 
 const drawBottomBorder = (doc) => {
   const y = 292;
   // Bottom Black section (left part)
   doc.setFillColor(15, 23, 42);
-  doc.triangle(0, 297, 155, 297, 145, 292, 'F');
-  doc.rect(0, 292, 145, 5, 'F');
+  doc.polygon([[0, 292], [145, 292], [155, 297], [0, 297]], 'F');
 
   // Bottom Red section (right part)
   doc.setFillColor(220, 38, 38);
-  doc.triangle(145, 292, 155, 297, 210, 297, 'F');
-  doc.rect(155, 292, 55, 5, 'F');
-  doc.triangle(145, 292, 210, 292, 210, 297, 'F');
+  doc.polygon([[145, 292], [210, 292], [210, 297], [155, 297]], 'F');
+};
+
+// Helper to draw phone icon
+const drawPhoneIcon = (doc, x, y) => {
+  doc.setFillColor(220, 38, 38);
+  doc.circle(x, y, 2.8, 'F');
+  
+  // White handset icon representation
+  doc.saveGraphicsState();
+  doc.setLineWidth(0.6);
+  doc.setDrawColor(255, 255, 255);
+  doc.line(x - 1, y - 1, x + 0.5, y + 1);
+  doc.restoreGraphicsState();
+};
+
+// Helper to draw location pin icon
+const drawPinIcon = (doc, x, y) => {
+  doc.setFillColor(220, 38, 38);
+  doc.circle(x, y - 1, 2, 'F');
+  doc.triangle(x - 1.8, y - 0.5, x + 1.8, y - 0.5, x, y + 2, 'F');
+  doc.setFillColor(255, 255, 255);
+  doc.circle(x, y - 1, 0.8, 'F');
 };
 
 // Helper for Watermark on background
@@ -35,18 +52,17 @@ const drawWatermark = (doc, yStart = 110, yEnd = 240) => {
   
   // Set ultra light watermark styling
   doc.setGState(new doc.GState({ opacity: 0.05 }));
-  doc.setTextColor(100, 100, 100);
   
-  // Outer Bike silhouette text/logo representation
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(28);
-  doc.text('NATIONAL', 105, centerY - 12, { align: 'center' });
-  doc.setFontSize(36);
-  doc.setTextColor(220, 38, 38);
-  doc.text('AUTO GARAGE', 105, centerY + 4, { align: 'center' });
-  doc.setFontSize(11);
-  doc.setTextColor(100, 100, 100);
-  doc.text('TWO WHEELER SERVICE & REPAIR CENTER', 105, centerY + 14, { align: 'center' });
+  if (logoBase64) {
+    try {
+      doc.addImage(logoBase64, 'JPEG', 45, centerY - 25, 120, 50);
+    } catch (e) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(28);
+      doc.setTextColor(100, 100, 100);
+      doc.text('NATIONAL AUTO GARAGE', 105, centerY, { align: 'center' });
+    }
+  }
   
   doc.restoreGraphicsState();
 };
@@ -61,7 +77,6 @@ export const getBillPDFDoc = (bill) => {
   const redColor = [220, 38, 38]; // Red #dc2626
   const blackColor = [15, 23, 42]; // Black / Dark Slate
   const grayTextColor = [71, 85, 105]; // Slate-600
-  const lightBgColor = [248, 250, 252]; // Slate-50
 
   const items = Array.isArray(bill?.items) && bill.items.length > 0 ? bill.items : [];
   const grandTotal = Number(bill?.grandTotal || bill?.totalAmount || 0);
@@ -81,148 +96,128 @@ export const getBillPDFDoc = (bill) => {
   });
 
   let currentPage = 1;
-  let y = 12;
+  let y = 10;
 
   // Render Page 1 Top Border
   drawTopBorder(doc);
 
   // --- PAGE 1 HEADER ---
-  // Left: Logo text representation matching reference
-  doc.saveGraphicsState();
-  // Motorcycle icon outline representation
-  doc.setFillColor(15, 23, 42);
-  doc.circle(22, y + 5, 6, 'F');
-  doc.circle(42, y + 5, 6, 'F');
-  doc.setLineWidth(1.2);
-  doc.setDrawColor(15, 23, 42);
-  doc.line(22, y + 5, 32, y + 10);
-  doc.line(32, y + 10, 42, y + 5);
-  doc.line(32, y + 10, 35, y + 2);
-  doc.restoreGraphicsState();
-
-  // Brand Name Below Logo
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(...blackColor);
-  doc.text('NATIONAL', 32, y + 16, { align: 'center' });
-  doc.setFontSize(17);
-  doc.setTextColor(...redColor);
-  doc.text('AUTO GARAGE', 32, y + 22, { align: 'center' });
-  
-  doc.setFontSize(6.5);
-  doc.setTextColor(...blackColor);
-  doc.setFont('helvetica', 'bold');
-  doc.text('— TWO WHEELER SERVICE & REPAIR CENTER —', 32, y + 26, { align: 'center' });
+  // Left: Exact High-Res Logo Image
+  if (logoBase64) {
+    try {
+      doc.addImage(logoBase64, 'JPEG', 10, y + 2, 58, 26);
+    } catch (e) {
+      console.error('Failed to render logo base64:', e);
+    }
+  }
 
   // Center: Contact Details
-  doc.setFillColor(...redColor);
-  doc.circle(108, y + 6, 2.5, 'F');
+  drawPhoneIcon(doc, 108, y + 7);
   doc.setFontSize(8.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...blackColor);
-  doc.text('Imran Pathan', 113, y + 5);
+  doc.text('Imran Pathan', 113, y + 6);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  doc.text('+91 96248 44188', 113, y + 9.5);
+  doc.text('+91 96248 44188', 113, y + 10.5);
 
-  doc.setFillColor(...redColor);
-  doc.circle(108, y + 17, 2.5, 'F');
+  drawPhoneIcon(doc, 108, y + 18);
   doc.setFontSize(8.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...blackColor);
-  doc.text('Naim Pathan', 113, y + 16);
+  doc.text('Naim Pathan', 113, y + 17);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  doc.text('+91 81281 44350', 113, y + 20.5);
+  doc.text('+91 81281 44350', 113, y + 21.5);
 
   // Vertical Separator Line
   doc.setDrawColor(203, 213, 225);
   doc.setLineWidth(0.5);
-  doc.line(144, y + 2, 144, y + 26);
+  doc.line(144, y + 3, 144, y + 26);
 
   // Right: Invoice Information
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...redColor);
-  doc.text('INVOICE / SERVICE BILL', 150, y + 6);
+  doc.text('INVOICE / SERVICE BILL', 150, y + 7);
 
   doc.setFontSize(8.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...blackColor);
-  doc.text('Date', 150, y + 15);
-  doc.text(':', 168, y + 15);
+  doc.text('Date', 150, y + 16);
+  doc.text(':', 168, y + 16);
   doc.setFont('helvetica', 'bold');
-  doc.text(formattedDateStr, 173, y + 15);
+  doc.text(formattedDateStr, 173, y + 16);
 
   doc.setFont('helvetica', 'bold');
-  doc.text('Time', 150, y + 21);
-  doc.text(':', 168, y + 21);
+  doc.text('Time', 150, y + 22);
+  doc.text(':', 168, y + 22);
   doc.setFont('helvetica', 'bold');
-  doc.text(formattedTimeStr, 173, y + 21);
+  doc.text(formattedTimeStr, 173, y + 22);
 
   // --- CUSTOMER & VEHICLE DETAILS SECTION ---
   y = 44;
 
-  // Left Card: Customer Details
   const cardW = 88;
-  const cardH = 26;
+  const cardH = 24;
+
+  // Left Card: Customer Details Box
+  doc.setDrawColor(203, 213, 225);
+  doc.setFillColor(255, 255, 255);
+  doc.roundedRect(12, y + 3, cardW, cardH - 3, 2, 2, 'D');
 
   // Red Title Tab
   doc.setFillColor(...redColor);
-  doc.roundedRect(12, y, 48, 6, 1.5, 1.5, 'F');
-  doc.circle(16, y + 3, 2, 'F');
+  doc.roundedRect(12, y, 48, 5.5, 1.5, 1.5, 'F');
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
-  doc.text('CUSTOMER DETAILS', 20, y + 4.2);
+  doc.text('CUSTOMER DETAILS', 18, y + 3.8);
 
-  // Box Content
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...blackColor);
+  doc.text('Customer Name', 16, y + 10);
+  doc.text(':', 44, y + 10);
+  doc.setFont('helvetica', 'bold');
+  doc.text(bill?.customerName || '—', 48, y + 10);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Mobile Number', 16, y + 17);
+  doc.text(':', 44, y + 17);
+  doc.setFont('helvetica', 'bold');
+  doc.text(bill?.mobileNumber || '—', 48, y + 17);
+
+  // Right Card: Vehicle Details Box
+  const rightX = 110;
   doc.setDrawColor(203, 213, 225);
   doc.setFillColor(255, 255, 255);
-  doc.roundedRect(12, y + 5, cardW, cardH - 5, 2, 2, 'D');
+  doc.roundedRect(rightX, y + 3, cardW, cardH - 3, 2, 2, 'D');
 
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...blackColor);
-  doc.text('Customer Name', 16, y + 12);
-  doc.text(':', 44, y + 12);
-  doc.setFont('helvetica', 'bold');
-  doc.text(bill?.customerName || '—', 48, y + 12);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('Mobile Number', 16, y + 18);
-  doc.text(':', 44, y + 18);
-  doc.setFont('helvetica', 'bold');
-  doc.text(bill?.mobileNumber || '—', 48, y + 18);
-
-  // Right Card: Vehicle Details
-  const rightX = 110;
+  // Red Title Tab
   doc.setFillColor(...redColor);
-  doc.roundedRect(rightX, y, 46, 6, 1.5, 1.5, 'F');
+  doc.roundedRect(rightX, y, 46, 5.5, 1.5, 1.5, 'F');
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
-  doc.text('VEHICLE DETAILS', rightX + 7, y + 4.2);
-
-  doc.setDrawColor(203, 213, 225);
-  doc.roundedRect(rightX, y + 5, cardW, cardH - 5, 2, 2, 'D');
+  doc.text('VEHICLE DETAILS', rightX + 6, y + 3.8);
 
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...blackColor);
-  doc.text('Bike Name', rightX + 4, y + 12);
-  doc.text(':', rightX + 32, y + 12);
+  doc.text('Bike Name', rightX + 4, y + 10);
+  doc.text(':', rightX + 32, y + 10);
   doc.setFont('helvetica', 'bold');
-  doc.text(bill?.bikeName || '—', rightX + 36, y + 12);
+  doc.text(bill?.bikeName || '—', rightX + 36, y + 10);
 
   doc.setFont('helvetica', 'bold');
-  doc.text('Number Plate', rightX + 4, y + 18);
-  doc.text(':', rightX + 32, y + 18);
+  doc.text('Number Plate', rightX + 4, y + 17);
+  doc.text(':', rightX + 32, y + 17);
   doc.setFont('helvetica', 'bold');
-  doc.text(bill?.bikeNumber || '—', rightX + 36, y + 18);
+  doc.text(bill?.bikeNumber || '—', rightX + 36, y + 17);
 
   // --- ITEMS TABLE HEADER ---
-  y = 75;
+  y = 74;
   const tableX = 12;
   const tableW = 186;
   const headerH = 7;
@@ -238,8 +233,8 @@ export const getBillPDFDoc = (bill) => {
     doc.text('#', tableX + 4, currentY + 4.8);
     doc.text('ITEM DESCRIPTION', tableX + 32, currentY + 4.8);
     doc.text('QTY', tableX + 106, currentY + 4.8, { align: 'center' });
-    doc.text('UNIT PRICE (₹)', tableX + 138, currentY + 4.8, { align: 'right' });
-    doc.text('TOTAL (₹)', tableX + 178, currentY + 4.8, { align: 'right' });
+    doc.text('UNIT PRICE (Rs.)', tableX + 144, currentY + 4.8, { align: 'right' });
+    doc.text('TOTAL (Rs.)', tableX + 182, currentY + 4.8, { align: 'right' });
   };
 
   renderTableHeader(y);
@@ -254,10 +249,7 @@ export const getBillPDFDoc = (bill) => {
   items.forEach((item, idx) => {
     // Check page break condition
     if (y + rowHeight > pageMaxY) {
-      // Draw bottom border on current page before breaking
       drawBottomBorder(doc);
-
-      // Add new page
       doc.addPage();
       currentPage += 1;
       drawTopBorder(doc);
@@ -267,7 +259,6 @@ export const getBillPDFDoc = (bill) => {
       renderTableHeader(y);
       y += headerH;
 
-      // Draw watermark on new page
       drawWatermark(doc, y, 260);
     }
 
@@ -329,7 +320,7 @@ export const getBillPDFDoc = (bill) => {
   doc.setFontSize(9.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...blackColor);
-  doc.text('TOTAL AMOUNT (₹)', tableX + 116, y + 6);
+  doc.text('TOTAL AMOUNT (Rs.)', tableX + 112, y + 6);
 
   doc.setFontSize(13);
   doc.setFont('helvetica', 'bold');
@@ -345,7 +336,7 @@ export const getBillPDFDoc = (bill) => {
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...redColor);
-  doc.text('★   Thank You!   ★', 105, y, { align: 'center' });
+  doc.text('-   Thank You!   -', 105, y, { align: 'center' });
 
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
@@ -354,12 +345,11 @@ export const getBillPDFDoc = (bill) => {
 
   // --- FOOTER ADDRESS & BOTTOM BORDER ---
   y += 10;
-  doc.setFillColor(...redColor);
-  doc.circle(44, y - 0.8, 1.6, 'F');
+  drawPinIcon(doc, 42, y - 0.5);
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...blackColor);
-  doc.text('National Auto Garage, Near Old Petrol Pump, Mangrol, Surat - Gujarat 394125', 105, y, {
+  doc.text('National Auto Garage, Near Old Petrol Pump, Mangrol, Surat - Gujarat 394125', 107, y, {
     align: 'center',
   });
 
