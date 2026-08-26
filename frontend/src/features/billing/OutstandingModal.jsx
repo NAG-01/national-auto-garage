@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, User, Phone, Bike, MapPin, DollarSign, FileText } from 'lucide-react';
-import { Modal } from '../../components/ui/Modal.jsx';
+import { Modal, ModalCancelButton } from '../../components/ui/Modal.jsx';
 import { Input } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -134,9 +134,9 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
       title={isEdit ? 'Baaki Record Edit Karein' : '+ Naya Baaki / Dues Record Add Karein'}
       footer={
         <div className="flex items-center justify-end gap-3 w-full">
-          <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+          <ModalCancelButton disabled={submitting}>
             Cancel
-          </Button>
+          </ModalCancelButton>
           <Button type="submit" form="outstanding-dues-form" variant="accent" loading={submitting}>
             {isEdit ? 'Update Record' : 'Save Record'}
           </Button>

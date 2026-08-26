@@ -16,10 +16,18 @@ import { KpiCard } from '../../components/ui/KpiCard.jsx';
 import { Card } from '../../components/ui/Card.jsx';
 import { SearchInput } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
-import { Table } from '../../components/ui/Table.jsx';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '../../components/ui/Table.jsx';
 import { Skeleton } from '../../components/ui/Skeleton.jsx';
 import { EmptyState } from '../../components/ui/EmptyState.jsx';
 import { ErrorState } from '../../components/ui/ErrorState.jsx';
+import { ConfirmDialog } from '../../components/ui/Modal.jsx';
 import { OutstandingModal } from './OutstandingModal.jsx';
 import { formatPhone, formatDate, formatINR } from '../../utils/formatters.js';
 
@@ -37,6 +45,10 @@ export const OutstandingPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
 
+  // Delete Confirmation State
+  const [deletingRecord, setDeletingRecord] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   const toast = useToast();
 
   const fetchOutstandingData = useCallback(async () => {
@@ -46,16 +58,17 @@ export const OutstandingPage = () => {
       const res = await api.get('/outstanding', {
         params: { search, page, limit: 15 },
       });
-      setRecords(res.data || []);
-      setSummary(res.meta?.summary || null);
-      setTotalPages(res.meta?.pagination?.totalPages || 1);
+
+      setRecords(res.data?.records || []);
+      setSummary(res.data?.summary || null);
+      setTotalPages(res.data?.pagination?.totalPages || 1);
     } catch (err) {
-      setError(err.message || 'Failed to load customer dues records.');
-      toast.error('Failed to load customer dues records.');
+      console.error('Failed to fetch outstanding dues:', err);
+      setError(err.message || 'Customer outstanding records load nahi ho paaye.');
     } finally {
       setLoading(false);
     }
-  }, [search, page, toast]);
+  }, [search, page]);
 
   useEffect(() => {
     fetchOutstandingData();
@@ -71,120 +84,20 @@ export const OutstandingPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteRecord = async (record) => {
-    const confirmDelete = window.confirm(
-      `Kya aap ${record.customerName} ke ₹${record.pendingAmount} baaki dues record ko delete karna chahte hain?`
-    );
-
-    if (!confirmDelete) return;
-
+  const handleConfirmDelete = async () => {
+    if (!deletingRecord) return;
+    setDeleteLoading(true);
     try {
-      await api.delete(`/outstanding/${record._id}`);
-      toast.success(`${record.customerName} ka record delete ho gaya!`);
+      await api.delete(`/outstanding/${deletingRecord._id}`);
+      toast.success(`${deletingRecord.customerName} ka baaki dues record delete ho gaya!`);
+      setDeletingRecord(null);
       fetchOutstandingData();
     } catch (err) {
       toast.error(err.message || 'Record delete karne me error aaya.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
-
-  const columns = [
-    {
-      header: 'Date',
-      accessor: 'date',
-      render: (r) => (
-        <span className="font-mono text-xs text-slate-700 font-medium">
-          {formatDate(r.date)}
-        </span>
-      ),
-    },
-    {
-      header: 'Customer Name',
-      accessor: 'customerName',
-      render: (r) => (
-        <div>
-          <div className="font-bold text-slate-900">{r.customerName}</div>
-          {r.notes && (
-            <div className="text-[11px] text-slate-400 italic max-w-xs truncate">
-              {r.notes}
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      header: 'Phone / Mobile',
-      accessor: 'mobileNumber',
-      render: (r) => (
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs text-slate-700 font-semibold">
-            {formatPhone(r.mobileNumber)}
-          </span>
-          <a
-            href={`https://api.whatsapp.com/send?phone=91${r.mobileNumber}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="p-1 text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
-            title="Send WhatsApp Message"
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-          </a>
-        </div>
-      ),
-    },
-    {
-      header: 'Bike Name',
-      accessor: 'bikeName',
-      render: (r) => (
-        <span className="font-semibold text-xs text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-          {r.bikeName}
-        </span>
-      ),
-    },
-    {
-      header: 'Address (Pata)',
-      accessor: 'address',
-      render: (r) => (
-        <span className="text-xs text-slate-600 font-medium">
-          {r.address || '—'}
-        </span>
-      ),
-    },
-    {
-      header: 'Baaki Amount',
-      accessor: 'pendingAmount',
-      className: 'text-right font-mono font-bold text-xs',
-      render: (r) => (
-        <span className="text-orange-900 bg-orange-100 px-2.5 py-1 rounded border border-orange-300">
-          {formatINR(r.pendingAmount)}
-        </span>
-      ),
-    },
-    {
-      header: 'Actions',
-      accessor: 'actions',
-      className: 'text-right',
-      render: (r) => (
-        <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={Pencil}
-            onClick={() => handleOpenEditModal(r)}
-            title="Edit Record"
-          />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-rose-600 hover:text-rose-700 hover:bg-rose-50"
-            icon={Trash2}
-            onClick={() => handleDeleteRecord(r)}
-            title="Delete Record"
-          />
-        </div>
-      ),
-    },
-  ];
 
   return (
     <div className="space-y-6">
@@ -218,10 +131,14 @@ export const OutstandingPage = () => {
       <Card noPadding className="p-4">
         <div className="w-full xl:max-w-md">
           <SearchInput
-            placeholder="Customer name, phone number, bike ya address search karein..."
+            placeholder="Customer name, phone number, bike, address se search karein..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
+              setPage(1);
+            }}
+            onClear={() => {
+              setSearch('');
               setPage(1);
             }}
           />
@@ -248,8 +165,90 @@ export const OutstandingPage = () => {
           onAction={search ? () => setSearch('') : handleOpenAddModal}
         />
       ) : (
-        <Card className="overflow-hidden">
-          <Table columns={columns} data={records} />
+        <Card noPadding className="overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow hover={false}>
+                <TableHead>Tareekh (Date)</TableHead>
+                <TableHead>Customer Name</TableHead>
+                <TableHead>Phone / Mobile</TableHead>
+                <TableHead>Bike Name</TableHead>
+                <TableHead>Address (Pata)</TableHead>
+                <TableHead className="text-right">Baaki Amount</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {records.map((r) => (
+                <TableRow key={r._id} hover={false}>
+                  <TableCell>
+                    <span className="font-mono text-xs text-slate-700 font-medium">
+                      {formatDate(r.date)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-bold text-slate-900">{r.customerName}</div>
+                    {r.notes && (
+                      <div className="text-[11px] text-slate-400 italic max-w-xs truncate">
+                        {r.notes}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs text-slate-700 font-semibold">
+                        {formatPhone(r.mobileNumber)}
+                      </span>
+                      <a
+                        href={`https://api.whatsapp.com/send?phone=91${r.mobileNumber}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1 text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
+                        title="Send WhatsApp Message"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-semibold text-xs text-slate-800 bg-slate-100 px-2.5 py-1 rounded border border-slate-200">
+                      {r.bikeName}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-xs text-slate-600 font-medium">
+                      {r.address || '—'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <span className="text-orange-950 bg-orange-100 px-2.5 py-1 rounded border border-orange-300 font-mono font-bold text-xs">
+                      {formatINR(r.pendingAmount)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={Pencil}
+                        onClick={() => handleOpenEditModal(r)}
+                        title="Edit Record"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                        icon={Trash2}
+                        onClick={() => setDeletingRecord(r)}
+                        title="Delete Record"
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
           {totalPages > 1 && (
             <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
@@ -287,6 +286,21 @@ export const OutstandingPage = () => {
           onClose={() => setIsModalOpen(false)}
           record={editingRecord}
           onSuccess={fetchOutstandingData}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deletingRecord && (
+        <ConfirmDialog
+          isOpen={Boolean(deletingRecord)}
+          onClose={() => setDeletingRecord(null)}
+          onConfirm={handleConfirmDelete}
+          title="Delete Customer Dues Record?"
+          message={`Kya aap ${deletingRecord.customerName} (Bike: ${deletingRecord.bikeName}) ke ${formatINR(deletingRecord.pendingAmount)} baaki dues record ko delete karna chahte hain? Pehle se save kiya hua data hamesha ke liye remove ho jayega.`}
+          confirmText="Yes, Delete Record"
+          cancelText="Cancel"
+          variant="danger"
+          loading={deleteLoading}
         />
       )}
     </div>
