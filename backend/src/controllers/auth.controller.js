@@ -25,14 +25,41 @@ export class AuthController {
     }
   }
 
-  static async updateCredentials(req, res, next) {
+  static async verifyPassword(req, res, next) {
     try {
-      const { currentPassword, newUsername, newEmail, newPassword } = req.body;
-      const { user, token } = await AuthService.updateCredentials(
-        { currentPassword, newUsername, newEmail, newPassword },
-        req.user
-      );
-      return ApiResponse.success(res, 'Admin credentials updated successfully', { user, token });
+      const { currentPassword } = req.body;
+      const result = await AuthService.verifyCurrentPassword(currentPassword, req.user._id);
+      return ApiResponse.success(res, 'Password verified successfully', result);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async updatePassword(req, res, next) {
+    try {
+      const { newPassword } = req.body;
+      const { user, token } = await AuthService.updatePasswordWithVerification(newPassword, req.user._id);
+      return ApiResponse.success(res, 'Admin password updated successfully', { user, token });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async requestEmailOTP(req, res, next) {
+    try {
+      const { newEmail } = req.body;
+      const result = await AuthService.requestEmailChangeOTP(newEmail, req.user._id);
+      return ApiResponse.success(res, 'Email OTP sent successfully', result);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async verifyEmailOTP(req, res, next) {
+    try {
+      const { otpCode, newEmail } = req.body;
+      const { user, token } = await AuthService.verifyEmailOTPAndChangeUsername(otpCode, newEmail, req.user._id);
+      return ApiResponse.success(res, 'Username & Email updated successfully', { user, token });
     } catch (err) {
       next(err);
     }

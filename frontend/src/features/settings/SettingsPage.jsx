@@ -19,11 +19,17 @@ import {
   KeyRound,
   Lock,
   User,
+  Mail,
+  Send,
+  ShieldAlert,
+  Unlock,
+  Check,
 } from 'lucide-react';
 import { PageHeader } from '../../components/layout/PageHeader.jsx';
 import { Card } from '../../components/ui/Card.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { Input, Textarea } from '../../components/ui/Input.jsx';
+import { Modal } from '../../components/ui/Modal.jsx';
 import { useSettings } from '../../context/SettingsContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -31,12 +37,12 @@ import api from '../../api/client.js';
 
 export const SettingsPage = () => {
   const { settings, updateSettings, loading: settingsLoading } = useSettings();
-  const { user, login } = useAuth();
+  const { user } = useAuth();
   const toast = useToast();
   const showSuccess = toast.showSuccess || toast.success || console.log;
   const showError = toast.showError || toast.error || console.error;
 
-  const [activeTab, setActiveTab] = useState('ui'); // 'ui' | 'branding' | 'prefixes' | 'mechanics' | 'security'
+  const [activeTab, setActiveTab] = useState('ui'); // 'ui' | 'branding' | 'prefixes' | 'mechanics' | 'username' | 'password'
 
   const [formData, setFormData] = useState({
     // Section 1: Dynamic UI Labels & Badges
@@ -63,15 +69,22 @@ export const SettingsPage = () => {
     expensePrefix: 'EXP',
   });
 
-  // Admin Credentials Change Form State
-  const [credForm, setCredForm] = useState({
-    currentPassword: '',
-    newUsername: '',
-    newEmail: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
-  const [savingCreds, setSavingCreds] = useState(false);
+  // Password Change 2-Step Gate State
+  const [passStep, setPassStep] = useState(1); // 1: Verify Current Pass, 2: Enter New Pass
+  const [currentPass, setCurrentPass] = useState('');
+  const [verifyingPass, setVerifyingPass] = useState(false);
+  const [passVerified, setPassVerified] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [savingPass, setSavingPass] = useState(false);
+
+  // Email / Username Change State & OTP Modal State
+  const [newEmail, setNewEmail] = useState('');
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [generatedOtpHint, setGeneratedOtpHint] = useState('');
+  const [inputOtp, setInputOtp] = useState('');
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
 
   const [mechanicsList, setMechanicsList] = useState([
     { id: 1, name: 'Imran Pathan', role: 'Head Technician', phone: '+91 98765 00001' },
@@ -106,21 +119,13 @@ export const SettingsPage = () => {
         expensePrefix: settings.expensePrefix || 'EXP',
       });
     }
-    if (user) {
-      setCredForm((prev) => ({
-        ...prev,
-        newUsername: user.username || '',
-        newEmail: user.email || '',
-      }));
+    if (user?.email) {
+      setNewEmail(user.email);
     }
   }, [settings, user]);
 
   const handleChange = (field, val) => {
     setFormData((prev) => ({ ...prev, [field]: val }));
-  };
-
-  const handleCredChange = (field, val) => {
-    setCredForm((prev) => ({ ...prev, [field]: val }));
   };
 
   const handleAddMechanic = (e) => {
@@ -154,44 +159,114 @@ export const SettingsPage = () => {
     }
   };
 
-  const handleUpdateCredentials = async (e) => {
+  // STEP 1: Verify Current Password Gate
+  const handleVerifyCurrentPassword = async (e) => {
     e.preventDefault();
-    if (!credForm.currentPassword) {
-      showError('Current Password is required to update admin credentials.');
+    if (!currentPass) {
+      showError('Please enter your current password.');
       return;
     }
-    if (credForm.newPassword && credForm.newPassword !== credForm.confirmPassword) {
+    setVerifyingPass(true);
+    try {
+      const res = await api.post('/auth/verify-password', { currentPassword: currentPass });
+      const payload = res.data || res;
+      if (payload) {
+        setPassVerified(true);
+        setPassStep(2);
+        showSuccess('Current password verified! Step 2 unlocked. Enter your new password below.');
+      }
+    } catch (err) {
+      showError(err.message || 'Current password is incorrect.');
+      setPassVerified(false);
+    } finally {
+      setVerifyingPass(false);
+    }
+  };
+
+  // STEP 2: Save New Password after Gate
+  const handleSaveNewPassword = async (e) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 4) {
+      showError('New password must be at least 4 characters long.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
       showError('New password and Confirm password do not match.');
       return;
     }
 
-    setSavingCreds(true);
+    setSavingPass(true);
     try {
-      const res = await api.put('/auth/update-credentials', {
-        currentPassword: credForm.currentPassword,
-        newUsername: credForm.newUsername,
-        newEmail: credForm.newEmail,
-        newPassword: credForm.newPassword,
-      });
+      const res = await api.put('/auth/update-password', { newPassword });
+      const payload = res.data || res;
+      if (payload && payload.token) {
+        localStorage.setItem('nag_token', payload.token);
+        localStorage.setItem('nag_user', JSON.stringify(payload.user));
+      }
+      showSuccess('Admin password updated successfully!');
+      // Reset gate
+      setCurrentPass('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setPassVerified(false);
+      setPassStep(1);
+    } catch (err) {
+      showError(err.message || 'Failed to update password');
+    } finally {
+      setSavingPass(false);
+    }
+  };
 
+  // EMAIL OTP FLOW 1: Request 6-Digit Code
+  const handleRequestEmailOtp = async (e) => {
+    e.preventDefault();
+    if (!newEmail || !newEmail.trim()) {
+      showError('Please enter a valid Email address.');
+      return;
+    }
+    setSendingOtp(true);
+    try {
+      const res = await api.post('/request-email-otp', { newEmail: newEmail.trim() });
+      const payload = res.data || res;
+      if (payload && payload.otp) {
+        setGeneratedOtpHint(payload.otp);
+        setOtpModalOpen(true);
+        showSuccess(`Confirmation OTP sent to ${newEmail.trim()}! Please check your email.`);
+      }
+    } catch (err) {
+      showError(err.message || 'Failed to send OTP code');
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
+  // EMAIL OTP FLOW 2: Verify Code and Update Username/Email
+  const handleVerifyEmailOtp = async (e) => {
+    e.preventDefault();
+    if (!inputOtp || inputOtp.trim().length !== 6) {
+      showError('Please enter the full 6-digit OTP code.');
+      return;
+    }
+
+    setVerifyingOtp(true);
+    try {
+      const res = await api.post('/verify-email-otp', {
+        otpCode: inputOtp.trim(),
+        newEmail: newEmail.trim(),
+      });
       const payload = res.data || res;
       if (payload && payload.token) {
         localStorage.setItem('nag_token', payload.token);
         localStorage.setItem('nag_user', JSON.stringify(payload.user));
       }
 
-      setCredForm((prev) => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      }));
-
-      showSuccess('Admin Username, Email & Password updated successfully!');
+      showSuccess(`Email & Username successfully changed to '${newEmail.trim()}'!`);
+      setOtpModalOpen(false);
+      setInputOtp('');
     } catch (err) {
-      showError(err.message || 'Failed to update credentials');
+      showError(err.message || 'OTP Verification failed');
     } finally {
-      setSavingCreds(false);
+      setVerifyingOtp(false);
     }
   };
 
@@ -205,14 +280,15 @@ export const SettingsPage = () => {
     { id: 'branding', label: '2. Garage Branding & Address', icon: Building2 },
     { id: 'prefixes', label: '3. System ID Prefixes', icon: Sliders },
     { id: 'mechanics', label: '4. Technicians Directory', icon: UserCheck },
-    { id: 'security', label: '5. Admin Username & Password', icon: KeyRound },
+    { id: 'username', label: '5. Change Admin Email / Username', icon: Mail },
+    { id: 'password', label: '6. Change Password (2-Step Gate)', icon: KeyRound },
   ];
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-20">
       <PageHeader
         title="System Settings"
-        subtitle="Header Badges, Portal Names, Garage Branding, Contact Details, Prefixes, aur Admin Login Credentials ko yahan se dynamically configure karein."
+        subtitle="Header Badges, Garage Branding, Prefixes, Email Username OTP Verification, aur 2-Step Security Password Gate."
       />
 
       {/* Sleek Tab Selection Pills */}
@@ -225,7 +301,7 @@ export const SettingsPage = () => {
               key={tb.id}
               type="button"
               onClick={() => setActiveTab(tb.id)}
-              className={`px-5 py-3 rounded-xl text-xs font-black transition-all flex items-center gap-2.5 shrink-0 ${
+              className={`px-4 py-3 rounded-xl text-xs font-black transition-all flex items-center gap-2.5 shrink-0 ${
                 isActive
                   ? 'bg-[#0284C7] text-white shadow-md shadow-sky-900/20'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
@@ -278,7 +354,7 @@ export const SettingsPage = () => {
                   </div>
                 </div>
 
-                {/* Form Input Rows with Generous Gaps */}
+                {/* Form Input Rows */}
                 <div className="space-y-6 pt-2">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Input
@@ -581,101 +657,207 @@ export const SettingsPage = () => {
             </Card>
           )}
 
-          {/* TAB 5: Admin Username & Password Change Form */}
-          {activeTab === 'security' && (
-            <form onSubmit={handleUpdateCredentials}>
+          {/* DEDICATED TAB 5: Change Admin Email / Username with OTP Confirmation */}
+          {activeTab === 'username' && (
+            <form onSubmit={handleRequestEmailOtp}>
               <Card className="p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6 bg-white">
                 <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-                  <div className="p-3 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 shrink-0">
-                    <KeyRound className="w-6 h-6" />
+                  <div className="p-3 rounded-2xl bg-sky-50 text-[#0284C7] border border-sky-200 shrink-0">
+                    <Mail className="w-6 h-6" />
                   </div>
                   <div>
                     <h2 className="text-base font-black text-slate-900 tracking-tight">
-                      Admin Username & Password Management
+                      Change Admin Email & Username (Email OTP Verification)
                     </h2>
                     <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      Admin login credentials ko direct yahan se change karein.
+                      Apna Naya Email address enter karein. Email par OTP jayega aur verification ke baad change ho jayega.
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-rose-50/70 p-4 rounded-2xl border border-rose-200/80 text-rose-900 text-xs font-medium space-y-1">
-                  <div className="font-extrabold flex items-center gap-1.5 text-rose-900">
-                    <Lock className="w-4 h-4 text-rose-600" /> Security Verification Required
+                <div className="bg-sky-50/80 p-4 rounded-2xl border border-sky-200 text-sky-950 text-xs font-medium space-y-1">
+                  <div className="font-extrabold flex items-center gap-1.5 text-sky-900">
+                    <ShieldCheck className="w-4 h-4 text-[#0284C7]" /> Email Confirmation Security
                   </div>
-                  <p className="text-[11px] leading-relaxed text-rose-800">
-                    Username ya Password badalne ke liye pehle apna <strong>Current Password</strong> enter karein.
+                  <p className="text-[11px] leading-relaxed text-sky-800">
+                    Security ke liye, Naya Email/Username tabhi active hoga jab aap <strong>6-digit Email OTP Code</strong> verify karenge.
                   </p>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="max-w-md">
-                    <Input
-                      type="password"
-                      label="Current Admin Password *"
-                      placeholder="Enter your current password"
-                      value={credForm.currentPassword}
-                      onChange={(e) => handleCredChange('currentPassword', e.target.value)}
-                      required
-                      helpText="Required to authorize changes to admin credentials."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
-                    <Input
-                      type="text"
-                      label="Admin Username (Name or Email)"
-                      placeholder="e.g. naim@nag.com or admin"
-                      value={credForm.newUsername}
-                      onChange={(e) => handleCredChange('newUsername', e.target.value)}
-                      icon={User}
-                      helpText="Login ke liye Naya Username ya Email rakhein."
-                    />
-                    <Input
-                      type="email"
-                      label="Admin Registered Email"
-                      placeholder="e.g. admin@nationalautogarage.com"
-                      value={credForm.newEmail}
-                      onChange={(e) => handleCredChange('newEmail', e.target.value)}
-                      helpText="Admin notification aur profile email."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
-                    <Input
-                      type="password"
-                      label="New Admin Password"
-                      placeholder="Enter new password (min 4 chars)"
-                      value={credForm.newPassword}
-                      onChange={(e) => handleCredChange('newPassword', e.target.value)}
-                      icon={Lock}
-                    />
-                    <Input
-                      type="password"
-                      label="Confirm New Password"
-                      placeholder="Re-enter new password"
-                      value={credForm.confirmPassword}
-                      onChange={(e) => handleCredChange('confirmPassword', e.target.value)}
-                      icon={Lock}
-                    />
-                  </div>
+                <div className="space-y-6 max-w-lg">
+                  <Input
+                    type="email"
+                    label="New Admin Email Address / Username *"
+                    placeholder="e.g. naim@nag.com or admin@nationalautogarage.com"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    icon={Mail}
+                    required
+                    helpText="Apna Naya Official Admin Email Address enter karein."
+                  />
                 </div>
 
                 <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200">
                   <span className="text-xs text-slate-500 font-medium hidden sm:inline">
-                    Updated credentials will take effect immediately.
+                    A 6-digit confirmation code will be sent to your email.
                   </span>
                   <Button
                     type="submit"
-                    disabled={savingCreds}
-                    className="px-8 py-3 text-xs font-black bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-900/20"
+                    disabled={sendingOtp}
+                    className="px-8 py-3 text-xs font-black bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-lg shadow-sky-900/20"
                   >
-                    <KeyRound className="w-4 h-4 mr-2" />
-                    {savingCreds ? 'Updating Credentials...' : 'Update Admin Credentials'}
+                    <Send className="w-4 h-4 mr-2" />
+                    {sendingOtp ? 'Sending OTP Code...' : 'Send Email Confirmation OTP'}
                   </Button>
                 </div>
               </Card>
             </form>
+          )}
+
+          {/* DEDICATED TAB 6: Change Password (2-Step Verification Gate) */}
+          {activeTab === 'password' && (
+            <Card className="p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6 bg-white">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+                <div className="p-3 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 shrink-0">
+                  <KeyRound className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-base font-black text-slate-900 tracking-tight">
+                    Change Admin Password (2-Step Verification Gate)
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Step 1: Current password verify karein ➔ Step 2: Naya password enter karke change karein.
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress Indicator Pills */}
+              <div className="flex items-center gap-4">
+                <div className={`flex-1 p-3 rounded-xl border text-xs font-extrabold flex items-center justify-between transition-all ${
+                  passStep === 1
+                    ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-xs'
+                    : 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                }`}>
+                  <span className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-white text-slate-900 text-[10px] font-black flex items-center justify-center border">
+                      1
+                    </span>
+                    Step 1: Verify Current Password
+                  </span>
+                  {passVerified ? <Check className="w-4 h-4 text-emerald-600" /> : <Lock className="w-4 h-4 text-amber-600" />}
+                </div>
+
+                <div className={`flex-1 p-3 rounded-xl border text-xs font-extrabold flex items-center justify-between transition-all ${
+                  passStep === 2
+                    ? 'bg-sky-50 border-sky-300 text-sky-900 shadow-xs'
+                    : 'bg-slate-50 border-slate-200 text-slate-400 opacity-60'
+                }`}>
+                  <span className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-white text-slate-900 text-[10px] font-black flex items-center justify-center border">
+                      2
+                    </span>
+                    Step 2: Set New Password
+                  </span>
+                  {passStep === 2 ? <Unlock className="w-4 h-4 text-[#0284C7]" /> : <Lock className="w-4 h-4" />}
+                </div>
+              </div>
+
+              {/* STEP 1 FORM: VERIFY CURRENT PASSWORD */}
+              {passStep === 1 && (
+                <form onSubmit={handleVerifyCurrentPassword} className="space-y-6 pt-2">
+                  <div className="bg-amber-50/80 p-4 rounded-2xl border border-amber-200/90 text-amber-950 text-xs font-medium space-y-1">
+                    <div className="font-extrabold flex items-center gap-1.5 text-amber-900">
+                      <ShieldAlert className="w-4 h-4 text-amber-600" /> Current Password Verification Needed
+                    </div>
+                    <p className="text-[11px] leading-relaxed text-amber-800">
+                      Naya password page unlock karne ke liye pehle apna <strong>Current Password</strong> (e.g. <code>admin123</code>) enter karein.
+                    </p>
+                  </div>
+
+                  <div className="max-w-md">
+                    <Input
+                      type="password"
+                      label="Current Admin Password *"
+                      placeholder="Enter current password (e.g. admin123)"
+                      value={currentPass}
+                      onChange={(e) => setCurrentPass(e.target.value)}
+                      required
+                      icon={Lock}
+                      helpText="Pehle isko verify karein."
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <Button
+                      type="submit"
+                      disabled={verifyingPass}
+                      className="px-8 py-3 text-xs font-black bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-900/20"
+                    >
+                      <Lock className="w-4 h-4 mr-2" />
+                      {verifyingPass ? 'Verifying Password...' : 'Verify Password to Unlock Step 2'}
+                    </Button>
+                  </div>
+                </form>
+              )}
+
+              {/* STEP 2 FORM: ENTER NEW PASSWORD (ONLY SHOWS AFTER STEP 1 VERIFICATION) */}
+              {passStep === 2 && (
+                <form onSubmit={handleSaveNewPassword} className="space-y-6 pt-2">
+                  <div className="bg-emerald-50/90 p-4 rounded-2xl border border-emerald-200 text-emerald-950 text-xs font-medium space-y-1">
+                    <div className="font-extrabold flex items-center gap-1.5 text-emerald-900">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Current Password Verified Successfully!
+                    </div>
+                    <p className="text-[11px] leading-relaxed text-emerald-800">
+                      Step 2 Unlocked! Ab apna Naya Password enter karke Save karein.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <Input
+                      type="password"
+                      label="New Admin Password *"
+                      placeholder="Enter new password (min 4 chars)"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      icon={Lock}
+                    />
+                    <Input
+                      type="password"
+                      label="Confirm New Password *"
+                      placeholder="Re-enter new password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      icon={Lock}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setPassStep(1);
+                        setPassVerified(false);
+                      }}
+                      className="text-xs font-bold"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Cancel / Reset
+                    </Button>
+
+                    <Button
+                      type="submit"
+                      disabled={savingPass}
+                      className="px-8 py-3 text-xs font-black bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-900/20"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {savingPass ? 'Saving New Password...' : 'Save New Admin Password'}
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </Card>
           )}
         </div>
 
@@ -686,7 +868,7 @@ export const SettingsPage = () => {
               <div className="flex items-center gap-2.5">
                 <Globe className="w-5 h-5 text-[#0284C7]" />
                 <span className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                  Live UI Mockup
+                  Live Security Preview
                 </span>
               </div>
               <span className="text-[10px] font-extrabold bg-sky-100 text-[#0284C7] px-2.5 py-1 rounded-full uppercase border border-sky-200">
@@ -694,64 +876,113 @@ export const SettingsPage = () => {
               </span>
             </div>
 
-            {/* Topbar Preview Widget */}
-            <div className="space-y-2">
+            {/* Current Admin Account Email Widget */}
+            <div className="space-y-2 text-xs">
               <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">
-                Topbar Header Badge Preview:
-              </span>
-              <div className="p-4 bg-white border border-slate-200 rounded-2xl flex items-center justify-between shadow-2xs">
-                <span className="text-xs font-semibold text-slate-500">
-                  {formData.topbarContextText || 'Workshop System'}
-                </span>
-                <span className="text-xs bg-sky-50 text-[#0284C7] font-black px-3.5 py-1.5 rounded-full border border-sky-200 uppercase tracking-wider shadow-2xs">
-                  {formData.portalBadgeText || 'ADMIN PORTAL'}
-                </span>
-              </div>
-            </div>
-
-            {/* Sidebar Logo Preview Widget */}
-            <div className="space-y-2 pt-4 border-t border-sky-100">
-              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">
-                Sidebar Brand Logo Preview:
-              </span>
-              <div className="p-4 bg-[#0F172A] text-white rounded-2xl flex items-center gap-3.5 shadow-md">
-                <div className="w-9 h-9 rounded-xl bg-[#0284C7] font-black text-base flex items-center justify-center shadow-xs shrink-0">
-                  {formData.brandNameMain ? formData.brandNameMain.charAt(0).toUpperCase() : 'N'}
-                </div>
-                <div>
-                  <div className="text-xs font-black uppercase text-white leading-tight tracking-tight">
-                    {formData.brandNameMain || 'National Auto'}
-                  </div>
-                  <span className="text-[10px] font-bold text-sky-400 uppercase tracking-widest mt-0.5 block">
-                    {formData.brandNameSub || 'Garage Portal'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Current Admin Account Username Widget */}
-            <div className="space-y-2 pt-4 border-t border-sky-100 text-xs">
-              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">
-                Active Admin Username:
+                Active Admin Username / Email:
               </span>
               <div className="font-extrabold text-slate-900 bg-white p-3 rounded-2xl border border-slate-200 text-xs flex items-center gap-2">
                 <User className="w-4 h-4 text-[#0284C7]" />
-                <span>@{user?.username || 'admin'}</span>
+                <span className="truncate">{user?.email || user?.username || 'admin@nag.com'}</span>
+              </div>
+            </div>
+
+            {/* Password Security Status Widget */}
+            <div className="space-y-2 text-xs pt-4 border-t border-sky-100">
+              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                Password Gate Status:
+              </span>
+              <div className={`p-3 rounded-2xl border text-xs font-extrabold flex items-center gap-2 ${
+                passVerified
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                  : 'bg-amber-50 border-amber-200 text-amber-900'
+              }`}>
+                {passVerified ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Lock className="w-4 h-4 text-amber-600" />}
+                <span>{passVerified ? 'Step 2 Unlocked (New Pass Active)' : 'Step 1 Locked (Current Pass Required)'}</span>
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-sky-50 text-[#0C4A6E] text-xs font-medium space-y-1.5 border border-sky-200">
               <div className="flex items-center gap-2 font-bold text-slate-900">
                 <ShieldCheck className="w-4.5 h-4.5 text-[#0284C7]" />
-                Zero Code Editing Needed
+                Double Verification Security
               </div>
               <p className="text-[11px] leading-relaxed text-slate-600">
-                Aap Username ya Password yahan se change karenge to wo turant database me encrypted save ho jayega aur naye credentials se login ho sakega!
+                Password change aur Email/Username change dono ko 2 alag pages me divide kiya gaya hai complete safety ke liye.
               </p>
             </div>
           </Card>
         </div>
       </div>
+
+      {/* 6-DIGIT EMAIL OTP VERIFICATION MODAL */}
+      {otpModalOpen && (
+        <Modal
+          isOpen={otpModalOpen}
+          onClose={() => setOtpModalOpen(false)}
+          title="Verify 6-Digit Email Confirmation Code"
+          size="md"
+        >
+          <form onSubmit={handleVerifyEmailOtp} className="space-y-5 py-2">
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 rounded-2xl bg-sky-100 text-[#0284C7] font-black text-xl flex items-center justify-center mx-auto border border-sky-200">
+                <Mail className="w-6 h-6" />
+              </div>
+              <h3 className="text-sm font-black text-slate-900">
+                Enter 6-Digit OTP Code
+              </h3>
+              <p className="text-xs text-slate-500 font-medium">
+                We sent a 6-digit verification code to <strong>{newEmail}</strong>
+              </p>
+            </div>
+
+            {/* Instant Demo OTP Hint Badge */}
+            {generatedOtpHint && (
+              <div className="bg-gradient-to-r from-sky-500 to-blue-600 text-white p-3.5 rounded-2xl text-center space-y-1 shadow-md">
+                <span className="text-[10px] font-black uppercase tracking-widest text-sky-100 block">
+                  DEMO EMAIL CONFIRMATION CODE
+                </span>
+                <span className="text-2xl font-black tracking-widest font-mono">
+                  {generatedOtpHint}
+                </span>
+                <span className="text-[10px] text-sky-100 block font-semibold">
+                  (Type this 6-digit code below to confirm change)
+                </span>
+              </div>
+            )}
+
+            <div className="max-w-xs mx-auto">
+              <Input
+                type="text"
+                placeholder="Enter 6-Digit OTP (e.g. 584920)"
+                value={inputOtp}
+                onChange={(e) => setInputOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                maxLength={6}
+                required
+                className="text-center text-lg font-mono font-black tracking-widest"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOtpModalOpen(false)}
+                className="text-xs font-bold"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={verifyingOtp}
+                className="px-6 py-2.5 text-xs font-black bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-md shadow-sky-900/20"
+              >
+                {verifyingOtp ? 'Verifying OTP...' : 'Confirm & Update Email'}
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 };
