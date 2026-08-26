@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { LogOut, AlertTriangle } from 'lucide-react';
 import api from '../api/client.js';
+import { Modal } from '../components/ui/Modal.jsx';
+import { Button } from '../components/ui/Button.jsx';
 
 const AuthContext = createContext(null);
 
@@ -18,6 +21,7 @@ export const AuthProvider = ({ children }) => {
     }
   });
   const [loading, setLoading] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -92,7 +96,18 @@ export const AuthProvider = ({ children }) => {
     throw new Error('Invalid authentication response from server.');
   };
 
-  const logout = () => {
+  /**
+   * Request Logout opens the confirmation modal
+   */
+  const requestLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  /**
+   * Confirms & executes logout
+   */
+  const confirmLogout = () => {
+    setShowLogoutModal(false);
     localStorage.removeItem('nag_token');
     localStorage.removeItem('nag_user');
     setUser(null);
@@ -100,8 +115,61 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, isAuthenticated: Boolean(user) }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout: requestLogout,
+        confirmLogout,
+        isAuthenticated: Boolean(user),
+      }}
+    >
       {children}
+
+      {/* Global Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <Modal
+          isOpen={showLogoutModal}
+          onClose={() => setShowLogoutModal(false)}
+          title="Confirm Logout"
+          size="sm"
+        >
+          <div className="space-y-6 py-2">
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-rose-50 border border-rose-200">
+              <div className="p-3 rounded-xl bg-rose-600 text-white shrink-0 shadow-xs">
+                <LogOut className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-black text-slate-900">
+                  Are you sure you want to log out?
+                </h3>
+                <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                  Aapka active admin session close ho jayega aur login page par redirect kar diya jayega.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowLogoutModal(false)}
+                className="text-xs font-bold"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={confirmLogout}
+                className="px-6 py-2.5 text-xs font-black bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-900/20"
+              >
+                <LogOut className="w-3.5 h-3.5 mr-1.5" /> Confirm Logout
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </AuthContext.Provider>
   );
 };
