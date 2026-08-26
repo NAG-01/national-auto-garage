@@ -3,6 +3,7 @@ import {
   Tag,
   Plus,
   Trash2,
+  Edit3,
   Sparkles,
   CheckCircle2,
   TrendingUp,
@@ -13,7 +14,7 @@ import { Button } from '../../components/ui/Button.jsx';
 import { Input, SearchInput } from '../../components/ui/Input.jsx';
 import { Skeleton } from '../../components/ui/Skeleton.jsx';
 import { ErrorState } from '../../components/ui/ErrorState.jsx';
-import { ConfirmDialog } from '../../components/ui/Modal.jsx';
+import { Modal, ConfirmDialog } from '../../components/ui/Modal.jsx';
 import { useTableSelection } from '../../hooks/useTableSelection.js';
 import { BulkActionBar } from '../../components/ui/BulkActionBar.jsx';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableHeadCheckbox, TableCellCheckbox } from '../../components/ui/Table.jsx';
@@ -29,6 +30,11 @@ export const MasterKeywordPage = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [search, setSearch] = useState('');
+
+  // Edit State
+  const [editingKeyword, setEditingKeyword] = useState(null);
+  const [editWord, setEditWord] = useState('');
+  const [updating, setUpdating] = useState(false);
 
   // Confirm Delete State
   const [deleteId, setDeleteId] = useState(null);
@@ -86,6 +92,34 @@ export const MasterKeywordPage = () => {
       alert(err.message || 'Failed to add master keyword');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleStartEdit = (kw) => {
+    setEditingKeyword(kw);
+    setEditWord(kw.word);
+  };
+
+  const handleUpdateKeyword = async (e) => {
+    e.preventDefault();
+    if (!editingKeyword || !editWord || !editWord.trim()) return;
+
+    setUpdating(true);
+    try {
+      const res = await api.put(`/master-keywords/${editingKeyword._id}`, {
+        word: editWord.trim(),
+      });
+      const updatedData = res.data || res.message || res;
+      setKeywords((prev) =>
+        prev.map((k) => (k._id === editingKeyword._id ? { ...k, word: editWord.trim() } : k))
+      );
+      setEditingKeyword(null);
+      setSuccessMessage(`Keyword successfully update ho gaya!`);
+      setTimeout(() => setSuccessMessage(''), 4000);
+    } catch (err) {
+      alert(err.message || 'Failed to update keyword');
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -276,14 +310,24 @@ export const MasterKeywordPage = () => {
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => setDeleteId(kw._id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
-                        title="Delete Keyword"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleStartEdit(kw)}
+                          className="p-1.5 text-slate-400 hover:text-[#0284C7] hover:bg-sky-50 rounded-xl transition-colors"
+                          title="Edit Keyword"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteId(kw._id)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                          title="Delete Keyword"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
@@ -292,6 +336,37 @@ export const MasterKeywordPage = () => {
           </Table>
         )}
       </div>
+
+      {/* Edit Keyword Modal */}
+      <Modal
+        isOpen={Boolean(editingKeyword)}
+        onClose={() => setEditingKeyword(null)}
+        title="Edit Master Keyword"
+      >
+        <form onSubmit={handleUpdateKeyword} className="space-y-4">
+          <Input
+            label="Keyword Word / Name"
+            value={editWord}
+            onChange={(e) => setEditWord(e.target.value)}
+            required
+            autoFocus
+          />
+
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setEditingKeyword(null)}
+              disabled={updating}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" disabled={updating}>
+              {updating ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
