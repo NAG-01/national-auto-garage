@@ -152,7 +152,7 @@ export const SettlementCalculatorPage = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="space-y-6 pb-12">
       <PageHeader
         title="Settlement Calculator"
         subtitle="Dono partners ke mahine ke hisaab aur final paise nikalne ke liye simple calculator tool."

@@ -109,7 +109,7 @@ export const InvoiceCreatePage = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-xl mx-auto pb-10">
+    <div className="space-y-6 pb-10">
       {/* Top Header */}
       <div className="flex items-center gap-3">
         <Button

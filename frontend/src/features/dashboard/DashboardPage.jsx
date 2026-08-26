@@ -36,7 +36,7 @@ export const DashboardPage = () => {
   }, []);
 
   return (
-    <div className="space-y-5 max-w-3xl mx-auto py-2">
+    <div className="space-y-6">
       {/* Clean Dashboard Header */}
       <div className="flex items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>

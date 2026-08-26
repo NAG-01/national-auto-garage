@@ -85,7 +85,7 @@ export const SettingsPage = () => {
   const { partners = [], employees = [], serviceTypes = [] } = data || {};
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="space-y-6">
       <PageHeader
         title="Settings & System Configuration"
         subtitle="Manage garage branding, partner equity ratios, technician staff, and immutable audit logs."
