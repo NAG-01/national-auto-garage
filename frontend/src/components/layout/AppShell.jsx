@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar.jsx';
 import { Topbar } from './Topbar.jsx';
 
@@ -35,7 +36,7 @@ export const AppShell = ({ children }) => {
         <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto overflow-x-hidden">
           <Topbar onOpenMobileSidebar={() => setMobileSidebarOpen(true)} />
           <main className="flex-1 p-3 sm:p-5 md:p-6 max-w-7xl w-full mx-auto space-y-5 overflow-x-hidden">
-            {children}
+            {children || <Outlet />}
           </main>
         </div>
       </div>
