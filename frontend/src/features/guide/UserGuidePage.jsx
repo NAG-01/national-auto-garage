@@ -216,39 +216,7 @@ export const UserGuidePage = () => {
         </div>
       </div>
 
-      {/* Direct Page Jump Grid (Quick Links) */}
-      <div className="space-y-3">
-        <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-          <Zap className="w-4 h-4 text-[#0284C7]" /> Direct Page Navigation Shortcuts
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {modules.map((m) => {
-            const Icon = m.icon;
-            return (
-              <Link
-                key={m.id}
-                to={m.to}
-                className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs hover:border-[#0284C7] hover:shadow-md transition-all group flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className={`p-2 rounded-xl border ${m.color}`}>
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0284C7] group-hover:translate-x-0.5 transition-all" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-black text-slate-900 leading-tight group-hover:text-[#0284C7] transition-colors">
-                    {m.title}
-                  </h3>
-                  <span className="text-[10px] text-slate-500 font-medium block mt-0.5">
-                    Jump to page
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+
 
       {/* Module Step-by-Step Documentation Cards */}
       <div className="space-y-6 pt-4">
