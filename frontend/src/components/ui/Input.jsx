@@ -32,7 +32,6 @@ export const Input = React.forwardRef(
       type === 'number' ||
       type === 'tel' ||
       type === 'phone' ||
-      type === 'password' ||
       type === 'date' ||
       (label && (label.toLowerCase().includes('mobile') || label.toLowerCase().includes('phone') || label.toLowerCase().includes('qty') || label.toLowerCase().includes('price') || label.toLowerCase().includes('amount')));
 
