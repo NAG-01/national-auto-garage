@@ -3,46 +3,27 @@ import {
   Sliders,
   Building2,
   Tag,
-  FileText,
   Save,
-  CheckCircle2,
-  Sparkles,
   ShieldCheck,
-  RotateCcw,
-  Globe,
   UserCheck,
   Plus,
   Trash2,
-  Wrench,
-  HelpCircle,
   Sparkle,
-  KeyRound,
-  Lock,
-  User,
-  Mail,
-  Send,
-  ShieldAlert,
-  Unlock,
-  Check,
 } from 'lucide-react';
 import { PageHeader } from '../../components/layout/PageHeader.jsx';
 import { Card } from '../../components/ui/Card.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { Input, Textarea } from '../../components/ui/Input.jsx';
-import { Modal } from '../../components/ui/Modal.jsx';
 import { useSettings } from '../../context/SettingsContext.jsx';
-import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
-import api from '../../api/client.js';
 
 export const SettingsPage = () => {
-  const { settings, updateSettings, loading: settingsLoading } = useSettings();
-  const { user } = useAuth();
+  const { settings, updateSettings } = useSettings();
   const toast = useToast();
   const showSuccess = toast.showSuccess || toast.success || console.log;
   const showError = toast.showError || toast.error || console.error;
 
-  const [activeTab, setActiveTab] = useState('ui'); // 'ui' | 'branding' | 'prefixes' | 'mechanics' | 'username' | 'password'
+  const [activeTab, setActiveTab] = useState('ui'); // 'ui' | 'branding' | 'prefixes' | 'mechanics'
 
   const [formData, setFormData] = useState({
     // Section 1: Dynamic UI Labels & Badges
@@ -68,23 +49,6 @@ export const SettingsPage = () => {
     duesPrefix: 'DUE',
     expensePrefix: 'EXP',
   });
-
-  // Password Change 2-Step Gate State
-  const [passStep, setPassStep] = useState(1); // 1: Verify Current Pass, 2: Enter New Pass
-  const [currentPass, setCurrentPass] = useState('');
-  const [verifyingPass, setVerifyingPass] = useState(false);
-  const [passVerified, setPassVerified] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [savingPass, setSavingPass] = useState(false);
-
-  // Email / Username Change State & OTP Modal State
-  const [newEmail, setNewEmail] = useState('');
-  const [sendingOtp, setSendingOtp] = useState(false);
-  const [otpModalOpen, setOtpModalOpen] = useState(false);
-  const [generatedOtpHint, setGeneratedOtpHint] = useState('');
-  const [inputOtp, setInputOtp] = useState('');
-  const [verifyingOtp, setVerifyingOtp] = useState(false);
 
   const [mechanicsList, setMechanicsList] = useState([
     { id: 1, name: 'Imran Pathan', role: 'Head Technician', phone: '+91 98765 00001' },
@@ -117,15 +81,9 @@ export const SettingsPage = () => {
         jobIdPrefix: settings.jobIdPrefix || 'NAG',
         duesPrefix: settings.duesPrefix || 'DUE',
         expensePrefix: settings.expensePrefix || 'EXP',
-
-        smtpUser: settings.smtpUser || '',
-        smtpPass: settings.smtpPass || '',
       });
     }
-    if (user?.email) {
-      setNewEmail(user.email);
-    }
-  }, [settings, user]);
+  }, [settings]);
 
   const handleChange = (field, val) => {
     setFormData((prev) => ({ ...prev, [field]: val }));
@@ -162,122 +120,6 @@ export const SettingsPage = () => {
     }
   };
 
-  // STEP 1: Verify Current Password Gate
-  const handleVerifyCurrentPassword = async (e) => {
-    e.preventDefault();
-    if (!currentPass) {
-      showError('Please enter your current password.');
-      return;
-    }
-    setVerifyingPass(true);
-    try {
-      const res = await api.post('/auth/verify-password', { currentPassword: currentPass });
-      const payload = res.data || res;
-      if (payload) {
-        setPassVerified(true);
-        setPassStep(2);
-        showSuccess('Current password verified! Step 2 unlocked. Enter your new password below.');
-      }
-    } catch (err) {
-      showError(err.message || 'Current password is incorrect.');
-      setPassVerified(false);
-    } finally {
-      setVerifyingPass(false);
-    }
-  };
-
-  // STEP 2: Save New Password after Gate
-  const handleSaveNewPassword = async (e) => {
-    e.preventDefault();
-    if (!newPassword || newPassword.length < 4) {
-      showError('New password must be at least 4 characters long.');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      showError('New password and Confirm password do not match.');
-      return;
-    }
-
-    setSavingPass(true);
-    try {
-      const res = await api.put('/auth/update-password', { newPassword });
-      const payload = res.data || res;
-      if (payload && payload.token) {
-        localStorage.setItem('nag_token', payload.token);
-        localStorage.setItem('nag_user', JSON.stringify(payload.user));
-      }
-      showSuccess('Admin password updated successfully!');
-      // Reset gate
-      setCurrentPass('');
-      setNewPassword('');
-      setConfirmPassword('');
-      setPassVerified(false);
-      setPassStep(1);
-    } catch (err) {
-      showError(err.message || 'Failed to update password');
-    } finally {
-      setSavingPass(false);
-    }
-  };
-
-  // GMAIL MAGIC LINK FLOW: Send Verification Link to Inbox
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
-  const [sentMagicLinkUrl, setSentMagicLinkUrl] = useState('');
-
-  const handleSendGmailMagicLink = async (e) => {
-    e.preventDefault();
-    if (!newEmail || !newEmail.trim()) {
-      showError('Please enter a valid Email address.');
-      return;
-    }
-    setSendingOtp(true);
-    try {
-      const res = await api.post('/auth/request-email-magic-link', { newEmail: newEmail.trim() });
-      const payload = res.data || res;
-      if (payload) {
-        setMagicLinkSent(true);
-        if (payload.magicLink) {
-          setSentMagicLinkUrl(payload.magicLink);
-        }
-        showSuccess(`Verification email sent to ${newEmail.trim()}! Please check your Gmail Inbox.`);
-      }
-    } catch (err) {
-      showError(err.message || 'Failed to send verification link');
-    } finally {
-      setSendingOtp(false);
-    }
-  };
-
-  // EMAIL OTP FLOW 2: Verify Code and Update Username/Email
-  const handleVerifyEmailOtp = async (e) => {
-    e.preventDefault();
-    if (!inputOtp || inputOtp.trim().length !== 6) {
-      showError('Please enter the full 6-digit OTP code.');
-      return;
-    }
-
-    setVerifyingOtp(true);
-    try {
-      const res = await api.post('/auth/verify-email-otp', {
-        otpCode: inputOtp.trim(),
-        newEmail: newEmail.trim(),
-      });
-      const payload = res.data || res;
-      if (payload && payload.token) {
-        localStorage.setItem('nag_token', payload.token);
-        localStorage.setItem('nag_user', JSON.stringify(payload.user));
-      }
-
-      showSuccess(`Email & Username successfully changed to '${newEmail.trim()}'!`);
-      setOtpModalOpen(false);
-      setInputOtp('');
-    } catch (err) {
-      showError(err.message || 'OTP Verification failed');
-    } finally {
-      setVerifyingOtp(false);
-    }
-  };
-
   const applyPresetBadge = (badgeText) => {
     setFormData((prev) => ({ ...prev, portalBadgeText: badgeText }));
     showSuccess(`Applied preset header badge: '${badgeText}'`);
@@ -288,15 +130,13 @@ export const SettingsPage = () => {
     { id: 'branding', label: '2. Garage Branding & Address', icon: Building2 },
     { id: 'prefixes', label: '3. System ID Prefixes', icon: Sliders },
     { id: 'mechanics', label: '4. Technicians Directory', icon: UserCheck },
-    { id: 'username', label: '5. Change Admin Email / Username', icon: Mail },
-    { id: 'password', label: '6. Change Password (2-Step Gate)', icon: KeyRound },
   ];
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-20">
       <PageHeader
         title="System Settings"
-        subtitle="Header Badges, Garage Branding, Prefixes, Email Username OTP Verification, aur 2-Step Security Password Gate."
+        subtitle="Header Badges, Garage Branding, Prefixes, Invoice Notes, and Workshop Customizations."
       />
 
       {/* Sleek Tab Selection Pills */}
@@ -449,69 +289,67 @@ export const SettingsPage = () => {
                       label="Garage Name"
                       value={formData.garageName}
                       onChange={(e) => handleChange('garageName', e.target.value)}
+                      required
                     />
                     <Input
-                      label="Business Tagline"
+                      label="Tagline / Subheader"
                       value={formData.tagline}
                       onChange={(e) => handleChange('tagline', e.target.value)}
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-slate-100">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Input
-                      label="Primary Phone"
+                      label="Primary Phone Number"
                       value={formData.phone}
                       onChange={(e) => handleChange('phone', e.target.value)}
+                      required
                     />
                     <Input
-                      label="Alternate Phone"
+                      label="Alternate Phone Number"
                       value={formData.alternatePhone}
                       onChange={(e) => handleChange('alternatePhone', e.target.value)}
                     />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Input
-                      label="Official Email"
+                      label="Official Email Address"
+                      type="email"
                       value={formData.email}
                       onChange={(e) => handleChange('email', e.target.value)}
                     />
-                  </div>
-
-                  <div className="pt-4 border-t border-slate-100">
-                    <Textarea
-                      label="Garage Shop Address"
-                      value={formData.address}
-                      onChange={(e) => handleChange('address', e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="pt-4 border-t border-slate-100">
                     <Input
-                      label="GSTIN / Business Registration Number (Optional)"
+                      label="GSTIN Number (Optional)"
                       value={formData.gstNumber}
                       onChange={(e) => handleChange('gstNumber', e.target.value)}
                       placeholder="e.g. 24AAAAA0000A1Z5"
                     />
                   </div>
+
+                  <Textarea
+                    label="Workshop Address"
+                    value={formData.address}
+                    onChange={(e) => handleChange('address', e.target.value)}
+                    rows={3}
+                  />
                 </div>
 
-                <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200">
-                  <span className="text-xs text-slate-500 font-medium hidden sm:inline">
-                    Changes reflect website-wide instantly upon saving.
-                  </span>
+                <div className="flex justify-end pt-4 border-t border-slate-200">
                   <Button
                     type="submit"
                     disabled={saving}
-                    className="px-8 py-3 text-xs font-black bg-[#0284C7] hover:bg-[#0369A1] shadow-lg shadow-sky-900/20"
+                    className="px-8 py-3 text-xs font-black bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-900/20"
                   >
                     <Save className="w-4 h-4 mr-2" />
-                    {saving ? 'Saving Changes...' : 'Save All Settings'}
+                    {saving ? 'Saving...' : 'Save Branding Details'}
                   </Button>
                 </div>
               </Card>
             </form>
           )}
 
-          {/* TAB 3: System ID Prefixes & Formats */}
+          {/* TAB 3: System ID Prefixes */}
           {activeTab === 'prefixes' && (
             <form onSubmit={handleSubmit}>
               <Card className="p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6 bg-white">
@@ -524,67 +362,63 @@ export const SettingsPage = () => {
                       System ID Prefixes & Currency
                     </h2>
                     <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      Sequential IDs ke dynamic prefixes aur formatting controls.
+                      Sequential billing, job cards, dues, aur expenses ke prefixes set karein.
                     </p>
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <Input
-                      label="Invoice ID Prefix"
-                      value={formData.invoicePrefix}
-                      onChange={(e) => handleChange('invoicePrefix', e.target.value)}
-                      helpText="Example: INV ➔ INV-2026-0001"
-                    />
-                    <Input
-                      label="Job Card Prefix"
-                      value={formData.jobIdPrefix}
-                      onChange={(e) => handleChange('jobIdPrefix', e.target.value)}
-                      helpText="Example: NAG ➔ NAG-2026-0001"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-slate-100">
-                    <Input
-                      label="Customer Dues Prefix"
-                      value={formData.duesPrefix}
-                      onChange={(e) => handleChange('duesPrefix', e.target.value)}
-                      helpText="Example: DUE ➔ DUE-0001"
-                    />
-                    <Input
-                      label="Expense Log Prefix"
-                      value={formData.expensePrefix}
-                      onChange={(e) => handleChange('expensePrefix', e.target.value)}
-                      helpText="Example: EXP ➔ EXP-2026-0001"
-                    />
-                    <Input
-                      label="Currency Symbol"
-                      value={formData.currencySymbol}
-                      onChange={(e) => handleChange('currencySymbol', e.target.value)}
-                      helpText="Default: ₹"
-                    />
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Input
+                    label="Currency Symbol"
+                    value={formData.currencySymbol}
+                    onChange={(e) => handleChange('currencySymbol', e.target.value)}
+                    required
+                  />
+                  <Input
+                    label="Invoice Prefix"
+                    value={formData.invoicePrefix}
+                    onChange={(e) => handleChange('invoicePrefix', e.target.value)}
+                    helpText="Example: INV-0001"
+                    required
+                  />
+                  <Input
+                    label="Job Card Prefix"
+                    value={formData.jobIdPrefix}
+                    onChange={(e) => handleChange('jobIdPrefix', e.target.value)}
+                    helpText="Example: NAG-0001"
+                    required
+                  />
+                  <Input
+                    label="Dues Register Prefix"
+                    value={formData.duesPrefix}
+                    onChange={(e) => handleChange('duesPrefix', e.target.value)}
+                    helpText="Example: DUE-0001"
+                    required
+                  />
+                  <Input
+                    label="Expense Prefix"
+                    value={formData.expensePrefix}
+                    onChange={(e) => handleChange('expensePrefix', e.target.value)}
+                    helpText="Example: EXP-0001"
+                    required
+                  />
                 </div>
 
-                <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200">
-                  <span className="text-xs text-slate-500 font-medium hidden sm:inline">
-                    Changes reflect website-wide instantly upon saving.
-                  </span>
+                <div className="flex justify-end pt-4 border-t border-slate-200">
                   <Button
                     type="submit"
                     disabled={saving}
-                    className="px-8 py-3 text-xs font-black bg-[#0284C7] hover:bg-[#0369A1] shadow-lg shadow-sky-900/20"
+                    className="px-8 py-3 text-xs font-black bg-amber-600 hover:bg-amber-700 shadow-lg shadow-amber-900/20"
                   >
                     <Save className="w-4 h-4 mr-2" />
-                    {saving ? 'Saving Changes...' : 'Save All Settings'}
+                    {saving ? 'Saving...' : 'Save Prefixes'}
                   </Button>
                 </div>
               </Card>
             </form>
           )}
 
-          {/* TAB 4: Technicians / Mechanics Register */}
+          {/* TAB 4: Mechanics & Technicians Directory */}
           {activeTab === 'mechanics' && (
             <Card className="p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6 bg-white">
               <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
@@ -596,22 +430,23 @@ export const SettingsPage = () => {
                     Technicians & Mechanics Directory
                   </h2>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Service Job Cards me mechanic assignment ke liye active staff.
+                    Job card allocation ke liye workshop staff add ya remove karein.
                   </p>
                 </div>
               </div>
 
-              {/* Add New Technician Form */}
-              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
-                <span className="text-xs font-black text-slate-900 uppercase tracking-wider block">
-                  + Add New Mechanic / Technician:
+              {/* Add New Mechanic Form */}
+              <form onSubmit={handleAddMechanic} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider block">
+                  Add New Technician
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                   <div className="sm:col-span-6">
                     <Input
-                      placeholder="Mechanic Full Name (e.g. Rahul Sharma)"
+                      placeholder="Technician Full Name (e.g. Imran Pathan)"
                       value={newMechName}
                       onChange={(e) => setNewMechName(e.target.value)}
+                      required
                     />
                   </div>
                   <div className="sm:col-span-4">
@@ -622,21 +457,17 @@ export const SettingsPage = () => {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <Button
-                      type="button"
-                      onClick={handleAddMechanic}
-                      className="w-full h-full justify-center text-xs font-black bg-purple-600 hover:bg-purple-700 text-white"
-                    >
+                    <Button type="submit" className="w-full h-10 bg-purple-600 hover:bg-purple-700 text-white font-black text-xs">
                       <Plus className="w-4 h-4 mr-1" /> Add
                     </Button>
                   </div>
                 </div>
-              </div>
+              </form>
 
-              {/* Active Staff List */}
+              {/* Mechanics List */}
               <div className="space-y-3 pt-2">
-                <span className="text-xs font-extrabold text-[#0C4A6E] uppercase tracking-wider block">
-                  Active Technicians List ({mechanicsList.length}):
+                <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block">
+                  Active Workshop Technicians ({mechanicsList.length})
                 </span>
                 <div className="divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden bg-white">
                   {mechanicsList.map((m) => (
@@ -664,398 +495,42 @@ export const SettingsPage = () => {
               </div>
             </Card>
           )}
-
-          {/* DEDICATED TAB 5: Change Admin Email / Username with Gmail Verification Link */}
-          {activeTab === 'username' && (
-            <form onSubmit={handleSendGmailMagicLink}>
-              <Card className="p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6 bg-white">
-                <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-                  <div className="p-3 rounded-2xl bg-sky-50 text-[#0284C7] border border-sky-200 shrink-0">
-                    <Mail className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-black text-slate-900 tracking-tight">
-                      Change Admin Email & Username (Gmail Magic Verification Link)
-                    </h2>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      Apna Naya Email address enter karein. Gmail par confirmation link jayega aur link click karne se confirm ho jayega.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-sky-50/80 p-4 rounded-2xl border border-sky-200 text-sky-950 text-xs font-medium space-y-1">
-                  <div className="font-extrabold flex items-center gap-1.5 text-sky-900">
-                    <ShieldCheck className="w-4 h-4 text-[#0284C7]" /> Real Gmail Inbox Verification
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-sky-800">
-                    Security ke liye, Naya Email/Username tabhi active hoga jab aap apne Gmail inbox me bheje gaye <strong>Magic Link</strong> par click karenge.
-                  </p>
-                </div>
-
-                {magicLinkSent && (
-                  <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-5 rounded-2xl space-y-3 shadow-lg">
-                    <div className="flex items-center gap-2 font-black text-sm text-white">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-200" /> Verification Email Sent to {newEmail}!
-                    </div>
-                    <p className="text-xs text-emerald-100 font-medium leading-relaxed">
-                      We sent a confirmation link to <strong>{newEmail}</strong>. Please check your Gmail Inbox and click the link to confirm and activate your new email.
-                    </p>
-
-                    {sentMagicLinkUrl && (
-                      <div className="pt-2 border-t border-emerald-400/40 space-y-2">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-100 block">
-                          DIRECT GMAIL VERIFICATION LINK:
-                        </span>
-                        <a
-                          href={sentMagicLinkUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-emerald-800 text-xs font-black hover:bg-emerald-50 shadow-md transition-all active:scale-95"
-                        >
-                          <Mail className="w-4 h-4 text-emerald-600" /> Click Here to Confirm Email Change
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <div className="space-y-6 max-w-lg">
-                  <Input
-                    type="email"
-                    label="New Admin Gmail Address / Username *"
-                    placeholder="e.g. naimpathan@gmail.com or admin@nationalautogarage.com"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    icon={Mail}
-                    required
-                    helpText="Apna Naya Official Admin Gmail Address enter karein."
-                  />
-
-                  {/* Gmail SMTP Server Integration Credentials Card */}
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 text-xs">
-                    <span className="font-extrabold text-slate-900 flex items-center gap-1.5 uppercase tracking-wider">
-                      ⚙️ Real Gmail Inbox SMTP Sender Credentials (Optional)
-                    </span>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">
-                      Apne real Gmail inbox me email prapt karne ke liye niche apna **Sender Gmail Email** aur Google ka **16-Digit App Password** enter karein:
-                    </p>
-
-                    <div className="space-y-4">
-                      <Input
-                        type="email"
-                        label="Sender Gmail Email Address"
-                        placeholder="e.g. yourgarage@gmail.com"
-                        value={formData.smtpUser}
-                        onChange={(e) => handleChange('smtpUser', e.target.value)}
-                        helpText="Aapka sending Gmail address."
-                      />
-                      <Input
-                        type="password"
-                        label="Gmail 16-Digit App Password"
-                        placeholder="e.g. xxxx xxxx xxxx xxxx"
-                        value={formData.smtpPass}
-                        onChange={(e) => handleChange('smtpPass', e.target.value)}
-                        helpText="Google Account ➔ Security ➔ App Passwords se generated 16-digit password."
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200">
-                  <span className="text-xs text-slate-500 font-medium hidden sm:inline">
-                    A confirmation link will be sent to your Gmail inbox.
-                  </span>
-                  <Button
-                    type="submit"
-                    disabled={sendingOtp}
-                    className="px-8 py-3 text-xs font-black bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-lg shadow-sky-900/20"
-                  >
-                    <Send className="w-4 h-4 mr-2" />
-                    {sendingOtp ? 'Sending Gmail Link...' : 'Send Gmail Verification Link'}
-                  </Button>
-                </div>
-              </Card>
-            </form>
-          )}
-
-          {/* DEDICATED TAB 6: Change Password (2-Step Verification Gate) */}
-          {activeTab === 'password' && (
-            <Card className="p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6 bg-white">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-                <div className="p-3 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 shrink-0">
-                  <KeyRound className="w-6 h-6" />
-                </div>
-                <div>
-                  <h2 className="text-base font-black text-slate-900 tracking-tight">
-                    Change Admin Password (2-Step Verification Gate)
-                  </h2>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Step 1: Current password verify karein ➔ Step 2: Naya password enter karke change karein.
-                  </p>
-                </div>
-              </div>
-
-              {/* Progress Indicator Pills */}
-              <div className="flex items-center gap-4">
-                <div className={`flex-1 p-3 rounded-xl border text-xs font-extrabold flex items-center justify-between transition-all ${
-                  passStep === 1
-                    ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-xs'
-                    : 'bg-emerald-50 border-emerald-300 text-emerald-900'
-                }`}>
-                  <span className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-white text-slate-900 text-[10px] font-black flex items-center justify-center border">
-                      1
-                    </span>
-                    Step 1: Verify Current Password
-                  </span>
-                  {passVerified ? <Check className="w-4 h-4 text-emerald-600" /> : <Lock className="w-4 h-4 text-amber-600" />}
-                </div>
-
-                <div className={`flex-1 p-3 rounded-xl border text-xs font-extrabold flex items-center justify-between transition-all ${
-                  passStep === 2
-                    ? 'bg-sky-50 border-sky-300 text-sky-900 shadow-xs'
-                    : 'bg-slate-50 border-slate-200 text-slate-400 opacity-60'
-                }`}>
-                  <span className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-white text-slate-900 text-[10px] font-black flex items-center justify-center border">
-                      2
-                    </span>
-                    Step 2: Set New Password
-                  </span>
-                  {passStep === 2 ? <Unlock className="w-4 h-4 text-[#0284C7]" /> : <Lock className="w-4 h-4" />}
-                </div>
-              </div>
-
-              {/* STEP 1 FORM: VERIFY CURRENT PASSWORD */}
-              {passStep === 1 && (
-                <form onSubmit={handleVerifyCurrentPassword} className="space-y-6 pt-2">
-                  <div className="bg-amber-50/80 p-4 rounded-2xl border border-amber-200/90 text-amber-950 text-xs font-medium space-y-1">
-                    <div className="font-extrabold flex items-center gap-1.5 text-amber-900">
-                      <ShieldAlert className="w-4 h-4 text-amber-600" /> Current Password Verification Needed
-                    </div>
-                    <p className="text-[11px] leading-relaxed text-amber-800">
-                      Naya password page unlock karne ke liye pehle apna <strong>Current Password</strong> (e.g. <code>admin123</code>) enter karein.
-                    </p>
-                  </div>
-
-                  <div className="max-w-md">
-                    <Input
-                      type="password"
-                      label="Current Admin Password *"
-                      placeholder="Enter current password (e.g. admin123)"
-                      value={currentPass}
-                      onChange={(e) => setCurrentPass(e.target.value)}
-                      required
-                      icon={Lock}
-                      helpText="Pehle isko verify karein."
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <Button
-                      type="submit"
-                      disabled={verifyingPass}
-                      className="px-8 py-3 text-xs font-black bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-900/20"
-                    >
-                      <Lock className="w-4 h-4 mr-2" />
-                      {verifyingPass ? 'Verifying Password...' : 'Verify Password to Unlock Step 2'}
-                    </Button>
-                  </div>
-                </form>
-              )}
-
-              {/* STEP 2 FORM: ENTER NEW PASSWORD (ONLY SHOWS AFTER STEP 1 VERIFICATION) */}
-              {passStep === 2 && (
-                <form onSubmit={handleSaveNewPassword} className="space-y-6 pt-2">
-                  <div className="bg-emerald-50/90 p-4 rounded-2xl border border-emerald-200 text-emerald-950 text-xs font-medium space-y-1">
-                    <div className="font-extrabold flex items-center gap-1.5 text-emerald-900">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Current Password Verified Successfully!
-                    </div>
-                    <p className="text-[11px] leading-relaxed text-emerald-800">
-                      Step 2 Unlocked! Ab apna Naya Password enter karke Save karein.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <Input
-                      type="password"
-                      label="New Admin Password *"
-                      placeholder="Enter new password (min 4 chars)"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                      icon={Lock}
-                    />
-                    <Input
-                      type="password"
-                      label="Confirm New Password *"
-                      placeholder="Re-enter new password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      icon={Lock}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setPassStep(1);
-                        setPassVerified(false);
-                      }}
-                      className="text-xs font-bold"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Cancel / Reset
-                    </Button>
-
-                    <Button
-                      type="submit"
-                      disabled={savingPass}
-                      className="px-8 py-3 text-xs font-black bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-900/20"
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      {savingPass ? 'Saving New Password...' : 'Save New Admin Password'}
-                    </Button>
-                  </div>
-                </form>
-              )}
-            </Card>
-          )}
         </div>
 
-        {/* Right Live Preview Card (4 cols) */}
+        {/* Sidebar Info Card (4 cols) */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="p-6 border-2 border-sky-100 bg-gradient-to-br from-white via-sky-50/30 to-blue-50/40 shadow-xs space-y-6 sticky top-24">
-            <div className="flex items-center justify-between pb-4 border-b border-sky-100">
-              <div className="flex items-center gap-2.5">
-                <Globe className="w-5 h-5 text-[#0284C7]" />
-                <span className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                  Live Security Preview
-                </span>
+          <Card className="p-6 border border-slate-200 bg-slate-900 text-white space-y-4 shadow-xl">
+            <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+              <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                <ShieldCheck className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-extrabold bg-sky-100 text-[#0284C7] px-2.5 py-1 rounded-full uppercase border border-sky-200">
-                Real-Time
-              </span>
-            </div>
-
-            {/* Current Admin Account Email Widget */}
-            <div className="space-y-2 text-xs">
-              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">
-                Active Admin Username / Email:
-              </span>
-              <div className="font-extrabold text-slate-900 bg-white p-3 rounded-2xl border border-slate-200 text-xs flex items-center gap-2">
-                <User className="w-4 h-4 text-[#0284C7]" />
-                <span className="truncate">{user?.email || user?.username || 'admin@nag.com'}</span>
+              <div>
+                <h3 className="text-sm font-black text-white">System Settings Info</h3>
+                <p className="text-[11px] text-slate-400">Workshop Configuration</p>
               </div>
             </div>
 
-            {/* Password Security Status Widget */}
-            <div className="space-y-2 text-xs pt-4 border-t border-sky-100">
-              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">
-                Password Gate Status:
-              </span>
-              <div className={`p-3 rounded-2xl border text-xs font-extrabold flex items-center gap-2 ${
-                passVerified
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                  : 'bg-amber-50 border-amber-200 text-amber-900'
-              }`}>
-                {passVerified ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Lock className="w-4 h-4 text-amber-600" />}
-                <span>{passVerified ? 'Step 2 Unlocked (New Pass Active)' : 'Step 1 Locked (Current Pass Required)'}</span>
+            <div className="space-y-3 text-xs text-slate-300">
+              <div className="flex justify-between py-1.5 border-b border-slate-800">
+                <span className="text-slate-400">Current Garage:</span>
+                <span className="font-bold text-white">{formData.garageName}</span>
               </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-sky-50 text-[#0C4A6E] text-xs font-medium space-y-1.5 border border-sky-200">
-              <div className="flex items-center gap-2 font-bold text-slate-900">
-                <ShieldCheck className="w-4.5 h-4.5 text-[#0284C7]" />
-                Double Verification Security
+              <div className="flex justify-between py-1.5 border-b border-slate-800">
+                <span className="text-slate-400">Active Currency:</span>
+                <span className="font-bold text-white">{formData.currencySymbol} (INR)</span>
               </div>
-              <p className="text-[11px] leading-relaxed text-slate-600">
-                Password change aur Email/Username change dono ko 2 alag pages me divide kiya gaya hai complete safety ke liye.
-              </p>
+              <div className="flex justify-between py-1.5 border-b border-slate-800">
+                <span className="text-slate-400">Invoice Pattern:</span>
+                <span className="font-bold text-sky-400">{formData.invoicePrefix}-0001</span>
+              </div>
+              <div className="flex justify-between py-1.5">
+                <span className="text-slate-400">Job Card Pattern:</span>
+                <span className="font-bold text-amber-400">{formData.jobIdPrefix}-0001</span>
+              </div>
             </div>
           </Card>
         </div>
       </div>
-
-      {/* 6-DIGIT EMAIL OTP VERIFICATION MODAL */}
-      {otpModalOpen && (
-        <Modal
-          isOpen={otpModalOpen}
-          onClose={() => setOtpModalOpen(false)}
-          title="Verify 6-Digit Email Confirmation Code"
-          size="md"
-        >
-          <form onSubmit={handleVerifyEmailOtp} className="space-y-5 py-2">
-            <div className="text-center space-y-2">
-              <div className="w-12 h-12 rounded-2xl bg-sky-100 text-[#0284C7] font-black text-xl flex items-center justify-center mx-auto border border-sky-200">
-                <Mail className="w-6 h-6" />
-              </div>
-              <h3 className="text-sm font-black text-slate-900">
-                Enter 6-Digit OTP Code
-              </h3>
-              <p className="text-xs text-slate-500 font-medium">
-                We sent a 6-digit verification code to <strong>{newEmail}</strong>
-              </p>
-            </div>
-
-            {/* Instant Demo OTP Hint Badge */}
-            {generatedOtpHint && (
-              <div className="bg-gradient-to-r from-sky-500 to-blue-600 text-white p-4 rounded-2xl text-center space-y-2 shadow-md">
-                <span className="text-[10px] font-black uppercase tracking-widest text-sky-100 block">
-                  SECURITY EMAIL CONFIRMATION CODE
-                </span>
-                <div className="flex items-center justify-center gap-3">
-                  <span className="text-3xl font-black tracking-widest font-mono select-all">
-                    {generatedOtpHint}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setInputOtp(generatedOtpHint)}
-                    className="px-3 py-1 rounded-xl text-xs font-extrabold bg-white text-[#0284C7] hover:bg-sky-50 active:scale-95 transition-all shadow-xs"
-                  >
-                    ⚡ Auto-Fill
-                  </button>
-                </div>
-                <span className="text-[10px] text-sky-100 block font-semibold">
-                  (Type or click Auto-Fill to confirm email change)
-                </span>
-              </div>
-            )}
-
-            <div className="max-w-xs mx-auto">
-              <Input
-                type="text"
-                placeholder="Enter 6-Digit OTP"
-                value={inputOtp}
-                onChange={(e) => setInputOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                maxLength={6}
-                required
-                className="text-center text-lg font-mono font-black tracking-widest"
-              />
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOtpModalOpen(false)}
-                className="text-xs font-bold"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={verifyingOtp}
-                className="px-6 py-2.5 text-xs font-black bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-md shadow-sky-900/20"
-              >
-                {verifyingOtp ? 'Verifying OTP...' : 'Confirm & Update Email'}
-              </Button>
-            </div>
-          </form>
-        </Modal>
-      )}
     </div>
   );
 };

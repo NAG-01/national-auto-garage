@@ -3,7 +3,6 @@ import { Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
 import { AppShell } from './components/layout/AppShell.jsx';
 import { LoginPage } from './features/auth/LoginPage.jsx';
-import { VerifyEmailPage } from './features/auth/VerifyEmailPage.jsx';
 import { DashboardPage } from './features/dashboard/DashboardPage.jsx';
 import { InventoryListPage } from './features/inventory/InventoryListPage.jsx';
 import { ProductDetailPage } from './features/inventory/ProductDetailPage.jsx';
@@ -51,7 +50,6 @@ export default function App() {
     <Routes>
       {/* Public Unauthenticated Routes */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/verify-email" element={<VerifyEmailPage />} />
 
       {/* Protected Authenticated Routes wrapped in AppShell */}
       <Route
