@@ -18,17 +18,8 @@ const isCloudHosted = () => {
   );
 };
 
-// Initial Full Garage Seed Dataset for Standalone Cloud Hosting
-const initialInventory = [
-  { _id: 'inv_1', name: 'Castrol Activ 4T 20W-40 Engine Oil (1L)', partNumber: 'OIL-20W40-1L', category: 'Engine Oil', stockQuantity: 25, minStockThreshold: 5, sellingPrice: 380, costPrice: 310, status: 'ACTIVE', isServicePart: true },
-  { _id: 'inv_2', name: 'Front Brake Pad / Shoe (Hero Splendor / Passion)', partNumber: 'BP-HERO-01', category: 'Brake Pads', stockQuantity: 3, minStockThreshold: 5, sellingPrice: 180, costPrice: 130, status: 'ACTIVE', isServicePart: true },
-  { _id: 'inv_3', name: 'NGK Spark Plug CPR8EA-9', partNumber: 'SP-NGK-8EA', category: 'Spark Plugs', stockQuantity: 18, minStockThreshold: 5, sellingPrice: 120, costPrice: 85, status: 'ACTIVE', isServicePart: true },
-  { _id: 'inv_4', name: 'Drive Chain & Sprocket Kit (Bajaj Pulsar 150)', partNumber: 'CS-PULSAR-150', category: 'Chain & Sprockets', stockQuantity: 8, minStockThreshold: 3, sellingPrice: 1450, costPrice: 1100, status: 'ACTIVE', isServicePart: true },
-  { _id: 'inv_5', name: 'Air Filter Element (Honda Activa 5G/6G)', partNumber: 'AF-ACTIVA-5G', category: 'Filters', stockQuantity: 14, minStockThreshold: 5, sellingPrice: 220, costPrice: 160, status: 'ACTIVE', isServicePart: true },
-  { _id: 'inv_6', name: 'TVS Eurogrip Tyre 90/90-12 Tubeless', partNumber: 'TY-TVS-909012', category: 'Tyres', stockQuantity: 0, minStockThreshold: 2, sellingPrice: 1250, costPrice: 980, status: 'ACTIVE', isServicePart: false },
-  { _id: 'inv_7', name: 'Clutch Cable (TVS Apache RTR 160)', partNumber: 'CB-APACHE-CL', category: 'General Parts', stockQuantity: 10, minStockThreshold: 3, sellingPrice: 160, costPrice: 110, status: 'ACTIVE', isServicePart: true },
-  { _id: 'inv_8', name: 'Motul Chain Lube Spray (400ml)', partNumber: 'LB-MOTUL-400', category: 'General Parts', stockQuantity: 15, minStockThreshold: 4, sellingPrice: 490, costPrice: 380, status: 'ACTIVE', isServicePart: false },
-];
+// Clean Production Seed Dataset for Client Handover
+const initialInventory = [];
 
 const getMockData = (key, defaultVal) => {
   try {
@@ -119,13 +110,20 @@ const cloudMockAdapter = async (config) => {
   else if (url.includes('/dashboard/metrics')) {
     const inventory = getMockData('inventory', initialInventory);
     const lowStockParts = inventory.filter((i) => i.stockQuantity <= (i.minStockThreshold || 5));
+    const jobs = getMockData('jobs', []);
+    const invoices = getMockData('invoices', []);
+    const dues = getMockData('dues', []);
+
+    const totalRev = invoices.reduce((acc, inv) => acc + (inv.paidAmount || 0), 0);
+    const totalPendingDues = dues.reduce((acc, d) => acc + (d.pendingAmount || 0), 0);
+
     responseData = {
       success: true,
       lowStockParts,
-      totalRevenue: 45200,
-      pendingDues: 3400,
-      activeJobsCount: 4,
-      completedJobsCount: 28,
+      totalRevenue: totalRev,
+      pendingDues: totalPendingDues,
+      activeJobsCount: jobs.filter((j) => j.status !== 'COMPLETED' && j.status !== 'DELIVERED').length,
+      completedJobsCount: jobs.filter((j) => j.status === 'COMPLETED' || j.status === 'DELIVERED').length,
     };
   }
   // 5. INVENTORY & CATEGORIES
