@@ -95,7 +95,72 @@ const cloudMockAdapter = async (config) => {
     };
     responseData = { success: true, user: userObj };
   }
-  // 3. SETTINGS
+  // 3. STEP 1: VERIFY CURRENT PASSWORD GATE
+  else if (url.includes('/auth/verify-password')) {
+    const currentStoredPass = localStorage.getItem('nag_mock_pass') || 'admin123';
+    const enteredPass = payload.currentPassword || '';
+    if (enteredPass === currentStoredPass || enteredPass === 'admin123') {
+      responseData = {
+        success: true,
+        verified: true,
+        message: 'Current password verified successfully',
+      };
+    } else {
+      return Promise.reject({
+        response: {
+          status: 400,
+          data: { message: 'Current password is incorrect. Please try again.' },
+        },
+      });
+    }
+  }
+  // 4. STEP 2: UPDATE NEW PASSWORD
+  else if (url.includes('/auth/update-password')) {
+    const newPass = payload.newPassword || 'admin123';
+    localStorage.setItem('nag_mock_pass', newPass);
+    const savedUser = localStorage.getItem('nag_user');
+    const userObj = savedUser ? JSON.parse(savedUser) : {
+      id: 'admin_demo_id',
+      username: 'admin',
+      email: 'admin@nationalautogarage.com',
+      role: 'ADMIN',
+    };
+    responseData = {
+      success: true,
+      token: 'vercel_demo_token_nag_2026',
+      user: userObj,
+      message: 'Admin password updated successfully',
+    };
+  }
+  // 5. GMAIL MAGIC LINK REQUEST
+  else if (url.includes('/auth/request-email-magic-link')) {
+    const targetEmail = payload.newEmail || 'admin@nationalautogarage.com';
+    const magicLink = `${window.location.origin}/verify-email?token=demo_token_${Date.now()}&email=${encodeURIComponent(targetEmail)}`;
+    responseData = {
+      success: true,
+      message: `Verification link sent to ${targetEmail}`,
+      magicLink,
+    };
+  }
+  // 6. GMAIL MAGIC LINK VERIFY TOKEN
+  else if (url.includes('/auth/verify-email-token')) {
+    const searchParams = new URLSearchParams(window.location.search);
+    const newEmail = searchParams.get('email') || 'admin@nationalautogarage.com';
+    const updatedUser = {
+      id: 'admin_demo_id',
+      username: newEmail,
+      email: newEmail,
+      role: 'ADMIN',
+    };
+    localStorage.setItem('nag_user', JSON.stringify(updatedUser));
+    responseData = {
+      success: true,
+      user: updatedUser,
+      token: 'vercel_demo_token_nag_2026',
+      message: 'Email and username updated successfully',
+    };
+  }
+  // 7. SETTINGS
   else if (url.includes('/settings')) {
     if (method === 'put' || method === 'post') {
       const updated = { ...defaultSettings, ...payload };
@@ -106,7 +171,7 @@ const cloudMockAdapter = async (config) => {
       responseData = { success: true, settings, data: settings };
     }
   }
-  // 4. DASHBOARD METRICS
+  // 8. DASHBOARD METRICS
   else if (url.includes('/dashboard/metrics')) {
     const inventory = getMockData('inventory', initialInventory);
     const lowStockParts = inventory.filter((i) => i.stockQuantity <= (i.minStockThreshold || 5));
@@ -126,7 +191,7 @@ const cloudMockAdapter = async (config) => {
       completedJobsCount: jobs.filter((j) => j.status === 'COMPLETED' || j.status === 'DELIVERED').length,
     };
   }
-  // 5. INVENTORY & CATEGORIES
+  // 9. INVENTORY & CATEGORIES
   else if (url.includes('/inventory/categories')) {
     responseData = { success: true, data: defaultSettings.inventoryCategories };
   }
@@ -193,7 +258,7 @@ const cloudMockAdapter = async (config) => {
       };
     }
   }
-  // 6. JOBS
+  // 10. JOBS
   else if (url.includes('/jobs')) {
     let jobs = getMockData('jobs', []);
     if (method === 'post') {
@@ -211,7 +276,7 @@ const cloudMockAdapter = async (config) => {
       responseData = { success: true, data: jobs, jobs };
     }
   }
-  // 7. INVOICES
+  // 11. INVOICES
   else if (url.includes('/invoices')) {
     let invoices = getMockData('invoices', []);
     if (method === 'post') {
@@ -229,7 +294,7 @@ const cloudMockAdapter = async (config) => {
       responseData = { success: true, data: invoices, invoices };
     }
   }
-  // 8. EXPENSES
+  // 12. EXPENSES
   else if (url.includes('/expenses')) {
     let expenses = getMockData('expenses', []);
     if (method === 'post') {
@@ -246,7 +311,7 @@ const cloudMockAdapter = async (config) => {
       responseData = { success: true, data: expenses, expenses };
     }
   }
-  // 9. DUES
+  // 13. DUES
   else if (url.includes('/dues')) {
     let dues = getMockData('dues', []);
     if (method === 'post') {
@@ -263,7 +328,7 @@ const cloudMockAdapter = async (config) => {
       responseData = { success: true, data: dues, dues };
     }
   }
-  // 10. SUPPLIERS & KEYWORDS
+  // 14. SUPPLIERS & KEYWORDS
   else if (url.includes('/suppliers')) {
     let suppliers = getMockData('suppliers', []);
     if (method === 'post') {
