@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   Phone,
   MessageSquare,
@@ -11,18 +11,37 @@ import {
   Wrench,
   Award,
   MapPin,
+  Sparkles,
 } from 'lucide-react';
 import garageLogo from '../../assets/garage_logo.jpg';
 
 export const PublicNavbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
   const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 15);
+
+      // Section scrollSpy
+      const sections = ['home', 'services', 'why-us', 'contact'];
+      const scrollPosition = window.scrollY + 200;
+
+      for (const section of sections) {
+        const el = document.getElementById(section);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -39,7 +58,7 @@ export const PublicNavbar = () => {
     };
   }, [mobileMenuOpen]);
 
-  // Close mobile menu on route change or ESC key
+  // Close mobile menu on ESC key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') setMobileMenuOpen(false);
@@ -79,75 +98,70 @@ export const PublicNavbar = () => {
 
   return (
     <>
-      {/* Fixed Top Header - Always 100% Stable Pixel-Perfect Geometry */}
-      <header className="fixed top-0 left-0 right-0 z-50 w-full select-none">
+      {/* Apple-Style Floating Glass Navbar Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 w-full select-none transition-all duration-300">
         <nav
-          className={`w-full transition-colors duration-300 ${
+          className={`w-full transition-all duration-300 ${
             isScrolled || mobileMenuOpen
-              ? 'bg-white/90 backdrop-blur-xl backdrop-saturate-150 shadow-sm border-b border-slate-200/80 py-2.5 sm:py-3'
-              : 'bg-white/70 backdrop-blur-lg backdrop-saturate-150 border-b border-white/50 py-3 sm:py-4'
+              ? 'bg-white/85 backdrop-blur-2xl backdrop-saturate-180 shadow-lg shadow-slate-900/5 border-b border-white/80 py-2.5 sm:py-3'
+              : 'bg-white/70 backdrop-blur-xl backdrop-saturate-150 border-b border-white/60 py-3 sm:py-4'
           }`}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             
-            {/* Logo & Brand Identity */}
+            {/* 3D Luxury Badge Logo & Brand Title (Click to Scroll Top) */}
             <button
               type="button"
               onClick={scrollToTop}
-              className="flex items-center gap-2.5 sm:gap-3.5 group shrink-0 text-left cursor-pointer transition-transform duration-200 active:scale-95"
+              className="flex items-center gap-3 sm:gap-3.5 group shrink-0 text-left cursor-pointer transition-transform duration-200 active:scale-95"
             >
-              <img
-                src={garageLogo}
-                alt="National Auto Garage"
-                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover shadow-sm group-hover:scale-105 transition-transform duration-300 ring-2 ring-white/80"
-              />
+              <div className="relative">
+                <img
+                  src={garageLogo}
+                  alt="National Auto Garage"
+                  className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover shadow-md shadow-sky-500/20 group-hover:scale-105 group-hover:rotate-6 transition-all duration-300 ring-2 ring-white/90 ring-offset-1 ring-offset-sky-100"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-2xs" />
+              </div>
               <div className="leading-tight">
-                <div className="text-sm sm:text-lg font-black text-slate-900 tracking-tight uppercase group-hover:text-[#0284C7] transition-colors">
-                  National Auto <span className="text-[#0284C7]">Garage</span>
+                <div className="text-sm sm:text-lg font-black text-slate-900 tracking-tight uppercase group-hover:text-[#0284C7] transition-colors flex items-center gap-1.5">
+                  <span>National Auto</span>
+                  <span className="text-[#0284C7] drop-shadow-xs">Garage</span>
                 </div>
-                <div className="text-[9px] sm:text-[11px] text-slate-600 font-bold tracking-wider uppercase">
-                  Bike Service & Repair • Mosali
+                <div className="text-[9px] sm:text-[10px] text-slate-500 font-extrabold tracking-wider uppercase flex items-center gap-1">
+                  <span>Bike Service & Repair</span>
+                  <span>•</span>
+                  <span className="text-slate-700">Mosali</span>
                 </div>
               </div>
             </button>
 
-            {/* Desktop Navigation Links */}
-            <div className="hidden lg:flex items-center gap-8 text-xs font-bold text-slate-700 uppercase tracking-wider">
-              <button
-                type="button"
-                onClick={() => scrollToSection('home')}
-                className="hover:text-[#0284C7] transition-colors duration-200 cursor-pointer relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#0284C7] hover:after:w-full after:transition-all after:duration-300"
-              >
-                Home
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollToSection('services')}
-                className="hover:text-[#0284C7] transition-colors duration-200 cursor-pointer relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#0284C7] hover:after:w-full after:transition-all after:duration-300"
-              >
-                Services
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollToSection('why-us')}
-                className="hover:text-[#0284C7] transition-colors duration-200 cursor-pointer relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#0284C7] hover:after:w-full after:transition-all after:duration-300"
-              >
-                Why Us
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollToSection('contact')}
-                className="hover:text-[#0284C7] transition-colors duration-200 cursor-pointer relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#0284C7] hover:after:w-full after:transition-all after:duration-300"
-              >
-                Contact & Location
-              </button>
+            {/* Desktop Navigation Links with Active Floating Pill */}
+            <div className="hidden lg:flex items-center gap-1.5 p-1.5 rounded-full bg-slate-100/80 backdrop-blur-md border border-white/80 shadow-inner">
+              {NAV_ITEMS.map((item) => {
+                const isActive = activeSection === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => scrollToSection(item.id)}
+                    className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                      isActive
+                        ? 'bg-white text-[#0284C7] shadow-md shadow-slate-900/5 scale-105'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Desktop Action Buttons */}
-            <div className="hidden sm:flex items-center gap-3">
+            {/* Desktop Action Buttons (WhatsApp & Call) */}
+            <div className="hidden sm:flex items-center gap-2.5">
               <a
                 href="tel:+919624844188"
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 bg-white/70 hover:bg-white/90 backdrop-blur-md border border-white/80 shadow-xs transition-all font-mono hover:scale-[1.03] active:scale-[0.97]"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-extrabold text-slate-800 bg-white/80 hover:bg-white backdrop-blur-md border border-white/90 shadow-sm transition-all duration-200 font-mono hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Phone className="w-3.5 h-3.5 text-[#0284C7]" />
                 <span>96248 44188</span>
@@ -157,7 +171,7 @@ export const PublicNavbar = () => {
                 href="https://api.whatsapp.com/send?phone=919624844188&text=Hello%20National%20Auto%20Garage,%20I%20want%20to%20inquire%20about%20bike%20service."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-emerald-600/90 hover:bg-emerald-600 backdrop-blur-md shadow-md shadow-emerald-600/20 border border-emerald-500/30 transition-all hover:scale-[1.03] active:scale-[0.97]"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 backdrop-blur-md shadow-md shadow-emerald-600/20 border border-emerald-400/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <MessageSquare className="w-3.5 h-3.5" />
                 <span>WhatsApp</span>
@@ -195,15 +209,15 @@ export const PublicNavbar = () => {
         </nav>
       </header>
 
-      {/* Backdrop Dimmer with Smooth Fade */}
+      {/* Backdrop Dimmer */}
       <div
-        className={`fixed inset-0 top-[57px] sm:top-[65px] bg-slate-900/35 backdrop-blur-xs transition-opacity duration-500 ease-out z-30 lg:hidden ${
+        className={`fixed inset-0 top-[57px] sm:top-[65px] bg-slate-900/30 backdrop-blur-xs transition-opacity duration-500 ease-out z-30 lg:hidden ${
           mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setMobileMenuOpen(false)}
       />
 
-      {/* Silky-Smooth Spring Gliding Mobile Menu Panel */}
+      {/* iOS 18 / VisionOS Gliding Mobile Menu Panel */}
       <div
         className={`fixed inset-x-0 top-[57px] sm:top-[65px] bottom-0 z-40 lg:hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           mobileMenuOpen
@@ -213,24 +227,33 @@ export const PublicNavbar = () => {
       >
         <div className="h-full bg-white/95 backdrop-blur-2xl flex flex-col justify-between p-5 overflow-y-auto shadow-2xl border-b border-slate-200/80">
           
-          {/* Middle: Navigation Cards with Staggered Entrance */}
+          {/* Navigation Items */}
           <div className="space-y-2.5 pt-2">
             {NAV_ITEMS.map((item, idx) => {
               const ItemIcon = item.icon;
+              const isActive = activeSection === item.id;
               return (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => scrollToSection(item.id)}
-                  className={`w-full text-left p-3.5 rounded-2xl bg-slate-50/90 hover:bg-sky-50/80 border border-slate-200/70 hover:border-sky-300 text-slate-900 hover:text-[#0284C7] font-black text-base uppercase tracking-tight flex items-center justify-between transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer group ${
-                    mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                  }`}
+                  className={`w-full text-left p-3.5 rounded-2xl border flex items-center justify-between transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-[0.98] cursor-pointer group ${
+                    isActive
+                      ? 'bg-sky-50 border-sky-300 text-[#0284C7] shadow-sm'
+                      : 'bg-slate-50/90 hover:bg-white border-slate-200/70 text-slate-900'
+                  } ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
                   style={{
                     transitionDelay: mobileMenuOpen ? `${idx * 45}ms` : '0ms',
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-white group-hover:bg-sky-500 group-hover:text-white text-[#0284C7] border border-slate-200/60 shadow-2xs transition-colors duration-200">
+                    <div
+                      className={`p-2 rounded-xl border shadow-2xs transition-colors duration-200 ${
+                        isActive
+                          ? 'bg-[#0284C7] text-white border-sky-400'
+                          : 'bg-white text-[#0284C7] border-slate-200/60'
+                      }`}
+                    >
                       <ItemIcon className="w-4 h-4" />
                     </div>
                     <div>
@@ -244,7 +267,7 @@ export const PublicNavbar = () => {
             })}
           </div>
 
-          {/* Bottom: Fast Action Cards */}
+          {/* Fast Action Contacts */}
           <div
             className={`pt-4 pb-2 border-t border-slate-200/80 space-y-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -253,11 +276,10 @@ export const PublicNavbar = () => {
               transitionDelay: mobileMenuOpen ? '200ms' : '0ms',
             }}
           >
-            {/* Direct Mechanics Call */}
             <div className="grid grid-cols-2 gap-2.5">
               <a
                 href="tel:+919624844188"
-                className="py-3 px-3 rounded-2xl bg-white hover:bg-sky-50 text-slate-900 font-bold text-xs flex flex-col items-center justify-center gap-1 border border-slate-200 shadow-xs hover:border-sky-300 hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:scale-98"
+                className="py-3 px-3 rounded-2xl bg-white hover:bg-sky-50 text-slate-900 font-bold text-xs flex flex-col items-center justify-center gap-1 border border-slate-200 shadow-xs hover:border-sky-300 hover:shadow-md transition-all duration-200 active:scale-98"
               >
                 <div className="flex items-center gap-1 text-[#0284C7]">
                   <Phone className="w-3.5 h-3.5" />
@@ -268,7 +290,7 @@ export const PublicNavbar = () => {
 
               <a
                 href="tel:+918128144350"
-                className="py-3 px-3 rounded-2xl bg-white hover:bg-sky-50 text-slate-900 font-bold text-xs flex flex-col items-center justify-center gap-1 border border-slate-200 shadow-xs hover:border-sky-300 hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:scale-98"
+                className="py-3 px-3 rounded-2xl bg-white hover:bg-sky-50 text-slate-900 font-bold text-xs flex flex-col items-center justify-center gap-1 border border-slate-200 shadow-xs hover:border-sky-300 hover:shadow-md transition-all duration-200 active:scale-98"
               >
                 <div className="flex items-center gap-1 text-[#0284C7]">
                   <Phone className="w-3.5 h-3.5" />
@@ -278,18 +300,16 @@ export const PublicNavbar = () => {
               </a>
             </div>
 
-            {/* WhatsApp Chat Button */}
             <a
               href="https://api.whatsapp.com/send?phone=919624844188&text=Hello%20National%20Auto%20Garage,%20I%20want%20to%20inquire%20about%20bike%20service."
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 hover:shadow-xl hover:-translate-y-0.5 active:scale-98 transition-all duration-200"
+              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 hover:shadow-xl active:scale-98 transition-all duration-200"
             >
               <MessageSquare className="w-4 h-4" />
               <span>Chat on WhatsApp</span>
             </a>
 
-            {/* Location Direction */}
             <a
               href="https://maps.app.goo.gl/skxxbgWa1k7Zrzef9"
               target="_blank"
