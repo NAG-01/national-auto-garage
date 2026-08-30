@@ -157,16 +157,8 @@ export const PublicNavbar = () => {
               })}
             </div>
 
-            {/* Desktop Action Buttons (WhatsApp & Call) */}
+            {/* Desktop Action Buttons (WhatsApp) */}
             <div className="hidden sm:flex items-center gap-2.5">
-              <a
-                href="tel:+919624844188"
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-extrabold text-slate-800 bg-white/80 hover:bg-white backdrop-blur-md border border-white/90 shadow-sm transition-all duration-200 font-mono hover:scale-[1.02] active:scale-[0.98]"
-              >
-                <Phone className="w-3.5 h-3.5 text-[#0284C7]" />
-                <span>96248 44188</span>
-              </a>
-
               <a
                 href="https://api.whatsapp.com/send?phone=919624844188&text=Hello%20National%20Auto%20Garage,%20I%20want%20to%20inquire%20about%20bike%20service."
                 target="_blank"

@@ -137,7 +137,7 @@ export const BookingSection = ({ preselectedService }) => {
               {/* WhatsApp Quick Confirm Button */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <a
-                  href={`https://api.whatsapp.com/send?phone=919408418836&text=Hello%20National%20Auto%20Garage,%20I%20just%20booked%20an%20online%20service%20for%20my%20${encodeURIComponent(
+                  href={`https://api.whatsapp.com/send?phone=919624844188&text=Hello%20National%20Auto%20Garage,%20I%20just%20booked%20an%20online%20service%20for%20my%20${encodeURIComponent(
                     bookedDetails.bikeName
                   )}%20(Name:%20${encodeURIComponent(bookedDetails.customerName)},%20Date:%20${bookedDetails.preferredDate}).`}
                   target="_blank"

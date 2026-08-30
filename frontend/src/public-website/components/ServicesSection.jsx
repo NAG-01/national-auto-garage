@@ -12,6 +12,12 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { ScrollReveal } from './ScrollReveal.jsx';
+import fullServiceBg from '../../assets/full_service_bg.jpg';
+import engineRepairBg from '../../assets/engine_repair_bg.jpg';
+import brakesShockerBg from '../../assets/brakes_shocker_bg.jpg';
+import wiringBatteryBg from '../../assets/wiring_battery_bg.jpg';
+import chainGearsBg from '../../assets/chain_gears_bg.jpg';
+import genuineSparesBg from '../../assets/genuine_spares_bg.jpg';
 
 const SERVICES = [
   {
@@ -21,7 +27,9 @@ const SERVICES = [
     icon: Wrench,
     iconBg: 'bg-sky-100/80 text-[#0284C7] border border-sky-200/60',
     description: 'Complete bike checkup, fresh engine oil change, and carburetor wash.',
-    bgImage: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80',
+    bgImage: fullServiceBg,
+    imgOpacity: 'opacity-100',
+    imgPosition: 'object-[100%_18%]',
   },
   {
     id: 'engine-repair',
@@ -30,7 +38,9 @@ const SERVICES = [
     icon: Flame,
     iconBg: 'bg-rose-100/80 text-rose-600 border border-rose-200/60',
     description: 'Engine rebuilding, fixing white smoke, piston work, and smooth pickup.',
-    bgImage: 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=800&q=80',
+    bgImage: engineRepairBg,
+    imgOpacity: 'opacity-100',
+    imgPosition: 'object-[100%_18%]',
   },
   {
     id: 'brakes-suspension',
@@ -38,7 +48,9 @@ const SERVICES = [
     icon: Disc,
     iconBg: 'bg-emerald-100/80 text-emerald-700 border border-emerald-200/60',
     description: 'New brake shoes, disc pads, front fork oil seal, and smooth shockers.',
-    bgImage: 'https://images.unsplash.com/photo-1600706432520-256f66eeaf23?auto=format&fit=crop&w=800&q=80',
+    bgImage: brakesShockerBg,
+    imgOpacity: 'opacity-100',
+    imgPosition: 'object-[100%_18%]',
   },
   {
     id: 'wiring-battery',
@@ -46,7 +58,9 @@ const SERVICES = [
     icon: Zap,
     iconBg: 'bg-purple-100/80 text-purple-700 border border-purple-200/60',
     description: 'Starter motor repair, battery testing, indicator lights, and wiring fix.',
-    bgImage: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80',
+    bgImage: wiringBatteryBg,
+    imgOpacity: 'opacity-100',
+    imgPosition: 'object-right',
   },
   {
     id: 'chain-gears',
@@ -54,7 +68,9 @@ const SERVICES = [
     icon: Layers,
     iconBg: 'bg-blue-100/80 text-blue-700 border border-blue-200/60',
     description: 'Smooth gear shift, new chain sprocket set, and clutch cable change.',
-    bgImage: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80',
+    bgImage: chainGearsBg,
+    imgOpacity: 'opacity-100',
+    imgPosition: 'object-right',
   },
   {
     id: 'genuine-spares',
@@ -63,7 +79,9 @@ const SERVICES = [
     icon: Shield,
     iconBg: 'bg-amber-100/80 text-amber-700 border border-amber-200/60',
     description: '100% authentic OEM parts, premium Castrol/Motul engine oils, and certified filters.',
-    bgImage: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=800&q=80',
+    bgImage: genuineSparesBg,
+    imgOpacity: 'opacity-100',
+    imgPosition: 'object-[100%_25%]',
   },
 ];
 
@@ -148,40 +166,41 @@ export const ServicesSection = () => {
           </div>
         </ScrollReveal>
 
-        {/* 1. DESKTOP VIEW: 6-Card Grid with Photographic Background Images */}
+        {/* 1. DESKTOP VIEW: 6-Card Grid with Surgical Per-Card Downward Shifts */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {SERVICES.map((srv, idx) => {
             const Icon = srv.icon;
             return (
               <ScrollReveal key={srv.id} direction="up" delay={idx * 80}>
-                <div className="group relative p-5 sm:p-6 rounded-3xl bg-white/70 hover:bg-white/90 backdrop-blur-xl border border-white/80 hover:border-[#0284C7]/40 shadow-md shadow-slate-200/30 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between h-full overflow-hidden">
+                <div className="group relative p-5 sm:p-6 rounded-3xl bg-white/90 hover:bg-white backdrop-blur-xl border border-white/80 hover:border-[#0284C7]/40 shadow-md shadow-slate-200/30 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between h-full overflow-hidden">
                   
-                  {/* Photographic Background Image with Gradient Overlay */}
+                  {/* Background Image with surgical per-card vertical alignment */}
                   <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
                     <img
                       src={srv.bgImage}
                       alt={srv.title}
-                      className="w-full h-full object-cover opacity-[0.14] group-hover:opacity-[0.22] transition-all duration-700 group-hover:scale-110"
+                      className={`w-full h-full object-cover ${srv.imgPosition || 'object-right'} ${srv.imgOpacity} transition-all duration-700 group-hover:scale-105`}
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/80 to-white/60" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/98 via-white/75 to-transparent" />
                   </div>
 
-                  <div className="relative z-10">
+                  <div className="relative z-10 max-w-[75%]">
                     <div className="flex items-center justify-between mb-4">
                       <div className={`p-2.5 rounded-2xl ${srv.iconBg} backdrop-blur-md shadow-2xs group-hover:scale-110 transition-transform duration-300`}>
                         <Icon className="w-5 h-5" />
                       </div>
                       {srv.badge && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/90 backdrop-blur-md border border-slate-200/80 text-slate-700 shadow-2xs">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/95 backdrop-blur-md border border-slate-200/80 text-slate-800 shadow-2xs">
                           {srv.badge}
                         </span>
                       )}
                     </div>
-                    <h3 className="text-base font-black text-slate-900 group-hover:text-[#0284C7] transition-colors mb-1.5">
+
+                    <h3 className="text-base font-black text-slate-900 group-hover:text-[#0284C7] transition-colors mb-1.5 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">
                       {srv.title}
                     </h3>
-                    <p className="text-xs text-slate-700 font-semibold leading-relaxed">
+                    <p className="text-xs text-slate-950 font-black leading-relaxed drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">
                       {srv.description}
                     </p>
                   </div>
@@ -191,7 +210,7 @@ export const ServicesSection = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Card Deck with Photographic Background Images */}
+        {/* 2. MOBILE VIEW ONLY: Card Deck */}
         <div className="block md:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -246,42 +265,42 @@ export const ServicesSection = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {/* Photographic Background Image */}
+                      {/* Mobile Background Image */}
                       {isFront && (
                         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
                           <img
                             src={srv.bgImage}
                             alt={srv.title}
-                            className="w-full h-full object-cover opacity-[0.16]"
+                            className={`w-full h-full object-cover object-right ${srv.imgOpacity}`}
                             loading="lazy"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/80 to-white/60" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/98 via-white/75 to-transparent" />
                         </div>
                       )}
 
                       {/* Hide inner text on rear cards while preserving h-[210px] height */}
                       <div className={isFront ? 'opacity-100 flex flex-col justify-between h-full relative z-10' : 'opacity-0 invisible h-full'}>
-                        <div>
-                          <div className="flex items-center justify-between mb-2.5">
+                        <div className="max-w-[78%]">
+                          <div className="flex items-center justify-between mb-2">
                             <div className={`p-2 rounded-2xl ${srv.iconBg} backdrop-blur-md shadow-2xs`}>
                               <Icon className="w-5 h-5" />
                             </div>
                             {srv.badge && (
-                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/90 border border-slate-200/80 text-slate-700 shadow-2xs">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/95 border border-slate-200/80 text-slate-800 shadow-2xs">
                                 {srv.badge}
                               </span>
                             )}
                           </div>
 
-                          <h3 className="text-base font-black text-slate-900 mb-1">
+                          <h3 className="text-base font-black text-slate-900 mb-1 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">
                             {srv.title}
                           </h3>
-                          <p className="text-xs text-slate-700 font-semibold leading-relaxed line-clamp-2">
+                          <p className="text-xs text-slate-950 font-black leading-relaxed line-clamp-2 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">
                             {srv.description}
                           </p>
                         </div>
 
-                        <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-slate-400">
+                        <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between text-slate-400">
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#0284C7]">
                             Tap to view next →
                           </span>

@@ -10,15 +10,17 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { ScrollReveal } from './ScrollReveal.jsx';
+import whyUsExpBg from '../../assets/why_us_exp_bg.png';
 
 const ADVANTAGES = [
   {
     id: 'exp',
     icon: Award,
-    title: '15+ Years Experience',
+    title: '20+ Years Experience',
     badge: 'Master Mechanics',
-    desc: 'Imran and Naim Pathan have over 15 years of hands-on experience fixing all bikes and scooters.',
+    desc: 'Imran and Naim Pathan have over 20 years of hands-on experience fixing all bikes and scooters.',
     color: 'text-[#0284C7] bg-sky-50/90 border-sky-200/60',
+    bgImage: whyUsExpBg,
   },
   {
     id: 'parts',
@@ -27,6 +29,7 @@ const ADVANTAGES = [
     badge: '100% Genuine',
     desc: 'We only fit 100% original company parts and trusted high-grade engine oil in every service.',
     color: 'text-emerald-700 bg-emerald-50/90 border-emerald-200/60',
+    bgImage: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'fast',
@@ -35,6 +38,7 @@ const ADVANTAGES = [
     badge: 'Quick Delivery',
     desc: 'Quick oil change, general tuneup, and minor repairs finished efficiently on the same day.',
     color: 'text-amber-700 bg-amber-50/90 border-amber-200/60',
+    bgImage: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'bill',
@@ -43,6 +47,7 @@ const ADVANTAGES = [
     badge: 'Transparent',
     desc: 'No hidden charges or extra fees. Get a clear digital bill directly sent to your WhatsApp.',
     color: 'text-purple-700 bg-purple-50/90 border-purple-200/60',
+    bgImage: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80',
   },
 ];
 
@@ -114,18 +119,26 @@ export const WhyChooseUs = () => {
           </div>
         </ScrollReveal>
 
-        {/* 1. DESKTOP VIEW: Full 4-Pillar Grid (Hidden on Mobile) */}
+        {/* 1. DESKTOP VIEW: Full 4-Pillar Grid with Custom Uploaded Background Images */}
         <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {ADVANTAGES.map((adv, idx) => {
             const Icon = adv.icon;
             return (
               <ScrollReveal key={idx} direction="up" delay={idx * 100}>
-                <div className="group relative p-5 sm:p-6 rounded-3xl bg-white/65 hover:bg-white/95 backdrop-blur-xl border border-white/80 shadow-md shadow-slate-200/30 hover:shadow-xl hover:border-[#0284C7]/40 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between h-full overflow-hidden">
+                <div className="group relative p-5 sm:p-6 rounded-3xl bg-white/85 hover:bg-white/95 backdrop-blur-xl border border-white/80 shadow-md shadow-slate-200/30 hover:shadow-xl hover:border-[#0284C7]/40 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between h-full overflow-hidden">
                   
-                  {/* Subtle Background Watermark Graphic */}
-                  <div className="absolute -bottom-4 -right-4 opacity-[0.06] group-hover:opacity-[0.14] pointer-events-none text-emerald-600 transition-all duration-500 group-hover:scale-110 group-hover:-rotate-6">
-                    <Icon className="w-36 h-36" />
-                  </div>
+                  {/* Custom Background Image with Minimal Soft Overlay */}
+                  {adv.bgImage && (
+                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
+                      <img
+                        src={adv.bgImage}
+                        alt={adv.title}
+                        className="w-full h-full object-cover object-right opacity-100 transition-all duration-700 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/35 to-transparent" />
+                    </div>
+                  )}
 
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-4">
@@ -141,7 +154,7 @@ export const WhyChooseUs = () => {
                     <h3 className="text-base font-black text-slate-900 mb-1.5">
                       {adv.title}
                     </h3>
-                    <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                    <p className="text-xs text-slate-900 font-extrabold leading-relaxed drop-shadow-xs">
                       {adv.desc}
                     </p>
                   </div>
@@ -151,7 +164,7 @@ export const WhyChooseUs = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Compact Card Deck with Watermark (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Compact Card Deck with Custom Uploaded Background Images */}
         <div className="block sm:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -206,10 +219,16 @@ export const WhyChooseUs = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {/* Subtle Background Watermark Graphic */}
-                      {isFront && (
-                        <div className="absolute -bottom-3 -right-3 opacity-[0.08] pointer-events-none text-emerald-600">
-                          <Icon className="w-32 h-32 transform -rotate-12" />
+                      {/* Custom Uploaded Background Image for Front Card */}
+                      {isFront && adv.bgImage && (
+                        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
+                          <img
+                            src={adv.bgImage}
+                            alt={adv.title}
+                            className="w-full h-full object-cover object-right opacity-100"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/35 to-transparent" />
                         </div>
                       )}
 
@@ -230,7 +249,7 @@ export const WhyChooseUs = () => {
                           <h3 className="text-base font-black text-slate-900 mb-1">
                             {adv.title}
                           </h3>
-                          <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                          <p className="text-xs text-slate-900 font-extrabold leading-relaxed line-clamp-2 drop-shadow-xs">
                             {adv.desc}
                           </p>
                         </div>

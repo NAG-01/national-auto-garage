@@ -85,7 +85,7 @@ export const TrackBikeModal = ({ isOpen, onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -244,7 +244,7 @@ export const TrackBikeModal = ({ isOpen, onClose }) => {
                   Have questions regarding your repair status or spare parts?
                 </div>
                 <a
-                  href={`https://api.whatsapp.com/send?phone=919408418836&text=Hello%20National%20Auto%20Garage,%20I%20am%20checking%20status%20for%20my%20bike%20${encodeURIComponent(
+                  href={`https://api.whatsapp.com/send?phone=919624844188&text=Hello%20National%20Auto%20Garage,%20I%20am%20checking%20status%20for%20my%20bike%20${encodeURIComponent(
                     searchResult.job?.bikeNameSnapshot || searchQuery
                   )}.`}
                   target="_blank"
