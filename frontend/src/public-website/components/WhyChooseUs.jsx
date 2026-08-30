@@ -156,10 +156,10 @@ export const WhyChooseUs = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Exact Match to Services Card Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: 3-Layered Rounded Deck (Hidden on Desktop) */}
         <div className="block sm:hidden">
           <ScrollReveal direction="up" delay={100}>
-            <div className="max-w-md mx-auto relative px-1 pb-4">
+            <div className="max-w-md mx-auto relative px-1 pb-2">
               <div className="flex items-center justify-between mb-3 px-1">
                 <div className="flex items-center gap-1 text-[11px] text-slate-500 font-bold uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
@@ -171,9 +171,9 @@ export const WhyChooseUs = () => {
                 </div>
               </div>
 
-              {/* Exact 310px Height Stack Container with 22px Step Peeking Shadows */}
+              {/* 340px Stage Container */}
               <div
-                className="relative w-full h-[310px] cursor-pointer touch-pan-y"
+                className="relative w-full h-[330px] cursor-pointer touch-pan-y"
                 onClick={cycleNext}
                 tabIndex={0}
                 role="button"
@@ -185,23 +185,23 @@ export const WhyChooseUs = () => {
                   const isFlipping = flippingCardId === adv.id;
                   const Icon = adv.icon;
 
-                  // 22px Step for clear visual peeking from bottom (matching ServicesSection)
-                  const translateY = Math.min(stackPos * 22, 66);
-                  const scale = Math.max(1 - stackPos * 0.03, 0.90);
-                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.12, 0.72);
+                  // Fixed 20px Step so rear cards stay 270px tall and peek as 3 distinct rounded card layers
+                  const translateY = Math.min(stackPos * 20, 60);
+                  const scale = Math.max(1 - stackPos * 0.04, 0.88);
+                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.70);
                   const zIndex = 30 - stackPos * 5;
 
                   return (
                     <div
                       key={adv.id}
-                      className={`absolute inset-x-0 top-0 p-5 rounded-3xl backdrop-blur-2xl border select-none flex flex-col justify-between will-change-transform ${
+                      className={`absolute inset-x-0 top-0 h-[270px] p-5 rounded-3xl backdrop-blur-2xl border select-none flex flex-col justify-between will-change-transform ${
                         isFlipping
                           ? 'duration-200 ease-out z-40'
                           : 'duration-300 ease-out'
                       } ${
                         isFront
                           ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
-                          : 'bg-white/85 border-white/90 shadow-md'
+                          : 'bg-white/85 border-white/90 shadow-md shadow-slate-900/10'
                       }`}
                       style={{
                         transform: isFlipping
@@ -212,50 +212,50 @@ export const WhyChooseUs = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {/* Hide inner text on rear cards so ONLY clean card edge & shadow peek out */}
-                      <div className={isFront ? 'opacity-100' : 'opacity-0 invisible'}>
-                        <div className="flex items-center justify-between mb-3">
-                          <div className={`p-2.5 rounded-2xl ${adv.color} backdrop-blur-md shadow-2xs`}>
-                            <Icon className="w-5 h-5" />
+                      {/* Hide inner text on rear cards while preserving h-[270px] height so full card sit behind */}
+                      <div className={isFront ? 'opacity-100 flex flex-col justify-between h-full' : 'opacity-0 invisible h-full'}>
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className={`p-2.5 rounded-2xl ${adv.color} backdrop-blur-md shadow-2xs`}>
+                              <Icon className="w-5 h-5" />
+                            </div>
+                            {adv.badge && (
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/90 border border-slate-200/80 text-slate-700 shadow-2xs">
+                                {adv.badge}
+                              </span>
+                            )}
                           </div>
-                          {adv.badge && (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/90 border border-slate-200/80 text-slate-700 shadow-2xs">
-                              {adv.badge}
-                            </span>
-                          )}
+
+                          <h3 className="text-base font-black text-slate-900 mb-1.5">
+                            {adv.title}
+                          </h3>
+                          <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4 line-clamp-2">
+                            {adv.desc}
+                          </p>
+
+                          <div className="flex flex-wrap gap-1.5">
+                            {adv.tags.map((tag, i) => (
+                              <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100/90 text-slate-700 border border-slate-200/70">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
                         </div>
 
-                        <h3 className="text-base font-black text-slate-900 mb-1.5">
-                          {adv.title}
-                        </h3>
-                        <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4 line-clamp-2">
-                          {adv.desc}
-                        </p>
-
-                        <div className="flex flex-wrap gap-1.5">
-                          {adv.tags.map((tag, i) => (
-                            <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100/90 text-slate-700 border border-slate-200/70">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {isFront && (
                         <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-400">
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#0284C7]">
                             Tap to view next →
                           </span>
                           <ChevronRight className="w-3.5 h-3.5 text-[#0284C7] animate-pulse" />
                         </div>
-                      )}
+                      </div>
                     </div>
                   );
                 })}
               </div>
 
               {/* Equal Controls */}
-              <div className="flex items-center justify-between mt-14 px-1">
+              <div className="flex items-center justify-between mt-8 px-1">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -263,7 +263,7 @@ export const WhyChooseUs = () => {
                     cyclePrev();
                   }}
                   disabled={isAnimating}
-                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95 transition-transform"
+                  className="p-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95 transition-transform"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -291,7 +291,7 @@ export const WhyChooseUs = () => {
                     cycleNext();
                   }}
                   disabled={isAnimating}
-                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95 transition-transform"
+                  className="p-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95 transition-transform"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
