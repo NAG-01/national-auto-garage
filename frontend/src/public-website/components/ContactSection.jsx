@@ -219,7 +219,7 @@ export const ContactSection = () => {
           ))}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Clearly Visible Stacked Card Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Clean Blank Rear Card Stack (Hidden on Desktop) */}
         <div className="block lg:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-4">
@@ -272,7 +272,10 @@ export const ContactSection = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {renderCardBody(item)}
+                      {/* Hide inner text on rear cards */}
+                      <div className={isFront ? 'opacity-100 h-full' : 'opacity-0 invisible h-full'}>
+                        {renderCardBody(item)}
+                      </div>
                     </div>
                   );
                 })}

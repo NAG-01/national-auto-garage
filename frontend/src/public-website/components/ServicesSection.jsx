@@ -186,7 +186,7 @@ export const ServicesSection = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Clearly Visible Stacked Card Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Clean Blank Rear Card Stack (Hidden on Desktop) */}
         <div className="block md:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-4">
@@ -201,7 +201,6 @@ export const ServicesSection = () => {
                 </div>
               </div>
 
-              {/* Stack Container with 310px Height to show bottom peeking cards clearly */}
               <div
                 className="relative w-full h-[310px] cursor-pointer touch-pan-y"
                 onClick={cycleNext}
@@ -215,7 +214,6 @@ export const ServicesSection = () => {
                   const isFlipping = flippingCardId === srv.id;
                   const Icon = srv.icon;
 
-                  // 22px Step for clear visual peeking from the bottom
                   const translateY = Math.min(stackPos * 22, 66);
                   const scale = Math.max(1 - stackPos * 0.03, 0.90);
                   const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.12, 0.72);
@@ -242,7 +240,8 @@ export const ServicesSection = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      <div>
+                      {/* Hide inner text on rear cards so ONLY clean card edge & shadow peek out */}
+                      <div className={isFront ? 'opacity-100' : 'opacity-0 invisible'}>
                         <div className="flex items-center justify-between mb-3">
                           <div className={`p-2.5 rounded-2xl ${srv.iconBg} backdrop-blur-md shadow-2xs`}>
                             <Icon className="w-5 h-5" />

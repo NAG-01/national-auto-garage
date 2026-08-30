@@ -134,7 +134,7 @@ export const WhyChooseUs = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Clearly Visible Stacked Card Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Clean Blank Rear Card Stack (Hidden on Desktop) */}
         <div className="block sm:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-4">
@@ -188,7 +188,8 @@ export const WhyChooseUs = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      <div>
+                      {/* Hide inner text on rear cards */}
+                      <div className={isFront ? 'opacity-100' : 'opacity-0 invisible'}>
                         <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border mb-3 backdrop-blur-md ${adv.color}`}>
                           <Icon className="w-5 h-5" />
                         </div>
