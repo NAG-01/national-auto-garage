@@ -134,10 +134,10 @@ export const WhyChooseUs = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Clean Blank Rear Card Stack (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Pixel-Perfect Equal Stack Deck (Hidden on Desktop) */}
         <div className="block sm:hidden">
           <ScrollReveal direction="up" delay={100}>
-            <div className="max-w-md mx-auto relative px-1 pb-4">
+            <div className="max-w-md mx-auto relative px-1">
               <div className="flex items-center justify-between mb-3 px-1">
                 <div className="flex items-center gap-1 text-[11px] text-slate-500 font-bold uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
@@ -149,8 +149,9 @@ export const WhyChooseUs = () => {
                 </div>
               </div>
 
+              {/* Uniform Stack Container */}
               <div
-                className="relative w-full h-[250px] cursor-pointer touch-pan-y"
+                className="relative w-full h-[240px] cursor-pointer touch-pan-y"
                 onClick={cycleNext}
                 tabIndex={0}
                 role="button"
@@ -162,9 +163,10 @@ export const WhyChooseUs = () => {
                   const isFlipping = flippingCardId === adv.id;
                   const Icon = adv.icon;
 
-                  const translateY = Math.min(stackPos * 22, 66);
-                  const scale = Math.max(1 - stackPos * 0.03, 0.90);
-                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.12, 0.72);
+                  // Clean 14px Step Offset
+                  const translateY = Math.min(stackPos * 14, 28);
+                  const scale = Math.max(1 - stackPos * 0.04, 0.92);
+                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.70);
                   const zIndex = 30 - stackPos * 5;
 
                   return (
@@ -177,7 +179,7 @@ export const WhyChooseUs = () => {
                       } ${
                         isFront
                           ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
-                          : 'bg-white/85 border-white/90 shadow-md'
+                          : 'bg-white/85 border-white/90 shadow-md shadow-slate-900/5'
                       }`}
                       style={{
                         transform: isFlipping
@@ -214,8 +216,8 @@ export const WhyChooseUs = () => {
                 })}
               </div>
 
-              {/* Controls */}
-              <div className="flex items-center justify-between mt-14 px-1">
+              {/* Equal Controls */}
+              <div className="flex items-center justify-between mt-10 px-1">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -223,7 +225,7 @@ export const WhyChooseUs = () => {
                     cyclePrev();
                   }}
                   disabled={isAnimating}
-                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95"
+                  className="p-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95 transition-transform"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -251,7 +253,7 @@ export const WhyChooseUs = () => {
                     cycleNext();
                   }}
                   disabled={isAnimating}
-                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95"
+                  className="p-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95 transition-transform"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
