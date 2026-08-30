@@ -173,7 +173,7 @@ export const ServicesSection = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Clean 3-Layered Rounded Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Compact Tight Card Deck (Hidden on Desktop) */}
         <div className="block md:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -188,9 +188,9 @@ export const ServicesSection = () => {
                 </div>
               </div>
 
-              {/* 330px Stage Container */}
+              {/* Compact 275px Stage Container for h-[210px] Cards */}
               <div
-                className="relative w-full h-[330px] cursor-pointer touch-pan-y"
+                className="relative w-full h-[275px] cursor-pointer touch-pan-y"
                 onClick={cycleNext}
                 tabIndex={0}
                 role="button"
@@ -202,8 +202,7 @@ export const ServicesSection = () => {
                   const isFlipping = flippingCardId === srv.id;
                   const Icon = srv.icon;
 
-                  // Fixed 20px Step so rear cards stay 270px tall and peek as 3 distinct rounded card layers
-                  const translateY = Math.min(stackPos * 20, 60);
+                  const translateY = Math.min(stackPos * 18, 54);
                   const scale = Math.max(1 - stackPos * 0.04, 0.88);
                   const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.70);
                   const zIndex = 30 - stackPos * 5;
@@ -211,7 +210,7 @@ export const ServicesSection = () => {
                   return (
                     <div
                       key={srv.id}
-                      className={`absolute inset-x-0 top-0 h-[270px] p-5 rounded-3xl backdrop-blur-2xl border select-none flex flex-col justify-between will-change-transform ${
+                      className={`absolute inset-x-0 top-0 h-[210px] p-5 rounded-3xl backdrop-blur-2xl border select-none flex flex-col justify-between will-change-transform ${
                         isFlipping
                           ? 'duration-200 ease-out z-40'
                           : 'duration-300 ease-out'
@@ -229,11 +228,11 @@ export const ServicesSection = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {/* Hide inner text on rear cards while preserving h-[270px] height */}
+                      {/* Hide inner text on rear cards while preserving h-[210px] height */}
                       <div className={isFront ? 'opacity-100 flex flex-col justify-between h-full' : 'opacity-0 invisible h-full'}>
                         <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div className={`p-2.5 rounded-2xl ${srv.iconBg} backdrop-blur-md shadow-2xs`}>
+                          <div className="flex items-center justify-between mb-2.5">
+                            <div className={`p-2 rounded-2xl ${srv.iconBg} backdrop-blur-md shadow-2xs`}>
                               <Icon className="w-5 h-5" />
                             </div>
                             {srv.badge && (
@@ -243,15 +242,15 @@ export const ServicesSection = () => {
                             )}
                           </div>
 
-                          <h3 className="text-base font-black text-slate-900 mb-1.5">
+                          <h3 className="text-base font-black text-slate-900 mb-1">
                             {srv.title}
                           </h3>
-                          <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                          <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-2">
                             {srv.description}
                           </p>
                         </div>
 
-                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-400">
+                        <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-slate-400">
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#0284C7]">
                             Tap to view next →
                           </span>
@@ -264,7 +263,7 @@ export const ServicesSection = () => {
               </div>
 
               {/* Equal Controls */}
-              <div className="flex items-center justify-between mt-8 px-1">
+              <div className="flex items-center justify-between mt-6 px-1">
                 <button
                   type="button"
                   onClick={(e) => {
