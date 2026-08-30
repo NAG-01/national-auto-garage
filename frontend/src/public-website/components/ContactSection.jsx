@@ -219,10 +219,10 @@ export const ContactSection = () => {
           ))}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Seamless Soft Dissolve Card Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Clearly Visible Stacked Card Deck (Hidden on Desktop) */}
         <div className="block lg:hidden">
           <ScrollReveal direction="up" delay={100}>
-            <div className="max-w-md mx-auto relative px-1 pb-2">
+            <div className="max-w-md mx-auto relative px-1 pb-4">
               <div className="flex items-center justify-between mb-3 px-1">
                 <div className="flex items-center gap-1 text-[11px] text-slate-500 font-bold uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
@@ -235,7 +235,7 @@ export const ContactSection = () => {
               </div>
 
               <div
-                className="relative w-full h-[270px] cursor-pointer touch-pan-y"
+                className="relative w-full h-[310px] cursor-pointer touch-pan-y"
                 onClick={cycleNext}
                 tabIndex={0}
                 role="button"
@@ -246,9 +246,9 @@ export const ContactSection = () => {
                   const isFront = stackPos === 0;
                   const isFlipping = flippingCardId === item.id;
 
-                  const translateY = Math.min(stackPos * 14, 42);
-                  const scale = Math.max(1 - stackPos * 0.05, 0.85);
-                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.18, 0.5);
+                  const translateY = Math.min(stackPos * 22, 66);
+                  const scale = Math.max(1 - stackPos * 0.03, 0.90);
+                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.12, 0.72);
                   const zIndex = 30 - stackPos * 5;
 
                   return (
@@ -261,7 +261,7 @@ export const ContactSection = () => {
                       } ${
                         isFront
                           ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
-                          : 'bg-white/80 border-white/90 shadow-md'
+                          : 'bg-white/85 border-white/90 shadow-md'
                       }`}
                       style={{
                         transform: isFlipping
@@ -279,7 +279,7 @@ export const ContactSection = () => {
               </div>
 
               {/* Controls */}
-              <div className="flex items-center justify-between mt-10 px-1">
+              <div className="flex items-center justify-between mt-14 px-1">
                 <button
                   type="button"
                   onClick={(e) => {

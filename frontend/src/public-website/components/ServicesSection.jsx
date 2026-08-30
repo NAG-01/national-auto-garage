@@ -62,7 +62,7 @@ const SERVICES = [
     badge: '100% Original',
     icon: Shield,
     iconBg: 'bg-orange-100/80 text-orange-700 border border-orange-200/60',
-    description: '100% original company parts, Castrol/Motul engine oil, and new filters.',
+    description: '100% authentic OEM parts, premium Castrol/Motul engine oils, and certified filters.',
     tags: ['Castrol / Motul', 'Original Spares', 'New Filters'],
   },
 ];
@@ -88,7 +88,6 @@ export const ServicesSection = () => {
     const activeIndex = deckOrder[0];
     setFlippingCardId(SERVICES[activeIndex].id);
 
-    // Instant soft dissolve (200ms) for 100% friction-free switch
     setTimeout(
       () => {
         setDeckOrder((prev) => {
@@ -187,10 +186,10 @@ export const ServicesSection = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Seamless Soft Dissolve Card Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Clearly Visible Stacked Card Deck (Hidden on Desktop) */}
         <div className="block md:hidden">
           <ScrollReveal direction="up" delay={100}>
-            <div className="max-w-md mx-auto relative px-1 pb-2">
+            <div className="max-w-md mx-auto relative px-1 pb-4">
               <div className="flex items-center justify-between mb-3 px-1">
                 <div className="flex items-center gap-1 text-[11px] text-slate-500 font-bold uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5 text-[#0284C7] animate-pulse" />
@@ -202,8 +201,9 @@ export const ServicesSection = () => {
                 </div>
               </div>
 
+              {/* Stack Container with 310px Height to show bottom peeking cards clearly */}
               <div
-                className="relative w-full h-[270px] cursor-pointer touch-pan-y"
+                className="relative w-full h-[310px] cursor-pointer touch-pan-y"
                 onClick={cycleNext}
                 tabIndex={0}
                 role="button"
@@ -215,9 +215,10 @@ export const ServicesSection = () => {
                   const isFlipping = flippingCardId === srv.id;
                   const Icon = srv.icon;
 
-                  const translateY = Math.min(stackPos * 12, 36);
-                  const scale = Math.max(1 - stackPos * 0.04, 0.88);
-                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.6);
+                  // 22px Step for clear visual peeking from the bottom
+                  const translateY = Math.min(stackPos * 22, 66);
+                  const scale = Math.max(1 - stackPos * 0.03, 0.90);
+                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.12, 0.72);
                   const zIndex = 30 - stackPos * 5;
 
                   return (
@@ -230,7 +231,7 @@ export const ServicesSection = () => {
                       } ${
                         isFront
                           ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
-                          : 'bg-white/80 border-white/90 shadow-md'
+                          : 'bg-white/85 border-white/90 shadow-md'
                       }`}
                       style={{
                         transform: isFlipping
@@ -283,7 +284,7 @@ export const ServicesSection = () => {
               </div>
 
               {/* Controls & Dots */}
-              <div className="flex items-center justify-between mt-12 px-1">
+              <div className="flex items-center justify-between mt-14 px-1">
                 <button
                   type="button"
                   onClick={(e) => {
