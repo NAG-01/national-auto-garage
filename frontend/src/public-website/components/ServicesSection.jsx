@@ -148,8 +148,14 @@ export const ServicesSection = () => {
             const Icon = srv.icon;
             return (
               <ScrollReveal key={srv.id} direction="up" delay={idx * 80}>
-                <div className="group relative p-5 sm:p-6 rounded-3xl bg-white/65 hover:bg-white/95 backdrop-blur-xl border border-white/80 hover:border-[#0284C7]/40 shadow-md shadow-slate-200/30 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between h-full">
-                  <div>
+                <div className="group relative p-5 sm:p-6 rounded-3xl bg-white/65 hover:bg-white/95 backdrop-blur-xl border border-white/80 hover:border-[#0284C7]/40 shadow-md shadow-slate-200/30 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between h-full overflow-hidden">
+                  
+                  {/* Subtle Background Watermark Graphic */}
+                  <div className="absolute -bottom-4 -right-4 opacity-[0.06] group-hover:opacity-[0.14] pointer-events-none text-[#0284C7] transition-all duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                    <Icon className="w-36 h-36" />
+                  </div>
+
+                  <div className="relative z-10">
                     <div className="flex items-center justify-between mb-4">
                       <div className={`p-2.5 rounded-2xl ${srv.iconBg} backdrop-blur-md shadow-2xs group-hover:scale-110 transition-transform duration-300`}>
                         <Icon className="w-5 h-5" />
@@ -173,7 +179,7 @@ export const ServicesSection = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Compact Tight Card Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Compact Card Deck with Watermark (Hidden on Desktop) */}
         <div className="block md:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -210,7 +216,7 @@ export const ServicesSection = () => {
                   return (
                     <div
                       key={srv.id}
-                      className={`absolute inset-x-0 top-0 h-[210px] p-5 rounded-3xl backdrop-blur-2xl border select-none flex flex-col justify-between will-change-transform ${
+                      className={`absolute inset-x-0 top-0 h-[210px] p-5 rounded-3xl backdrop-blur-2xl border select-none flex flex-col justify-between will-change-transform overflow-hidden ${
                         isFlipping
                           ? 'duration-200 ease-out z-40'
                           : 'duration-300 ease-out'
@@ -228,8 +234,15 @@ export const ServicesSection = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
+                      {/* Subtle Background Watermark Graphic */}
+                      {isFront && (
+                        <div className="absolute -bottom-3 -right-3 opacity-[0.08] pointer-events-none text-[#0284C7]">
+                          <Icon className="w-32 h-32 transform -rotate-12" />
+                        </div>
+                      )}
+
                       {/* Hide inner text on rear cards while preserving h-[210px] height */}
-                      <div className={isFront ? 'opacity-100 flex flex-col justify-between h-full' : 'opacity-0 invisible h-full'}>
+                      <div className={isFront ? 'opacity-100 flex flex-col justify-between h-full relative z-10' : 'opacity-0 invisible h-full'}>
                         <div>
                           <div className="flex items-center justify-between mb-2.5">
                             <div className={`p-2 rounded-2xl ${srv.iconBg} backdrop-blur-md shadow-2xs`}>
