@@ -65,13 +65,13 @@ export const HeroSection = () => {
 
         </div>
 
-        {/* 4 Separate Metric Cards (2x2 Grid on Mobile, 4 columns on Desktop) */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-12 sm:mt-16">
+        {/* 4 Separate Metric Cards (100% Equal Height & Uniform Grid Size) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-12 sm:mt-16 items-stretch">
           {STATS.map((st, idx) => (
-            <ScrollReveal key={st.id} direction="up" delay={idx * 80}>
-              <div className="p-4 sm:p-6 rounded-3xl bg-white/60 hover:bg-white/85 backdrop-blur-xl border border-white/80 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
+            <ScrollReveal key={st.id} direction="up" delay={idx * 80} className="h-full">
+              <div className="h-full flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl bg-white/60 hover:bg-white/85 backdrop-blur-xl border border-white/80 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center min-h-[110px] sm:min-h-[130px]">
                 <div className={`text-xl sm:text-3xl font-black ${st.color}`}>{st.value}</div>
-                <div className="text-[11px] sm:text-xs text-slate-600 font-bold uppercase tracking-wider mt-1">
+                <div className="text-[10px] sm:text-xs text-slate-600 font-bold uppercase tracking-wider mt-1 text-center leading-tight">
                   {st.label}
                 </div>
               </div>
