@@ -105,7 +105,7 @@ export const ContactSection = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="w-full py-2.5 px-4 rounded-2xl bg-slate-900/90 hover:bg-[#0284C7] backdrop-blur-md text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-md active:scale-98"
+            className="w-full py-2.5 px-4 rounded-2xl bg-slate-900/90 hover:bg-[#0284C7] backdrop-blur-md text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-md active:scale-98"
           >
             <Navigation className="w-4 h-4 text-sky-400" />
             <span>Open in Google Maps</span>
@@ -149,7 +149,7 @@ export const ContactSection = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="w-full py-2.5 px-4 rounded-2xl bg-emerald-600/90 hover:bg-emerald-600 backdrop-blur-md text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition-all duration-200 active:scale-98"
+            className="w-full py-2.5 px-4 rounded-2xl bg-emerald-600/90 hover:bg-emerald-600 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition-all duration-200 active:scale-98"
           >
             <MessageSquare className="w-4 h-4" />
             <span>Chat on WhatsApp</span>
@@ -180,7 +180,7 @@ export const ContactSection = () => {
         <a
           href="tel:+919624844188"
           onClick={(e) => e.stopPropagation()}
-          className="w-full py-2.5 px-4 rounded-2xl bg-white/70 hover:bg-[#0284C7] backdrop-blur-md text-slate-800 hover:text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-white/90 hover:border-[#0284C7] transition-all duration-200 active:scale-98 shadow-2xs"
+          className="w-full py-2.5 px-4 rounded-2xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-sky-500/25 border border-sky-400/30 transition-all duration-200 active:scale-98 cursor-pointer"
         >
           <Phone className="w-4 h-4" />
           <span>Call for Help</span>
