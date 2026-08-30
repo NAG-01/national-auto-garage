@@ -16,29 +16,37 @@ const ADVANTAGES = [
     id: 'exp',
     icon: Award,
     title: '15+ Years Experience',
-    desc: 'Imran and Naim Pathan have over 15 years of experience fixing bikes and scooters.',
+    badge: 'Master Mechanics',
+    desc: 'Imran and Naim Pathan have over 15 years of hands-on experience fixing all bikes and scooters.',
     color: 'text-[#0284C7] bg-sky-50/90 border-sky-200/60',
+    tags: ['15+ Years', 'Imran & Naim', 'Mosali Expert'],
   },
   {
     id: 'parts',
     icon: ShieldCheck,
     title: 'Original Spare Parts',
-    desc: 'We only fit 100% original company parts and trusted engine oil in every service.',
+    badge: '100% Genuine',
+    desc: 'We only fit 100% original company parts and trusted high-grade engine oil in every service.',
     color: 'text-emerald-700 bg-emerald-50/90 border-emerald-200/60',
+    tags: ['OEM Parts', 'Castrol / Motul', 'Quality Guarantee'],
   },
   {
     id: 'fast',
     icon: Zap,
     title: 'Fast Same-Day Service',
-    desc: 'Quick oil change, general tuneup, and minor repairs finished on the same day.',
+    badge: 'Quick Delivery',
+    desc: 'Quick oil change, general tuneup, and minor repairs finished efficiently on the same day.',
     color: 'text-amber-700 bg-amber-50/90 border-amber-200/60',
+    tags: ['Same Day', 'Express Oil', 'Quick Tuneup'],
   },
   {
     id: 'bill',
     icon: ThumbsUp,
     title: 'Clear & Honest Bills',
-    desc: 'No hidden charges. Get a clear digital bill directly sent to your WhatsApp.',
+    badge: 'Transparent',
+    desc: 'No hidden charges or extra fees. Get a clear digital bill directly sent to your WhatsApp.',
     color: 'text-purple-700 bg-purple-50/90 border-purple-200/60',
+    tags: ['WhatsApp Bill', 'No Hidden Fees', 'Fair Pricing'],
   },
 ];
 
@@ -118,15 +126,29 @@ export const WhyChooseUs = () => {
               <ScrollReveal key={idx} direction="up" delay={idx * 100}>
                 <div className="p-5 sm:p-6 rounded-3xl bg-white/65 hover:bg-white/95 backdrop-blur-xl border border-white/80 shadow-md shadow-slate-200/30 hover:shadow-xl hover:border-[#0284C7]/40 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between h-full">
                   <div>
-                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center border mb-4 backdrop-blur-md ${adv.color}`}>
-                      <Icon className="w-5 h-5" />
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`p-2.5 rounded-2xl ${adv.color} backdrop-blur-md shadow-2xs`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      {adv.badge && (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/90 border border-slate-200/80 text-slate-700 shadow-2xs">
+                          {adv.badge}
+                        </span>
+                      )}
                     </div>
                     <h3 className="text-base font-black text-slate-900 mb-1.5">
                       {adv.title}
                     </h3>
-                    <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-2">
+                    <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4 line-clamp-2">
                       {adv.desc}
                     </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {adv.tags.map((tag, i) => (
+                        <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100/90 text-slate-600 border border-slate-200/60">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </ScrollReveal>
@@ -134,7 +156,7 @@ export const WhyChooseUs = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Pixel-Perfect Equal Stack Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Equal 290px Height Stack Deck (Hidden on Desktop) */}
         <div className="block sm:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1">
@@ -149,9 +171,9 @@ export const WhyChooseUs = () => {
                 </div>
               </div>
 
-              {/* Uniform Stack Container */}
+              {/* Exact 290px Height Matching Services and Contact Sections */}
               <div
-                className="relative w-full h-[240px] cursor-pointer touch-pan-y"
+                className="relative w-full h-[290px] cursor-pointer touch-pan-y"
                 onClick={cycleNext}
                 tabIndex={0}
                 role="button"
@@ -190,17 +212,33 @@ export const WhyChooseUs = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {/* Hide inner text on rear cards */}
+                      {/* Hide inner text on rear cards so ONLY clean equal card edge & shadow peek out */}
                       <div className={isFront ? 'opacity-100' : 'opacity-0 invisible'}>
-                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border mb-3 backdrop-blur-md ${adv.color}`}>
-                          <Icon className="w-5 h-5" />
+                        <div className="flex items-center justify-between mb-3">
+                          <div className={`p-2.5 rounded-2xl ${adv.color} backdrop-blur-md shadow-2xs`}>
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          {adv.badge && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/90 border border-slate-200/80 text-slate-700 shadow-2xs">
+                              {adv.badge}
+                            </span>
+                          )}
                         </div>
+
                         <h3 className="text-base font-black text-slate-900 mb-1.5">
                           {adv.title}
                         </h3>
-                        <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-2">
+                        <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4 line-clamp-2">
                           {adv.desc}
                         </p>
+
+                        <div className="flex flex-wrap gap-1.5">
+                          {adv.tags.map((tag, i) => (
+                            <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100/90 text-slate-700 border border-slate-200/70">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
 
                       {isFront && (
