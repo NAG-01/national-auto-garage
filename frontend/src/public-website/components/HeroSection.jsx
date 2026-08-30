@@ -1,8 +1,63 @@
-import React from 'react';
-import { Phone, MessageSquare } from 'lucide-react';
+import React, { useState } from 'react';
+import { Phone, MessageSquare, ChevronRight, ChevronLeft, Sparkles, MousePointerClick } from 'lucide-react';
 import { ScrollReveal } from './ScrollReveal.jsx';
 
+const STATS = [
+  { id: 'exp', value: '15+', label: 'Years of Experience', color: 'text-[#0284C7]' },
+  { id: 'bikes', value: '10,000+', label: 'Bikes Serviced', color: 'text-emerald-600' },
+  { id: 'rating', value: '4.9 ★', label: 'Happy Customers', color: 'text-amber-600' },
+  { id: 'pricing', value: '100%', label: 'Honest Pricing', color: 'text-slate-900' },
+];
+
 export const HeroSection = () => {
+  const [deckOrder, setDeckOrder] = useState([0, 1, 2, 3]);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [flippingCardId, setFlippingCardId] = useState(null);
+
+  const cycleNext = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    const activeIndex = deckOrder[0];
+    setFlippingCardId(STATS[activeIndex].id);
+
+    setTimeout(() => {
+      setDeckOrder((prev) => {
+        const next = [...prev];
+        const top = next.shift();
+        next.push(top);
+        return next;
+      });
+      setFlippingCardId(null);
+      setIsAnimating(false);
+    }, 400);
+  };
+
+  const cyclePrev = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setDeckOrder((prev) => {
+      const next = [...prev];
+      const bottom = next.pop();
+      next.unshift(bottom);
+      return next;
+    });
+    setTimeout(() => setIsAnimating(false), 350);
+  };
+
+  const jumpToCard = (targetIdx) => {
+    if (isAnimating || deckOrder[0] === targetIdx) return;
+    setIsAnimating(true);
+    setDeckOrder((prev) => {
+      const currentPos = prev.indexOf(targetIdx);
+      if (currentPos === -1) return prev;
+      const next = [...prev];
+      const moved = next.splice(currentPos, 1)[0];
+      next.unshift(moved);
+      return next;
+    });
+    setTimeout(() => setIsAnimating(false), 350);
+  };
+
   return (
     <section id="home" className="relative bg-transparent text-slate-900 pt-10 pb-16 sm:pt-16 sm:pb-24 border-b border-slate-200/60 select-none overflow-hidden scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,40 +113,122 @@ export const HeroSection = () => {
 
         </div>
 
-        {/* 4 Frosted Glass Stats Metrics with Staggered Scroll Reveal */}
-        <div className="mt-12 sm:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+        {/* 1. DESKTOP VIEW: Full 4-Metric Grid (Hidden on Mobile) */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-12 sm:mt-16">
+          {STATS.map((st, idx) => (
+            <ScrollReveal key={st.id} direction="up" delay={idx * 100}>
+              <div className="p-4 sm:p-6 rounded-3xl bg-white/60 hover:bg-white/85 backdrop-blur-xl border border-white/80 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
+                <div className={`text-xl sm:text-3xl font-black ${st.color}`}>{st.value}</div>
+                <div className="text-[11px] sm:text-xs text-slate-600 font-bold uppercase tracking-wider mt-1">
+                  {st.label}
+                </div>
+              </div>
+            </ScrollReveal>
+          ))}
+        </div>
+
+        {/* 2. MOBILE VIEW ONLY: Interactive Stacked Card Deck (Hidden on Desktop) */}
+        <div className="block sm:hidden mt-10">
           <ScrollReveal direction="up" delay={100}>
-            <div className="p-4 sm:p-6 rounded-3xl bg-white/60 hover:bg-white/85 backdrop-blur-xl border border-white/80 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
-              <div className="text-xl sm:text-3xl font-black text-[#0284C7]">15+</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-bold uppercase tracking-wider mt-1">
-                Years of Experience
+            <div className="max-w-xs mx-auto relative px-1 pb-2">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <div className="flex items-center gap-1 text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5 text-[#0284C7] animate-pulse" />
+                  <span>Highlight {deckOrder[0] + 1} of {STATS.length}</span>
+                </div>
+                <div className="flex items-center gap-1 text-[10px] text-slate-400 font-medium">
+                  <MousePointerClick className="w-3 h-3 text-slate-500" />
+                  <span>Tap card</span>
+                </div>
               </div>
-            </div>
-          </ScrollReveal>
 
-          <ScrollReveal direction="up" delay={200}>
-            <div className="p-4 sm:p-6 rounded-3xl bg-white/60 hover:bg-white/85 backdrop-blur-xl border border-white/80 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
-              <div className="text-xl sm:text-3xl font-black text-emerald-600">10,000+</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-bold uppercase tracking-wider mt-1">
-                Bikes Serviced
+              <div
+                className="relative w-full h-[120px] cursor-pointer touch-pan-y"
+                onClick={cycleNext}
+                tabIndex={0}
+                role="button"
+                aria-label="Cycle next highlight metric"
+              >
+                {STATS.map((st, originalIndex) => {
+                  const stackPos = deckOrder.indexOf(originalIndex);
+                  const isFront = stackPos === 0;
+                  const isFlipping = flippingCardId === st.id;
+
+                  const translateY = Math.min(stackPos * 10, 30);
+                  const scale = Math.max(1 - stackPos * 0.04, 0.88);
+                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.6);
+                  const zIndex = 30 - stackPos * 5;
+
+                  return (
+                    <div
+                      key={st.id}
+                      className={`absolute inset-x-0 top-0 p-4 rounded-3xl backdrop-blur-2xl border transition-all ease-[cubic-bezier(0.16,1,0.3,1)] select-none text-center flex flex-col justify-center ${
+                        isFlipping
+                          ? 'duration-400 -translate-y-6 -translate-x-4 scale-90 opacity-30 z-40 rotate-[-1.5deg]'
+                          : 'duration-500'
+                      } ${
+                        isFront
+                          ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
+                          : 'bg-white/75 border-white/80 shadow-md'
+                      }`}
+                      style={{
+                        transform: isFlipping
+                          ? 'translate3d(-16px, -24px, 0) scale(0.9) rotate(-1.5deg)'
+                          : `translate3d(0px, ${translateY}px, 0px) scale(${scale})`,
+                        opacity: isFlipping ? 0.3 : opacity,
+                        zIndex: isFlipping ? 40 : zIndex,
+                      }}
+                    >
+                      <div className={`text-2xl font-black ${st.color}`}>{st.value}</div>
+                      <div className="text-xs text-slate-600 font-bold uppercase tracking-wider mt-1">
+                        {st.label}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-          </ScrollReveal>
 
-          <ScrollReveal direction="up" delay={300}>
-            <div className="p-4 sm:p-6 rounded-3xl bg-white/60 hover:bg-white/85 backdrop-blur-xl border border-white/80 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
-              <div className="text-xl sm:text-3xl font-black text-amber-600">4.9 ★</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-bold uppercase tracking-wider mt-1">
-                Happy Customers
-              </div>
-            </div>
-          </ScrollReveal>
+              {/* Controls */}
+              <div className="flex items-center justify-between mt-8 px-1">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    cyclePrev();
+                  }}
+                  disabled={isAnimating}
+                  className="p-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
 
-          <ScrollReveal direction="up" delay={400}>
-            <div className="p-4 sm:p-6 rounded-3xl bg-white/60 hover:bg-white/85 backdrop-blur-xl border border-white/80 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
-              <div className="text-xl sm:text-3xl font-black text-slate-900">100%</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-bold uppercase tracking-wider mt-1">
-                Honest Pricing
+                <div className="flex items-center gap-1.5">
+                  {STATS.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        jumpToCard(idx);
+                      }}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        deckOrder[0] === idx ? 'w-5 bg-[#0284C7]' : 'w-2 bg-slate-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    cycleNext();
+                  }}
+                  disabled={isAnimating}
+                  className="p-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </ScrollReveal>
