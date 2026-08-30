@@ -19,7 +19,6 @@ const ADVANTAGES = [
     badge: 'Master Mechanics',
     desc: 'Imran and Naim Pathan have over 15 years of hands-on experience fixing all bikes and scooters.',
     color: 'text-[#0284C7] bg-sky-50/90 border-sky-200/60',
-    tags: ['15+ Years', 'Imran & Naim', 'Mosali Expert'],
   },
   {
     id: 'parts',
@@ -28,7 +27,6 @@ const ADVANTAGES = [
     badge: '100% Genuine',
     desc: 'We only fit 100% original company parts and trusted high-grade engine oil in every service.',
     color: 'text-emerald-700 bg-emerald-50/90 border-emerald-200/60',
-    tags: ['OEM Parts', 'Castrol Oil', 'Quality Check'],
   },
   {
     id: 'fast',
@@ -37,7 +35,6 @@ const ADVANTAGES = [
     badge: 'Quick Delivery',
     desc: 'Quick oil change, general tuneup, and minor repairs finished efficiently on the same day.',
     color: 'text-amber-700 bg-amber-50/90 border-amber-200/60',
-    tags: ['Same Day', 'Express Oil', 'Quick Service'],
   },
   {
     id: 'bill',
@@ -46,7 +43,6 @@ const ADVANTAGES = [
     badge: 'Transparent',
     desc: 'No hidden charges or extra fees. Get a clear digital bill directly sent to your WhatsApp.',
     color: 'text-purple-700 bg-purple-50/90 border-purple-200/60',
-    tags: ['WhatsApp Bill', 'No Hidden Fees', 'Fair Quote'],
   },
 ];
 
@@ -139,16 +135,9 @@ export const WhyChooseUs = () => {
                     <h3 className="text-base font-black text-slate-900 mb-1.5">
                       {adv.title}
                     </h3>
-                    <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4 line-clamp-2">
+                    <p className="text-xs text-slate-600 font-medium leading-relaxed">
                       {adv.desc}
                     </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {adv.tags.map((tag, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100/90 text-slate-600 border border-slate-200/60">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </ScrollReveal>
@@ -156,7 +145,7 @@ export const WhyChooseUs = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: 3-Layered Rounded Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Clean 3-Layered Card Deck (Hidden on Desktop) */}
         <div className="block sm:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -171,7 +160,7 @@ export const WhyChooseUs = () => {
                 </div>
               </div>
 
-              {/* 340px Stage Container */}
+              {/* 330px Stage Container with 20px Step Peeking Shadows */}
               <div
                 className="relative w-full h-[330px] cursor-pointer touch-pan-y"
                 onClick={cycleNext}
@@ -185,7 +174,7 @@ export const WhyChooseUs = () => {
                   const isFlipping = flippingCardId === adv.id;
                   const Icon = adv.icon;
 
-                  // Fixed 20px Step so rear cards stay 270px tall and peek as 3 distinct rounded card layers
+                  // 20px Step Offset for 3 distinct rounded card layers (matching ServicesSection)
                   const translateY = Math.min(stackPos * 20, 60);
                   const scale = Math.max(1 - stackPos * 0.04, 0.88);
                   const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.70);
@@ -212,7 +201,7 @@ export const WhyChooseUs = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {/* Hide inner text on rear cards while preserving h-[270px] height so full card sit behind */}
+                      {/* Hide inner text on rear cards so ONLY clean card edge & shadow peek out */}
                       <div className={isFront ? 'opacity-100 flex flex-col justify-between h-full' : 'opacity-0 invisible h-full'}>
                         <div>
                           <div className="flex items-center justify-between mb-3">
@@ -229,17 +218,9 @@ export const WhyChooseUs = () => {
                           <h3 className="text-base font-black text-slate-900 mb-1.5">
                             {adv.title}
                           </h3>
-                          <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4 line-clamp-2">
+                          <p className="text-xs text-slate-600 font-medium leading-relaxed">
                             {adv.desc}
                           </p>
-
-                          <div className="flex flex-wrap gap-1.5">
-                            {adv.tags.map((tag, i) => (
-                              <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100/90 text-slate-700 border border-slate-200/70">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
                         </div>
 
                         <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-400">
