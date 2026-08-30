@@ -20,8 +20,8 @@ const SERVICES = [
     badge: 'Popular',
     icon: Wrench,
     iconBg: 'bg-sky-100/80 text-[#0284C7] border border-sky-200/60',
-    watermarkColor: 'text-[#0284C7]',
     description: 'Complete bike checkup, fresh engine oil change, and carburetor wash.',
+    bgImage: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'engine-repair',
@@ -29,32 +29,32 @@ const SERVICES = [
     badge: 'Specialist',
     icon: Flame,
     iconBg: 'bg-rose-100/80 text-rose-600 border border-rose-200/60',
-    watermarkColor: 'text-rose-500',
     description: 'Engine rebuilding, fixing white smoke, piston work, and smooth pickup.',
+    bgImage: 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'brakes-suspension',
     title: 'Brakes & Shocker Service',
     icon: Disc,
     iconBg: 'bg-emerald-100/80 text-emerald-700 border border-emerald-200/60',
-    watermarkColor: 'text-emerald-600',
     description: 'New brake shoes, disc pads, front fork oil seal, and smooth shockers.',
+    bgImage: 'https://images.unsplash.com/photo-1600706432520-256f66eeaf23?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'wiring-battery',
     title: 'Wiring & Battery Check',
     icon: Zap,
     iconBg: 'bg-purple-100/80 text-purple-700 border border-purple-200/60',
-    watermarkColor: 'text-purple-600',
     description: 'Starter motor repair, battery testing, indicator lights, and wiring fix.',
+    bgImage: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'chain-gears',
     title: 'Chain & Gear System',
     icon: Layers,
     iconBg: 'bg-blue-100/80 text-blue-700 border border-blue-200/60',
-    watermarkColor: 'text-blue-600',
     description: 'Smooth gear shift, new chain sprocket set, and clutch cable change.',
+    bgImage: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'genuine-spares',
@@ -62,8 +62,8 @@ const SERVICES = [
     badge: '100% Original',
     icon: Shield,
     iconBg: 'bg-amber-100/80 text-amber-700 border border-amber-200/60',
-    watermarkColor: 'text-amber-600',
     description: '100% authentic OEM parts, premium Castrol/Motul engine oils, and certified filters.',
+    bgImage: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=800&q=80',
   },
 ];
 
@@ -148,17 +148,23 @@ export const ServicesSection = () => {
           </div>
         </ScrollReveal>
 
-        {/* 1. DESKTOP VIEW: Clean 6-Card Grid with Topic-Specific Watermarks */}
+        {/* 1. DESKTOP VIEW: 6-Card Grid with Photographic Background Images */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {SERVICES.map((srv, idx) => {
             const Icon = srv.icon;
             return (
               <ScrollReveal key={srv.id} direction="up" delay={idx * 80}>
-                <div className="group relative p-5 sm:p-6 rounded-3xl bg-white/65 hover:bg-white/95 backdrop-blur-xl border border-white/80 hover:border-[#0284C7]/40 shadow-md shadow-slate-200/30 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between h-full overflow-hidden">
+                <div className="group relative p-5 sm:p-6 rounded-3xl bg-white/70 hover:bg-white/90 backdrop-blur-xl border border-white/80 hover:border-[#0284C7]/40 shadow-md shadow-slate-200/30 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between h-full overflow-hidden">
                   
-                  {/* Topic-Specific Background Watermark Graphic */}
-                  <div className={`absolute -bottom-4 -right-4 opacity-[0.08] group-hover:opacity-[0.16] pointer-events-none ${srv.watermarkColor} transition-all duration-500 group-hover:scale-110 group-hover:-rotate-6`}>
-                    <Icon className="w-36 h-36" />
+                  {/* Photographic Background Image with Gradient Overlay */}
+                  <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
+                    <img
+                      src={srv.bgImage}
+                      alt={srv.title}
+                      className="w-full h-full object-cover opacity-[0.14] group-hover:opacity-[0.22] transition-all duration-700 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/80 to-white/60" />
                   </div>
 
                   <div className="relative z-10">
@@ -175,7 +181,7 @@ export const ServicesSection = () => {
                     <h3 className="text-base font-black text-slate-900 group-hover:text-[#0284C7] transition-colors mb-1.5">
                       {srv.title}
                     </h3>
-                    <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                    <p className="text-xs text-slate-700 font-semibold leading-relaxed">
                       {srv.description}
                     </p>
                   </div>
@@ -185,7 +191,7 @@ export const ServicesSection = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Compact Card Deck with Topic-Specific Watermarks */}
+        {/* 2. MOBILE VIEW ONLY: Card Deck with Photographic Background Images */}
         <div className="block md:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -240,10 +246,16 @@ export const ServicesSection = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {/* Topic-Specific Background Watermark Graphic */}
+                      {/* Photographic Background Image */}
                       {isFront && (
-                        <div className={`absolute -bottom-3 -right-3 opacity-[0.09] pointer-events-none ${srv.watermarkColor}`}>
-                          <Icon className="w-32 h-32 transform -rotate-12" />
+                        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
+                          <img
+                            src={srv.bgImage}
+                            alt={srv.title}
+                            className="w-full h-full object-cover opacity-[0.16]"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/80 to-white/60" />
                         </div>
                       )}
 
@@ -264,7 +276,7 @@ export const ServicesSection = () => {
                           <h3 className="text-base font-black text-slate-900 mb-1">
                             {srv.title}
                           </h3>
-                          <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-2">
+                          <p className="text-xs text-slate-700 font-semibold leading-relaxed line-clamp-2">
                             {srv.description}
                           </p>
                         </div>
