@@ -17,32 +17,36 @@ const ADVANTAGES = [
     icon: Award,
     title: '15+ Years Experience',
     badge: 'Master Mechanics',
-    desc: 'Over 15 years of expert two-wheeler repairs by Imran Pathan & Naim Pathan. Trusted by 10,000+ bike owners across Mosali & Surat district.',
+    desc: 'Imran and Naim Pathan have over 15 years of hands-on experience fixing all bikes and scooters.',
     color: 'text-[#0284C7] bg-sky-50/90 border-sky-200/60',
+    tags: ['15+ Years', 'Imran & Naim', 'Mosali Expert'],
   },
   {
     id: 'parts',
     icon: ShieldCheck,
     title: 'Original Spare Parts',
     badge: '100% Genuine',
-    desc: 'We fit 100% original company spare parts and premium Castrol/Motul engine oils to ensure long engine life and peak bike performance.',
+    desc: 'We only fit 100% original company parts and trusted high-grade engine oil in every service.',
     color: 'text-emerald-700 bg-emerald-50/90 border-emerald-200/60',
+    tags: ['OEM Parts', 'Castrol Oil', 'Quality Check'],
   },
   {
     id: 'fast',
     icon: Zap,
     title: 'Fast Same-Day Service',
     badge: 'Quick Delivery',
-    desc: 'Get quick engine oil changes, brake servicing, and general tuneups completed on the same day with guaranteed quality and care.',
+    desc: 'Quick oil change, general tuneup, and minor repairs finished efficiently on the same day.',
     color: 'text-amber-700 bg-amber-50/90 border-amber-200/60',
+    tags: ['Same Day', 'Express Oil', 'Quick Service'],
   },
   {
     id: 'bill',
     icon: ThumbsUp,
     title: 'Clear & Honest Bills',
     badge: 'Transparent',
-    desc: 'Complete pricing transparency with zero hidden costs. Receive detailed itemized digital bills directly on your WhatsApp after every service.',
+    desc: 'No hidden charges or extra fees. Get a clear digital bill directly sent to your WhatsApp.',
     color: 'text-purple-700 bg-purple-50/90 border-purple-200/60',
+    tags: ['WhatsApp Bill', 'No Hidden Fees', 'Fair Quote'],
   },
 ];
 
@@ -132,12 +136,19 @@ export const WhyChooseUs = () => {
                         </span>
                       )}
                     </div>
-                    <h3 className="text-base font-black text-slate-900 mb-2">
+                    <h3 className="text-base font-black text-slate-900 mb-1.5">
                       {adv.title}
                     </h3>
-                    <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                    <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4 line-clamp-2">
                       {adv.desc}
                     </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {adv.tags.map((tag, i) => (
+                        <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100/90 text-slate-600 border border-slate-200/60">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </ScrollReveal>
@@ -145,10 +156,10 @@ export const WhyChooseUs = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Deep Shadow Card Stack Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Exact Match to Services Card Deck (Hidden on Desktop) */}
         <div className="block sm:hidden">
           <ScrollReveal direction="up" delay={100}>
-            <div className="max-w-md mx-auto relative px-1">
+            <div className="max-w-md mx-auto relative px-1 pb-4">
               <div className="flex items-center justify-between mb-3 px-1">
                 <div className="flex items-center gap-1 text-[11px] text-slate-500 font-bold uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
@@ -160,9 +171,9 @@ export const WhyChooseUs = () => {
                 </div>
               </div>
 
-              {/* 270px Height Stack Container with Deep Peeking Shadows */}
+              {/* Exact 310px Height Stack Container with 22px Step Peeking Shadows */}
               <div
-                className="relative w-full h-[270px] cursor-pointer touch-pan-y"
+                className="relative w-full h-[310px] cursor-pointer touch-pan-y"
                 onClick={cycleNext}
                 tabIndex={0}
                 role="button"
@@ -174,10 +185,10 @@ export const WhyChooseUs = () => {
                   const isFlipping = flippingCardId === adv.id;
                   const Icon = adv.icon;
 
-                  // 18px Step Offset for deep visible peeking shadows at bottom
-                  const translateY = Math.min(stackPos * 18, 36);
-                  const scale = Math.max(1 - stackPos * 0.04, 0.92);
-                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.70);
+                  // 22px Step for clear visual peeking from bottom (matching ServicesSection)
+                  const translateY = Math.min(stackPos * 22, 66);
+                  const scale = Math.max(1 - stackPos * 0.03, 0.90);
+                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.12, 0.72);
                   const zIndex = 30 - stackPos * 5;
 
                   return (
@@ -190,7 +201,7 @@ export const WhyChooseUs = () => {
                       } ${
                         isFront
                           ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
-                          : 'bg-white/85 border-white/90 shadow-md shadow-slate-900/10'
+                          : 'bg-white/85 border-white/90 shadow-md'
                       }`}
                       style={{
                         transform: isFlipping
@@ -201,7 +212,7 @@ export const WhyChooseUs = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {/* Clean content formatting without small tag pills */}
+                      {/* Hide inner text on rear cards so ONLY clean card edge & shadow peek out */}
                       <div className={isFront ? 'opacity-100' : 'opacity-0 invisible'}>
                         <div className="flex items-center justify-between mb-3">
                           <div className={`p-2.5 rounded-2xl ${adv.color} backdrop-blur-md shadow-2xs`}>
@@ -217,9 +228,17 @@ export const WhyChooseUs = () => {
                         <h3 className="text-base font-black text-slate-900 mb-1.5">
                           {adv.title}
                         </h3>
-                        <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                        <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4 line-clamp-2">
                           {adv.desc}
                         </p>
+
+                        <div className="flex flex-wrap gap-1.5">
+                          {adv.tags.map((tag, i) => (
+                            <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100/90 text-slate-700 border border-slate-200/70">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
 
                       {isFront && (
@@ -235,8 +254,8 @@ export const WhyChooseUs = () => {
                 })}
               </div>
 
-              {/* Controls */}
-              <div className="flex items-center justify-between mt-12 px-1">
+              {/* Equal Controls */}
+              <div className="flex items-center justify-between mt-14 px-1">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -244,7 +263,7 @@ export const WhyChooseUs = () => {
                     cyclePrev();
                   }}
                   disabled={isAnimating}
-                  className="p-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95 transition-transform"
+                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95 transition-transform"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -272,7 +291,7 @@ export const WhyChooseUs = () => {
                     cycleNext();
                   }}
                   disabled={isAnimating}
-                  className="p-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95 transition-transform"
+                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95 transition-transform"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
