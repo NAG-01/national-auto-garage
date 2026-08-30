@@ -21,7 +21,6 @@ const SERVICES = [
     icon: Wrench,
     iconBg: 'bg-sky-100/80 text-[#0284C7] border border-sky-200/60',
     description: 'Complete bike checkup, fresh engine oil change, and carburetor wash.',
-    tags: ['Oil Change', 'Washing', 'Brake Check'],
   },
   {
     id: 'engine-repair',
@@ -30,7 +29,6 @@ const SERVICES = [
     icon: Flame,
     iconBg: 'bg-[#0284C7]/10 text-[#0284C7] border border-sky-200/60',
     description: 'Engine rebuilding, fixing white smoke, piston work, and smooth pickup.',
-    tags: ['Engine Rebuild', 'Piston Work', 'Clutch Plates'],
   },
   {
     id: 'brakes-suspension',
@@ -38,7 +36,6 @@ const SERVICES = [
     icon: Disc,
     iconBg: 'bg-emerald-100/80 text-emerald-700 border border-emerald-200/60',
     description: 'New brake shoes, disc pads, front fork oil seal, and smooth shockers.',
-    tags: ['Brake Shoes', 'Disc Pads', 'Shocker Oil'],
   },
   {
     id: 'wiring-battery',
@@ -46,7 +43,6 @@ const SERVICES = [
     icon: Zap,
     iconBg: 'bg-purple-100/80 text-purple-700 border border-purple-200/60',
     description: 'Starter motor repair, battery testing, indicator lights, and wiring fix.',
-    tags: ['Self Start', 'Battery Test', 'Wiring Fix'],
   },
   {
     id: 'chain-gears',
@@ -54,7 +50,6 @@ const SERVICES = [
     icon: Layers,
     iconBg: 'bg-blue-100/80 text-blue-700 border border-blue-200/60',
     description: 'Smooth gear shift, new chain sprocket set, and clutch cable change.',
-    tags: ['Chain Sprocket', 'Clutch Cable', 'Smooth Gears'],
   },
   {
     id: 'genuine-spares',
@@ -63,7 +58,6 @@ const SERVICES = [
     icon: Shield,
     iconBg: 'bg-orange-100/80 text-orange-700 border border-orange-200/60',
     description: '100% authentic OEM parts, premium Castrol/Motul engine oils, and certified filters.',
-    tags: ['Castrol / Motul', 'Original Spares', 'New Filters'],
   },
 ];
 
@@ -169,16 +163,9 @@ export const ServicesSection = () => {
                     <h3 className="text-base font-black text-slate-900 group-hover:text-[#0284C7] transition-colors mb-1.5">
                       {srv.title}
                     </h3>
-                    <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4 line-clamp-2">
+                    <p className="text-xs text-slate-600 font-medium leading-relaxed">
                       {srv.description}
                     </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {srv.tags.map((tag, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100/90 text-slate-600 border border-slate-200/60">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </ScrollReveal>
@@ -186,7 +173,7 @@ export const ServicesSection = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: 3-Layered Rounded Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Clean 3-Layered Rounded Deck (Hidden on Desktop) */}
         <div className="block md:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -259,17 +246,9 @@ export const ServicesSection = () => {
                           <h3 className="text-base font-black text-slate-900 mb-1.5">
                             {srv.title}
                           </h3>
-                          <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4 line-clamp-2">
+                          <p className="text-xs text-slate-600 font-medium leading-relaxed">
                             {srv.description}
                           </p>
-
-                          <div className="flex flex-wrap gap-1.5">
-                            {srv.tags.map((tag, i) => (
-                              <span key={i} className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100/90 text-slate-700 border border-slate-200/70">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
                         </div>
 
                         <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-400">
