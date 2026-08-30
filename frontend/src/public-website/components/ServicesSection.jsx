@@ -20,6 +20,7 @@ const SERVICES = [
     badge: 'Popular',
     icon: Wrench,
     iconBg: 'bg-sky-100/80 text-[#0284C7] border border-sky-200/60',
+    watermarkColor: 'text-[#0284C7]',
     description: 'Complete bike checkup, fresh engine oil change, and carburetor wash.',
   },
   {
@@ -27,7 +28,8 @@ const SERVICES = [
     title: 'Engine Repair & Tuning',
     badge: 'Specialist',
     icon: Flame,
-    iconBg: 'bg-[#0284C7]/10 text-[#0284C7] border border-sky-200/60',
+    iconBg: 'bg-rose-100/80 text-rose-600 border border-rose-200/60',
+    watermarkColor: 'text-rose-500',
     description: 'Engine rebuilding, fixing white smoke, piston work, and smooth pickup.',
   },
   {
@@ -35,6 +37,7 @@ const SERVICES = [
     title: 'Brakes & Shocker Service',
     icon: Disc,
     iconBg: 'bg-emerald-100/80 text-emerald-700 border border-emerald-200/60',
+    watermarkColor: 'text-emerald-600',
     description: 'New brake shoes, disc pads, front fork oil seal, and smooth shockers.',
   },
   {
@@ -42,6 +45,7 @@ const SERVICES = [
     title: 'Wiring & Battery Check',
     icon: Zap,
     iconBg: 'bg-purple-100/80 text-purple-700 border border-purple-200/60',
+    watermarkColor: 'text-purple-600',
     description: 'Starter motor repair, battery testing, indicator lights, and wiring fix.',
   },
   {
@@ -49,6 +53,7 @@ const SERVICES = [
     title: 'Chain & Gear System',
     icon: Layers,
     iconBg: 'bg-blue-100/80 text-blue-700 border border-blue-200/60',
+    watermarkColor: 'text-blue-600',
     description: 'Smooth gear shift, new chain sprocket set, and clutch cable change.',
   },
   {
@@ -56,7 +61,8 @@ const SERVICES = [
     title: 'Original Spare Parts',
     badge: '100% Original',
     icon: Shield,
-    iconBg: 'bg-orange-100/80 text-orange-700 border border-orange-200/60',
+    iconBg: 'bg-amber-100/80 text-amber-700 border border-amber-200/60',
+    watermarkColor: 'text-amber-600',
     description: '100% authentic OEM parts, premium Castrol/Motul engine oils, and certified filters.',
   },
 ];
@@ -142,7 +148,7 @@ export const ServicesSection = () => {
           </div>
         </ScrollReveal>
 
-        {/* 1. DESKTOP VIEW: Clean 6-Card Grid (Hidden on Mobile) */}
+        {/* 1. DESKTOP VIEW: Clean 6-Card Grid with Topic-Specific Watermarks */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {SERVICES.map((srv, idx) => {
             const Icon = srv.icon;
@@ -150,8 +156,8 @@ export const ServicesSection = () => {
               <ScrollReveal key={srv.id} direction="up" delay={idx * 80}>
                 <div className="group relative p-5 sm:p-6 rounded-3xl bg-white/65 hover:bg-white/95 backdrop-blur-xl border border-white/80 hover:border-[#0284C7]/40 shadow-md shadow-slate-200/30 hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between h-full overflow-hidden">
                   
-                  {/* Subtle Background Watermark Graphic */}
-                  <div className="absolute -bottom-4 -right-4 opacity-[0.06] group-hover:opacity-[0.14] pointer-events-none text-[#0284C7] transition-all duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                  {/* Topic-Specific Background Watermark Graphic */}
+                  <div className={`absolute -bottom-4 -right-4 opacity-[0.08] group-hover:opacity-[0.16] pointer-events-none ${srv.watermarkColor} transition-all duration-500 group-hover:scale-110 group-hover:-rotate-6`}>
                     <Icon className="w-36 h-36" />
                   </div>
 
@@ -179,7 +185,7 @@ export const ServicesSection = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Compact Card Deck with Watermark (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Compact Card Deck with Topic-Specific Watermarks */}
         <div className="block md:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -234,9 +240,9 @@ export const ServicesSection = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {/* Subtle Background Watermark Graphic */}
+                      {/* Topic-Specific Background Watermark Graphic */}
                       {isFront && (
-                        <div className="absolute -bottom-3 -right-3 opacity-[0.08] pointer-events-none text-[#0284C7]">
+                        <div className={`absolute -bottom-3 -right-3 opacity-[0.09] pointer-events-none ${srv.watermarkColor}`}>
                           <Icon className="w-32 h-32 transform -rotate-12" />
                         </div>
                       )}
