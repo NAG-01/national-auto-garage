@@ -35,7 +35,7 @@ const ADVANTAGES = [
 
 export const WhyChooseUs = () => {
   return (
-    <section id="why-us" className="py-14 sm:py-18 bg-transparent text-slate-900 relative select-none border-b border-slate-200/60">
+    <section id="why-us" className="py-14 sm:py-18 bg-transparent text-slate-900 relative select-none border-b border-slate-200/60 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

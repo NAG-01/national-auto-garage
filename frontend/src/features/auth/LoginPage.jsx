@@ -197,8 +197,15 @@ export const LoginPage = () => {
           </form>
 
           {/* Card Footer Divider & Developer Attribution */}
-          <div className="mt-8 pt-5 border-t border-slate-100 text-center">
-            <p className="text-xs text-slate-500 font-medium">
+          <div className="mt-8 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-medium">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="text-[#0284C7] hover:text-[#0369A1] font-bold hover:underline cursor-pointer flex items-center gap-1 transition-colors"
+            >
+              ← Back to Public Website
+            </button>
+            <p>
               National Auto Garage •{' '}
               <a
                 href="https://www.linkedin.com/in/maazpathan07"

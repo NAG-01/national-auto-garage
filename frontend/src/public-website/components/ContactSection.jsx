@@ -9,7 +9,7 @@ import {
 
 export const ContactSection = () => {
   return (
-    <section id="contact" className="py-14 sm:py-18 bg-transparent text-slate-900 relative select-none">
+    <section id="contact" className="py-14 sm:py-18 bg-transparent text-slate-900 relative select-none scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

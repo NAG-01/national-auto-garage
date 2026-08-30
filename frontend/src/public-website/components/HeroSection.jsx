@@ -6,7 +6,7 @@ import {
 
 export const HeroSection = () => {
   return (
-    <section id="home" className="relative bg-transparent text-slate-900 pt-10 pb-16 sm:pt-16 sm:pb-24 border-b border-slate-200/60 select-none overflow-hidden">
+    <section id="home" className="relative bg-transparent text-slate-900 pt-10 pb-16 sm:pt-16 sm:pb-24 border-b border-slate-200/60 select-none overflow-hidden scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto space-y-5 sm:space-y-6">
           
