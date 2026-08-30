@@ -7,6 +7,7 @@ let cachedMasterKeywords = null;
 let isFetchingMasterKeywords = false;
 
 export const SmartAutocomplete = ({
+  name,
   value = '',
   onChange,
   onSelect,
@@ -18,6 +19,7 @@ export const SmartAutocomplete = ({
   required = false,
   icon: Icon,
   error,
+  ...props
 }) => {
   const [masterKeywords, setMasterKeywords] = useState(cachedMasterKeywords || []);
   const [suggestions, setSuggestions] = useState([]);
@@ -81,7 +83,7 @@ export const SmartAutocomplete = ({
   }, []);
 
   const handleSelectKeyword = (kw) => {
-    onChange?.({ target: { value: kw.word } });
+    onChange?.({ target: { name, value: kw.word } });
     onSelect?.(kw.word);
     setIsOpen(false);
   };
@@ -123,6 +125,7 @@ export const SmartAutocomplete = ({
         )}
         <input
           id={inputId}
+          name={name}
           type="text"
           value={value}
           onChange={onChange}
@@ -137,6 +140,7 @@ export const SmartAutocomplete = ({
               ? 'border-rose-400 focus:ring-rose-500 focus:border-rose-500 bg-rose-50/20'
               : 'border-slate-300 bg-white hover:border-slate-400'
           } ${className}`}
+          {...props}
         />
       </div>
 

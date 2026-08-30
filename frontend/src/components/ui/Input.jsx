@@ -41,6 +41,7 @@ export const Input = React.forwardRef(
         <div className="w-full">
           <SmartAutocomplete
             id={inputId}
+            name={props.name}
             label={label}
             error={error}
             required={required}
@@ -50,6 +51,7 @@ export const Input = React.forwardRef(
             onChange={onChange}
             placeholder={props.placeholder}
             className={className}
+            {...props}
           />
           {error ? (
             <p className="mt-1 text-xs text-rose-600 font-medium">{error}</p>

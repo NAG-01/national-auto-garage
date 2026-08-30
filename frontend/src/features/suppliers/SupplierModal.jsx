@@ -4,7 +4,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { Modal, ModalCancelButton } from '../../components/ui/Modal.jsx';
 import { Input, Textarea } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
-import { validatePhone, formatPhone } from '../../utils/formatters.js';
+import { validatePhone, cleanPhoneDigits } from '../../utils/formatters.js';
 
 export const SupplierModal = ({ isOpen, onClose, supplier, onSuccess }) => {
   const [name, setName] = useState('');
@@ -19,7 +19,7 @@ export const SupplierModal = ({ isOpen, onClose, supplier, onSuccess }) => {
   useEffect(() => {
     if (supplier) {
       setName(supplier.name || '');
-      setPhone(supplier.phone ? formatPhone(supplier.phone) : '');
+      setPhone(cleanPhoneDigits(supplier.phone || ''));
       setAddress(supplier.address || '');
       setNotes(supplier.notes || '');
     } else {
@@ -53,7 +53,7 @@ export const SupplierModal = ({ isOpen, onClose, supplier, onSuccess }) => {
     try {
       const payload = {
         name: name.trim(),
-        phone: phone.trim(),
+        phone: cleanPhoneDigits(phone),
         address: address.trim(),
         notes: notes.trim(),
       };

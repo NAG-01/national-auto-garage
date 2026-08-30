@@ -7,16 +7,16 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  ShieldCheck,
   AlertCircle,
-  KeyRound,
+  ShieldCheck,
+  ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 
 export const LoginPage = () => {
-  const [identifier, setIdentifier] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -32,10 +32,10 @@ export const LoginPage = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!identifier.trim()) {
-      newErrors.identifier = 'Please enter your username or email.';
+      newErrors.identifier = 'Username ya email enter karein.';
     }
     if (!password) {
-      newErrors.password = 'Please enter your password.';
+      newErrors.password = 'Password enter karein.';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -59,7 +59,7 @@ export const LoginPage = () => {
       const target = from && from !== '/login' ? from : '/dashboard';
       navigate(target, { replace: true });
     } catch (err) {
-      const msg = err.message || 'Invalid username or password.';
+      const msg = err.message || 'Galat username ya password. Dobara check karein.';
       setFormError(msg);
       toast.error(msg);
     } finally {
@@ -67,42 +67,45 @@ export const LoginPage = () => {
     }
   };
 
-  const fillAdminCredentials = () => {
-    setIdentifier('admin');
-    setPassword('admin123');
-    setErrors({});
-    setFormError('');
-    toast.info('Admin credentials auto-filled');
-  };
-
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden select-none">
-      {/* Ambient background glows */}
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden select-none">
+      {/* Soft Ambient Background Glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#0284C7]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-72 h-72 bg-sky-400/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Grid Pattern */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#0284c7_1px,transparent_1px)] [background-size:24px_24px]" />
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
-        {/* Brand Badge */}
-        <div className="inline-flex p-3.5 rounded-2xl bg-[#0284C7] text-white shadow-xl shadow-sky-500/20 ring-4 ring-sky-100 mb-4 transform hover:scale-105 transition-transform duration-200">
-          <Wrench className="w-8 h-8" />
+      <div className="w-full max-w-md relative z-10">
+        {/* Brand Header Icon */}
+        <div className="text-center mb-6">
+          <div className="inline-flex p-3 rounded-2xl bg-[#0284C7] text-white shadow-xl shadow-sky-500/20 ring-4 ring-sky-100 mb-3 transform hover:scale-105 transition-transform duration-200">
+            <Wrench className="w-7 h-7" />
+          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
+            National Auto Garage
+          </h1>
+          <p className="text-[11px] text-[#0284C7] font-extrabold tracking-widest uppercase mt-0.5">
+            Enterprise Workshop Portal
+          </p>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight uppercase">
-          National Auto Garage
-        </h1>
-        <p className="mt-1 text-xs text-[#0284C7] font-extrabold tracking-widest uppercase flex items-center justify-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          Enterprise Garage Portal
-        </p>
-      </div>
+        {/* Clean Modern Card */}
+        <div className="bg-white p-7 sm:p-9 rounded-3xl border border-slate-200/90 shadow-xl shadow-slate-200/50">
+          <div className="mb-6">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-50 border border-sky-200 text-[#0284C7] text-[10px] font-extrabold tracking-wider uppercase mb-2">
+              <ShieldCheck className="w-3.5 h-3.5" /> Secure Admin Access
+            </div>
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+              Welcome Back <span>👋</span>
+            </h2>
+            <p className="text-xs text-slate-500 font-medium mt-1">
+              Enter your admin credentials to access the workshop dashboard.
+            </p>
+          </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl">
           {formError && (
-            <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-xs text-rose-700 font-semibold animate-fadeIn">
+            <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-xs text-rose-700 font-semibold animate-in fade-in">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <span>{formError}</span>
             </div>
@@ -125,12 +128,12 @@ export const LoginPage = () => {
                     setIdentifier(e.target.value);
                     if (errors.identifier) setErrors((prev) => ({ ...prev, identifier: '' }));
                   }}
-                  placeholder="e.g. admin"
+                  placeholder="e.g. admin or username"
                   autoComplete="username"
-                  className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 transition-all ${
+                  className={`w-full pl-10 pr-4 py-2.5 bg-slate-50/80 border rounded-xl text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 transition-all ${
                     errors.identifier
                       ? 'border-rose-400 focus:ring-rose-400/20'
-                      : 'border-slate-300 focus:border-[#0284C7] focus:ring-[#0284C7]/20'
+                      : 'border-slate-300 focus:border-[#0284C7] focus:ring-[#0284C7]/20 hover:border-slate-400'
                   }`}
                 />
               </div>
@@ -157,17 +160,17 @@ export const LoginPage = () => {
                   }}
                   placeholder="••••••••"
                   autoComplete="current-password"
-                  className={`w-full pl-10 pr-10 py-2.5 bg-slate-50 border rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 transition-all ${
+                  className={`w-full pl-10 pr-10 py-2.5 bg-slate-50/80 border rounded-xl text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 transition-all ${
                     errors.password
                       ? 'border-rose-400 focus:ring-rose-400/20'
-                      : 'border-slate-300 focus:border-[#0284C7] focus:ring-[#0284C7]/20'
+                      : 'border-slate-300 focus:border-[#0284C7] focus:ring-[#0284C7]/20 hover:border-slate-400'
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 focus:outline-none transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 focus:outline-none transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -180,52 +183,35 @@ export const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 bg-[#0284C7] hover:bg-[#0369A1] active:scale-[0.99] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-sky-500/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              className="w-full mt-2 py-3 px-4 bg-[#0284C7] hover:bg-[#0369A1] active:scale-[0.99] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-sky-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Sign In as Admin</span>
+                  <span>Sign In to Workshop</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Quick Admin Helper Card */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2.5 flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-slate-700">
-                <ShieldCheck className="w-4 h-4 text-[#0284C7]" />
-                Single Admin Credentials
-              </span>
-            </div>
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
-              <div>
-                <div className="font-bold text-xs text-slate-900 flex items-center gap-1">
-                  <KeyRound className="w-3.5 h-3.5 text-[#F59E0B]" />
-                  System Administrator
-                </div>
-                <div className="text-[11px] text-slate-500 font-mono mt-0.5">
-                  admin / admin123
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={fillAdminCredentials}
-                className="px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#0284C7] bg-white hover:bg-slate-100 rounded-xl border border-slate-200 transition-colors shadow-2xs"
+          {/* Card Footer Divider & Developer Attribution */}
+          <div className="mt-8 pt-5 border-t border-slate-100 text-center">
+            <p className="text-xs text-slate-500 font-medium">
+              National Auto Garage •{' '}
+              <a
+                href="https://www.linkedin.com/in/maazpathan07"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[#0284C7] hover:text-[#0369A1] font-bold hover:underline transition-colors"
               >
-                Auto-Fill
-              </button>
-            </div>
+                Developed by Maaz Pathan
+                <ExternalLink className="w-3 h-3 inline" />
+              </a>
+            </p>
           </div>
         </div>
-
-        {/* Footer info */}
-        <p className="mt-6 text-center text-xs text-slate-500 font-medium">
-          National Auto Garage • Powered by Antigravity ERP
-        </p>
       </div>
     </div>
   );

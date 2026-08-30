@@ -4,6 +4,7 @@ import { Modal, ModalCancelButton, ConfirmDialog } from '../../components/ui/Mod
 import { Input } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
+import { cleanPhoneDigits } from '../../utils/formatters.js';
 import api from '../../api/client.js';
 
 export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
@@ -33,7 +34,7 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
       setFormData({
         date: formattedDate,
         customerName: record.customerName || '',
-        mobileNumber: record.mobileNumber || '',
+        mobileNumber: cleanPhoneDigits(record.mobileNumber || ''),
         bikeName: record.bikeName || '',
         address: record.address || '',
         pendingAmount: record.pendingAmount !== undefined ? String(record.pendingAmount) : '',
@@ -57,7 +58,7 @@ export const OutstandingModal = ({ isOpen, onClose, record, onSuccess }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'mobileNumber') {
-      const cleanDigits = value.replace(/\D/g, '').slice(0, 10);
+      const cleanDigits = cleanPhoneDigits(value);
       setFormData((prev) => ({ ...prev, [name]: cleanDigits }));
       if (errors.mobileNumber && cleanDigits.length === 10) {
         setErrors((prev) => ({ ...prev, mobileNumber: null }));

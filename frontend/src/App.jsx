@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
 import { AppShell } from './components/layout/AppShell.jsx';
+import { PublicHomePage } from './public-website/pages/PublicHomePage.jsx';
 import { LoginPage } from './features/auth/LoginPage.jsx';
 import { DashboardPage } from './features/dashboard/DashboardPage.jsx';
 import { InventoryListPage } from './features/inventory/InventoryListPage.jsx';
@@ -48,10 +49,12 @@ const ProtectedRoute = ({ children }) => {
 export default function App() {
   return (
     <Routes>
-      {/* Public Unauthenticated Routes */}
+      {/* 1. Public Website Routes (For Customers & Public Visitors) */}
+      <Route path="/" element={<PublicHomePage />} />
+      <Route path="/admin" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Protected Authenticated Routes wrapped in AppShell */}
+      {/* 2. Protected Authenticated Routes (For Garage Admin ERP) */}
       <Route
         element={
           <ProtectedRoute>
@@ -59,7 +62,6 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardPage />} />
 
         {/* Spare Parts Inventory */}
@@ -106,7 +108,7 @@ export default function App() {
         <Route path="/help" element={<UserGuidePage />} />
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
   );

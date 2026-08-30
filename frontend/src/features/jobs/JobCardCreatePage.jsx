@@ -5,7 +5,7 @@ import api from '../../api/client.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { Input, Textarea } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
-import { validatePhone } from '../../utils/formatters.js';
+import { validatePhone, cleanPhoneDigits } from '../../utils/formatters.js';
 
 export const JobCardCreatePage = () => {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ export const JobCardCreatePage = () => {
     try {
       const payload = {
         customerName: customerName.trim(),
-        mobileNumber: mobileNumber.trim(),
+        mobileNumber: cleanPhoneDigits(mobileNumber),
         bikeName: bikeName.trim(),
         registrationNumber: registrationNumber.trim(),
         serviceDetails: serviceDetails.trim(),

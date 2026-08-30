@@ -5,7 +5,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { Modal, ModalCancelButton } from '../../components/ui/Modal.jsx';
 import { Input, Select } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
-import { validatePhone } from '../../utils/formatters.js';
+import { validatePhone, cleanPhoneDigits } from '../../utils/formatters.js';
 
 export const BillCreateModal = ({ isOpen, onClose, onSuccess }) => {
   const [customerName, setCustomerName] = useState('');
@@ -58,7 +58,6 @@ export const BillCreateModal = ({ isOpen, onClose, onSuccess }) => {
         total: price * qty,
       },
     ]);
-
     setItemName('');
     setItemQty(1);
     setItemPrice('');
@@ -96,7 +95,7 @@ export const BillCreateModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       const payload = {
         customerName: customerName.trim(),
-        mobileNumber: mobileNumber.trim(),
+        mobileNumber: cleanPhoneDigits(mobileNumber),
         bikeName: bikeName.trim(),
         bikeNumber: bikeNumber.trim(),
         items,

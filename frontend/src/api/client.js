@@ -1,404 +1,301 @@
 import axios from 'axios';
-
-const getBaseURL = () => {
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return 'http://localhost:5000/api';
-  }
-  return '/api';
-};
-
-const isCloudHosted = () => {
-  return (
-    window.location.hostname.includes('vercel.app') ||
-    window.location.hostname.includes('netlify.app') ||
-    window.location.hostname.includes('github.io')
-  );
-};
-
-// Clean Production Seed Dataset for Client Handover
-const initialInventory = [];
-
-const getMockData = (key, defaultVal) => {
-  try {
-    const saved = localStorage.getItem(`nag_mock_${key}`);
-    return saved ? JSON.parse(saved) : defaultVal;
-  } catch (e) {
-    return defaultVal;
-  }
-};
-
-const setMockData = (key, val) => {
-  try {
-    localStorage.setItem(`nag_mock_${key}`, JSON.stringify(val));
-  } catch (e) {}
-};
-
-const defaultSettings = {
-  garageName: 'National Auto Garage',
-  tagline: 'Two-Wheeler Service & Repair Specialists',
-  phone: '+91 98765 43210',
-  email: 'admin@nationalautogarage.com',
-  address: 'Shop No. 4, Garage Hub, Main Road, City',
-  currencySymbol: '₹',
-  dateFormat: 'DD/MM/YYYY',
-  invoicePrefix: 'INV',
-  jobIdPrefix: 'NAG',
-  duesPrefix: 'DUE',
-  expensePrefix: 'EXP',
-  portalBadgeText: 'ADMIN PORTAL',
-  topbarContextText: 'Workshop System',
-  inventoryCategories: ['Engine Oil', 'Brake Pads', 'Filters', 'Chain & Sprockets', 'Tyres', 'Spark Plugs', 'General Parts'],
-  expenseCategories: ['Shop Rent', 'Electricity & Utility', 'Mechanic Salary', 'Tea & Refreshments', 'Tool Purchase', 'Misc Maintenance'],
-  paymentMethods: ['Cash', 'UPI / GPay / PhonePe', 'Bank Transfer (IMPS/NEFT)', 'Card'],
-};
+import { AuthService } from '../services/authService.js';
+import { InventoryService } from '../services/inventoryService.js';
+import { JobService } from '../services/jobService.js';
+import { BillingService } from '../services/billingService.js';
+import { OutstandingService } from '../services/outstandingService.js';
+import { ExpenseService } from '../services/expenseService.js';
+import { SupplierService } from '../services/supplierService.js';
+import { KeywordService } from '../services/keywordService.js';
+import { SettingsService } from '../services/settingsService.js';
+import { DashboardService } from '../services/dashboardService.js';
 
 /**
- * Custom Cloud Adapter handles requests locally on Vercel without triggering browser 405 network logs
+ * Universal Direct Firebase Adapter
+ * Routes all API calls directly to Cloud Firestore & Firebase Auth services
+ * with offline IndexedDB local caching and atomic sequence transactions.
  */
-const cloudMockAdapter = async (config) => {
-  const url = config?.url || '';
+const firebaseApiAdapter = async (config) => {
+  const url = (config?.url || '').replace(/^\/api/, '');
   const method = (config?.method || 'get').toLowerCase();
 
   let payload = {};
   try {
-    payload = config.data ? (typeof config.data === 'string' ? JSON.parse(config.data) : config.data) : {};
+    payload = config.data
+      ? typeof config.data === 'string'
+        ? JSON.parse(config.data)
+        : config.data
+      : {};
   } catch (e) {}
 
-  let responseData = { success: true };
+  const params = config?.params || {};
 
-  // 1. AUTH LOGIN
-  if (url.includes('/auth/login')) {
-    const userObj = {
-      id: 'admin_demo_id',
-      username: payload.username || 'admin',
-      email: payload.email || 'admin@nationalautogarage.com',
-      role: 'ADMIN',
-    };
-    responseData = {
-      success: true,
-      token: 'vercel_demo_token_nag_2026',
-      user: userObj,
-      message: 'Login successful',
-    };
-  }
-  // 2. AUTH ME
-  else if (url.includes('/auth/me')) {
-    const savedUser = localStorage.getItem('nag_user');
-    const userObj = savedUser ? JSON.parse(savedUser) : {
-      id: 'admin_demo_id',
-      username: 'admin',
-      email: 'admin@nationalautogarage.com',
-      role: 'ADMIN',
-    };
-    responseData = { success: true, user: userObj };
-  }
-  // 3. STEP 1: VERIFY CURRENT PASSWORD GATE
-  else if (url.includes('/auth/verify-password')) {
-    const currentStoredPass = localStorage.getItem('nag_mock_pass') || 'admin123';
-    const enteredPass = payload.currentPassword || '';
-    if (enteredPass === currentStoredPass || enteredPass === 'admin123') {
-      responseData = {
-        success: true,
-        verified: true,
-        message: 'Current password verified successfully',
-      };
-    } else {
-      return Promise.reject({
-        response: {
-          status: 400,
-          data: { message: 'Current password is incorrect. Please try again.' },
-        },
-      });
-    }
-  }
-  // 4. STEP 2: UPDATE NEW PASSWORD
-  else if (url.includes('/auth/update-password')) {
-    const newPass = payload.newPassword || 'admin123';
-    localStorage.setItem('nag_mock_pass', newPass);
-    const savedUser = localStorage.getItem('nag_user');
-    const userObj = savedUser ? JSON.parse(savedUser) : {
-      id: 'admin_demo_id',
-      username: 'admin',
-      email: 'admin@nationalautogarage.com',
-      role: 'ADMIN',
-    };
-    responseData = {
-      success: true,
-      token: 'vercel_demo_token_nag_2026',
-      user: userObj,
-      message: 'Admin password updated successfully',
-    };
-  }
-  // 5. GMAIL MAGIC LINK REQUEST
-  else if (url.includes('/auth/request-email-magic-link')) {
-    const targetEmail = payload.newEmail || 'admin@nationalautogarage.com';
-    const magicLink = `${window.location.origin}/verify-email?token=demo_token_${Date.now()}&email=${encodeURIComponent(targetEmail)}`;
-    responseData = {
-      success: true,
-      message: `Verification link sent to ${targetEmail}`,
-      magicLink,
-    };
-  }
-  // 6. GMAIL MAGIC LINK VERIFY TOKEN
-  else if (url.includes('/auth/verify-email-token')) {
-    const searchParams = new URLSearchParams(window.location.search);
-    const newEmail = searchParams.get('email') || 'admin@nationalautogarage.com';
-    const updatedUser = {
-      id: 'admin_demo_id',
-      username: newEmail,
-      email: newEmail,
-      role: 'ADMIN',
-    };
-    localStorage.setItem('nag_user', JSON.stringify(updatedUser));
-    responseData = {
-      success: true,
-      user: updatedUser,
-      token: 'vercel_demo_token_nag_2026',
-      message: 'Email and username updated successfully',
-    };
-  }
-  // 7. SETTINGS
-  else if (url.includes('/settings')) {
-    if (method === 'put' || method === 'post') {
-      const updated = { ...defaultSettings, ...payload };
-      setMockData('settings', updated);
-      responseData = { success: true, settings: updated, data: updated };
-    } else {
-      const settings = getMockData('settings', defaultSettings);
-      responseData = { success: true, settings, data: settings };
-    }
-  }
-  // 8. DASHBOARD METRICS
-  else if (url.includes('/dashboard/metrics')) {
-    const inventory = getMockData('inventory', initialInventory);
-    const lowStockParts = inventory.filter((i) => i.stockQuantity <= (i.minStockThreshold || 5));
-    const jobs = getMockData('jobs', []);
-    const invoices = getMockData('invoices', []);
-    const dues = getMockData('dues', []);
+  try {
+    let resultData = { success: true };
 
-    const totalRev = invoices.reduce((acc, inv) => acc + (inv.paidAmount || 0), 0);
-    const totalPendingDues = dues.reduce((acc, d) => acc + (d.pendingAmount || 0), 0);
+    // --- 1. AUTHENTICATION ---
+    if (url.includes('/auth/login')) {
+      const user = await AuthService.login(payload.username || payload.email || payload.identifier, payload.password);
+      resultData = { success: true, user, token: 'firebase_auth_token_' + user.id, message: 'Login successful' };
+    } else if (url.includes('/auth/me')) {
+      const user = AuthService.getCurrentUser();
+      resultData = { success: true, user, data: { user } };
+    } else if (url.includes('/auth/verify-password')) {
+      await AuthService.verifyPassword(payload.currentPassword);
+      resultData = { success: true, verified: true, message: 'Current password verified' };
+    } else if (url.includes('/auth/update-password') || url.includes('/auth/update-credentials')) {
+      const res = await AuthService.updateCredentials(payload);
+      resultData = { success: true, ...res };
+    }
 
-    responseData = {
-      success: true,
-      lowStockParts,
-      totalRevenue: totalRev,
-      pendingDues: totalPendingDues,
-      activeJobsCount: jobs.filter((j) => j.status !== 'COMPLETED' && j.status !== 'DELIVERED').length,
-      completedJobsCount: jobs.filter((j) => j.status === 'COMPLETED' || j.status === 'DELIVERED').length,
+    // --- 2. SETTINGS ---
+    else if (url.startsWith('/settings') || url === '/settings') {
+      if (method === 'put' || method === 'post') {
+        const updated = await SettingsService.updateSettings(payload);
+        resultData = { success: true, settings: updated, data: updated };
+      } else {
+        const settings = await SettingsService.getSettings();
+        resultData = { success: true, settings, data: settings, ...settings };
+      }
+    }
+
+    // --- 3. DASHBOARD METRICS & STOCK ALERTS ---
+    else if (url.includes('/dashboard/metrics')) {
+      const metrics = await DashboardService.getMetrics();
+      resultData = { success: true, ...metrics, data: metrics };
+    }
+
+    // --- 4. INVENTORY ---
+    else if (url.startsWith('/inventory')) {
+      if (url.includes('/categories')) {
+        const settings = await SettingsService.getSettings();
+        resultData = { success: true, data: settings.inventoryCategories || [] };
+      } else if (url.includes('/adjust-stock') || (method === 'post' && url.includes('/stock'))) {
+        const idMatch = url.match(/\/inventory\/([^/]+)\/adjust-stock/);
+        const prodId = idMatch ? idMatch[1] : (payload.productId || payload._id || payload.id);
+        const res = await InventoryService.adjustStock(prodId, payload);
+        resultData = { success: true, ...res };
+      } else if (url.includes('/movements')) {
+        const idMatch = url.match(/\/inventory\/([^/]+)\/movements/);
+        const prodId = idMatch ? idMatch[1] : params.productId;
+        const res = await InventoryService.getMovements(prodId, params);
+        resultData = { success: true, ...res, data: res };
+      } else if (method === 'post') {
+        const product = await InventoryService.createProduct(payload);
+        resultData = { success: true, product, data: product };
+      } else if (method === 'put' || method === 'patch') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        const product = await InventoryService.updateProduct(id, payload);
+        resultData = { success: true, product, data: product };
+      } else if (method === 'delete') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        await InventoryService.deleteProduct(id);
+        resultData = { success: true, message: 'Product deleted successfully' };
+      } else if (url.match(/\/inventory\/([^/?]+)$/)) {
+        const parts = url.split('?')[0].split('/');
+        const id = parts[parts.length - 1];
+        const res = await InventoryService.getProductById(id);
+        resultData = { success: true, ...res, data: res.product };
+      } else {
+        const res = await InventoryService.getProducts(params);
+        resultData = { success: true, ...res, data: res };
+      }
+    }
+
+    // --- 5. JOB CARDS ---
+    else if (url.startsWith('/jobs')) {
+      if (url.includes('/status') && (method === 'patch' || method === 'post' || method === 'put')) {
+        const idMatch = url.match(/\/jobs\/([^/]+)\/status/);
+        const jobId = idMatch ? idMatch[1] : payload.jobId;
+        const job = await JobService.updateJobStatus(jobId, payload.status || payload.newStatus);
+        resultData = { success: true, job, data: job };
+      } else if (method === 'post') {
+        const job = await JobService.createJob(payload);
+        resultData = { success: true, jobCard: job, job, data: job };
+      } else if (method === 'patch' || method === 'put') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        const job = await JobService.updateJob(id, payload);
+        resultData = { success: true, jobCard: job, job, data: job };
+      } else if (method === 'delete') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        await JobService.deleteJob(id);
+        resultData = { success: true, message: 'Job deleted successfully' };
+      } else if (url.match(/\/jobs\/([^/?]+)$/)) {
+        const parts = url.split('?')[0].split('/');
+        const id = parts[parts.length - 1];
+        const job = await JobService.getJobById(id);
+        resultData = { success: true, job, data: job };
+      } else {
+        const res = await JobService.getJobs(params);
+        resultData = { success: true, ...res, data: res.jobs };
+      }
+    }
+
+    // --- 6. BILLS & INVOICES ---
+    else if (url.startsWith('/invoices') || url.startsWith('/bills')) {
+      if (url.includes('/payments') && method === 'post') {
+        const idMatch = url.match(/\/(?:invoices|bills)\/([^/]+)\/payments/);
+        const billId = idMatch ? idMatch[1] : payload.billId;
+        const res = await BillingService.recordPayment({ billId, ...payload });
+        resultData = { success: true, ...res };
+      } else if (method === 'post') {
+        const bill = await BillingService.createBill(payload);
+        resultData = { success: true, invoice: bill, bill, data: bill };
+      } else if (method === 'delete') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        await BillingService.deleteBill(id);
+        resultData = { success: true, message: 'Invoice deleted successfully' };
+      } else if (url.match(/\/(?:invoices|bills)\/([^/?]+)$/)) {
+        const parts = url.split('?')[0].split('/');
+        const id = parts[parts.length - 1];
+        const bill = await BillingService.getBillById(id);
+        resultData = { success: true, invoice: bill, bill, data: bill };
+      } else {
+        const res = await BillingService.getBills(params);
+        resultData = { success: true, ...res, data: res.bills };
+      }
+    }
+
+    // --- 7. OUTSTANDING / KHATA (DUES) ---
+    else if (url.startsWith('/outstanding') || url.startsWith('/dues')) {
+      if (method === 'post') {
+        const record = await OutstandingService.createOutstandingRecord(payload);
+        resultData = { success: true, dueRecord: record, record, data: record };
+      } else if (method === 'put' || method === 'patch') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        const record = await OutstandingService.updateOutstandingRecord(id, payload);
+        resultData = { success: true, dueRecord: record, record, data: record };
+      } else if (method === 'delete') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        await OutstandingService.deleteOutstandingRecord(id);
+        resultData = { success: true, message: 'Outstanding dues record deleted' };
+      } else {
+        const res = await OutstandingService.getOutstandingRecords(params);
+        resultData = { success: true, ...res, data: res.records };
+      }
+    }
+
+    // --- 8. EXPENSES (3-ACCOUNTS) ---
+    else if (url.startsWith('/expenses')) {
+      if (url.includes('/bulk-delete') && method === 'post') {
+        const res = await ExpenseService.bulkDeleteExpenses(payload.ids);
+        resultData = { success: true, ...res };
+      } else if (method === 'post') {
+        const exp = await ExpenseService.createExpense(payload);
+        resultData = { success: true, expense: exp, data: exp };
+      } else if (method === 'put' || method === 'patch') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        const exp = await ExpenseService.updateExpense(id, payload);
+        resultData = { success: true, expense: exp, data: exp };
+      } else if (method === 'delete') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        await ExpenseService.deleteExpense(id);
+        resultData = { success: true, message: 'Expense entry deleted' };
+      } else {
+        const res = await ExpenseService.getExpenses(params);
+        resultData = { success: true, ...res, data: res };
+      }
+    }
+
+    // --- 9. SUPPLIERS & PURCHASE ORDERS ---
+    else if (url.startsWith('/supplier-orders')) {
+      if (method === 'post') {
+        const order = await SupplierService.createSupplierOrder(payload);
+        resultData = { success: true, order, data: order };
+      } else if (method === 'delete') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        await SupplierService.deleteSupplierOrder(id);
+        resultData = { success: true, message: 'Supplier order deleted' };
+      } else {
+        const res = await SupplierService.getSupplierOrders(params);
+        resultData = { success: true, ...res, data: res.orders };
+      }
+    } else if (url.startsWith('/suppliers')) {
+      if (method === 'post') {
+        const sup = await SupplierService.createSupplier(payload);
+        resultData = { success: true, supplier: sup, data: sup };
+      } else if (method === 'patch' || method === 'put') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        const sup = await SupplierService.updateSupplier(id, payload);
+        resultData = { success: true, supplier: sup, data: sup };
+      } else if (method === 'delete') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        await SupplierService.deleteSupplier(id);
+        resultData = { success: true, message: 'Supplier deleted' };
+      } else {
+        const res = await SupplierService.getSuppliers(params);
+        resultData = { success: true, ...res, data: res.suppliers };
+      }
+    }
+
+    // --- 10. MASTER KEYWORDS ---
+    else if (url.startsWith('/master-keywords') || url.startsWith('/keywords')) {
+      if (url.includes('/bulk-delete') && method === 'post') {
+        const res = await KeywordService.bulkDeleteKeywords(payload.ids);
+        resultData = { success: true, ...res };
+      } else if (method === 'post') {
+        const kw = await KeywordService.createKeyword(payload.word);
+        resultData = { success: true, keyword: kw, data: kw };
+      } else if (method === 'put' || method === 'patch') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        const kw = await KeywordService.updateKeyword(id, payload.word);
+        resultData = { success: true, keyword: kw, data: kw };
+      } else if (method === 'delete') {
+        const parts = url.split('/');
+        const id = parts[parts.length - 1];
+        await KeywordService.deleteKeyword(id);
+        resultData = { success: true, message: 'Keyword deleted' };
+      } else {
+        const list = await KeywordService.getKeywords();
+        resultData = { success: true, data: list, keywords: list };
+      }
+    } else {
+      resultData = { success: true, data: [] };
+    }
+
+    return {
+      data: resultData,
+      status: 200,
+      statusText: 'OK',
+      headers: { 'content-type': 'application/json' },
+      config,
     };
+  } catch (err) {
+    console.error(`Firebase API Adapter error on [${method.toUpperCase()}] ${url}:`, err);
+    return Promise.reject({
+      response: {
+        status: 400,
+        data: { message: err.message || 'Operation failed' },
+      },
+      message: err.message || 'Operation failed',
+    });
   }
-  // 9. INVENTORY & CATEGORIES
-  else if (url.includes('/inventory/categories')) {
-    responseData = { success: true, data: defaultSettings.inventoryCategories };
-  }
-  else if (url.includes('/inventory')) {
-    let inventory = getMockData('inventory', initialInventory);
-
-    if (method === 'post' && !url.includes('/stock') && !url.includes('/adjust')) {
-      const newItem = {
-        _id: 'inv_' + Date.now(),
-        status: 'ACTIVE',
-        stockQuantity: Number(payload.stockQuantity || 0),
-        minStockThreshold: Number(payload.minStockThreshold || 5),
-        sellingPrice: Number(payload.sellingPrice || 0),
-        costPrice: Number(payload.costPrice || 0),
-        isServicePart: Boolean(payload.isServicePart ?? true),
-        ...payload,
-      };
-      inventory = [newItem, ...inventory];
-      setMockData('inventory', inventory);
-      responseData = { success: true, product: newItem, data: newItem };
-    } else if (method === 'put' || method === 'patch') {
-      const urlParts = url.split('/');
-      const itemId = urlParts[urlParts.length - 1];
-      inventory = inventory.map((item) => {
-        if (item._id === itemId || url.includes(item._id)) {
-          if (url.includes('/stock') || payload.delta !== undefined) {
-            const newQty = Math.max(0, item.stockQuantity + (payload.delta || 0));
-            return { ...item, stockQuantity: newQty };
-          }
-          return { ...item, ...payload };
-        }
-        return item;
-      });
-      setMockData('inventory', inventory);
-      const updatedItem = inventory.find((i) => i._id === itemId) || inventory[0];
-      responseData = { success: true, product: updatedItem, data: updatedItem };
-    } else if (method === 'delete') {
-      const urlParts = url.split('/');
-      const itemId = urlParts[urlParts.length - 1];
-      inventory = inventory.filter((item) => item._id !== itemId);
-      setMockData('inventory', inventory);
-      responseData = { success: true, message: 'Item deleted successfully' };
-    } else {
-      const lowStock = inventory.filter((i) => i.stockQuantity > 0 && i.stockQuantity <= (i.minStockThreshold || 5)).length;
-      const outOfStock = inventory.filter((i) => i.stockQuantity === 0).length;
-      responseData = {
-        success: true,
-        data: {
-          products: inventory,
-          summary: {
-            totalProducts: inventory.length,
-            activeProducts: inventory.length,
-            lowStockCount: lowStock,
-            outOfStockCount: outOfStock,
-          },
-        },
-        products: inventory,
-        summary: {
-          totalProducts: inventory.length,
-          activeProducts: inventory.length,
-          lowStockCount: lowStock,
-          outOfStockCount: outOfStock,
-        },
-      };
-    }
-  }
-  // 10. JOBS
-  else if (url.includes('/jobs')) {
-    let jobs = getMockData('jobs', []);
-    if (method === 'post') {
-      const newJob = {
-        _id: 'job_' + Date.now(),
-        jobId: 'NAG-' + String(jobs.length + 1).padStart(4, '0'),
-        status: 'PENDING',
-        createdAt: new Date().toISOString(),
-        ...payload,
-      };
-      jobs = [newJob, ...jobs];
-      setMockData('jobs', jobs);
-      responseData = { success: true, jobCard: newJob, data: newJob };
-    } else {
-      responseData = { success: true, data: jobs, jobs };
-    }
-  }
-  // 11. INVOICES
-  else if (url.includes('/invoices')) {
-    let invoices = getMockData('invoices', []);
-    if (method === 'post') {
-      const newInvoice = {
-        _id: 'inv_bill_' + Date.now(),
-        invoiceNumber: 'INV-' + String(invoices.length + 1).padStart(4, '0'),
-        createdAt: new Date().toISOString(),
-        status: 'UNPAID',
-        ...payload,
-      };
-      invoices = [newInvoice, ...invoices];
-      setMockData('invoices', invoices);
-      responseData = { success: true, invoice: newInvoice, data: newInvoice };
-    } else {
-      responseData = { success: true, data: invoices, invoices };
-    }
-  }
-  // 12. EXPENSES
-  else if (url.includes('/expenses')) {
-    let expenses = getMockData('expenses', []);
-    if (method === 'post') {
-      const newExp = {
-        _id: 'exp_' + Date.now(),
-        expenseId: 'EXP-' + String(expenses.length + 1).padStart(4, '0'),
-        date: new Date().toISOString(),
-        ...payload,
-      };
-      expenses = [newExp, ...expenses];
-      setMockData('expenses', expenses);
-      responseData = { success: true, expense: newExp, data: newExp };
-    } else {
-      responseData = { success: true, data: expenses, expenses };
-    }
-  }
-  // 13. DUES
-  else if (url.includes('/dues')) {
-    let dues = getMockData('dues', []);
-    if (method === 'post') {
-      const newDue = {
-        _id: 'due_' + Date.now(),
-        dueId: 'DUE-' + String(dues.length + 1).padStart(4, '0'),
-        createdAt: new Date().toISOString(),
-        ...payload,
-      };
-      dues = [newDue, ...dues];
-      setMockData('dues', dues);
-      responseData = { success: true, dueRecord: newDue, data: newDue };
-    } else {
-      responseData = { success: true, data: dues, dues };
-    }
-  }
-  // 14. SUPPLIERS & KEYWORDS
-  else if (url.includes('/suppliers')) {
-    let suppliers = getMockData('suppliers', []);
-    if (method === 'post') {
-      const newSup = { _id: 'sup_' + Date.now(), ...payload };
-      suppliers = [newSup, ...suppliers];
-      setMockData('suppliers', suppliers);
-      responseData = { success: true, supplier: newSup, data: newSup };
-    } else {
-      responseData = { success: true, data: suppliers, suppliers };
-    }
-  } else if (url.includes('/keywords')) {
-    let keywords = getMockData('keywords', []);
-    if (method === 'post') {
-      const newKw = { _id: 'kw_' + Date.now(), ...payload };
-      keywords = [newKw, ...keywords];
-      setMockData('keywords', keywords);
-      responseData = { success: true, keyword: newKw, data: newKw };
-    } else {
-      responseData = { success: true, data: keywords, keywords };
-    }
-  } else {
-    responseData = { success: true, data: [] };
-  }
-
-  return {
-    data: responseData,
-    status: 200,
-    statusText: 'OK',
-    headers: { 'content-type': 'application/json' },
-    config,
-  };
 };
 
 const api = axios.create({
-  baseURL: getBaseURL(),
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
-  adapter: async (config) => {
-    if (isCloudHosted()) {
-      return cloudMockAdapter(config);
-    }
-    // Default Axios Adapter for Local Server
-    return axios.defaults.adapter(config);
-  },
+  adapter: firebaseApiAdapter,
 });
 
-// Request interceptor to attach JWT token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('nag_token');
-    if (token && token !== 'undefined' && token !== 'null') {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// Response interceptor
 api.interceptors.response.use(
   (response) => response.data,
   async (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('nag_token');
-      localStorage.removeItem('nag_user');
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
-    }
     const customMessage = error.response?.data?.message || error.message || 'An error occurred';
     return Promise.reject(new Error(customMessage));
   }

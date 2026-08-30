@@ -7,7 +7,7 @@ import { PageHeader } from '../../components/layout/PageHeader.jsx';
 import { Card } from '../../components/ui/Card.jsx';
 import { Input, Select } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
-import { formatINR, formatPhone, formatRegNumber, formatDate } from '../../utils/formatters.js';
+import { formatINR, formatPhone, formatRegNumber, formatDate, cleanPhoneDigits } from '../../utils/formatters.js';
 
 export const InvoiceCreatePage = () => {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ export const InvoiceCreatePage = () => {
         }
         const payload = {
           customerName: customerName.trim(),
-          mobileNumber: mobileNumber.trim(),
+          mobileNumber: cleanPhoneDigits(mobileNumber),
           bikeName: bikeName.trim(),
           grandTotal: Number(billAmount),
           paymentStatus,

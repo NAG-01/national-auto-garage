@@ -56,12 +56,27 @@ export const formatDateTime = (dateStr) => {
 };
 
 /**
+ * Strips country code (+91, 91, 0) and non-digit characters to return clean 10-digit mobile number.
+ * Example: "+91 98765 43210" -> "9876543210"
+ * Example: "919876543210" -> "9876543210"
+ * Example: "09876543210" -> "9876543210"
+ */
+export const cleanPhoneDigits = (phone) => {
+  if (!phone) return '';
+  const digits = String(phone).replace(/\D/g, '');
+  if (digits.length > 10) {
+    return digits.slice(-10);
+  }
+  return digits;
+};
+
+/**
  * Formats a 10-digit Indian phone number with readable spacing.
  * Example: "9876543210" -> "+91 98765 43210"
  */
 export const formatPhone = (phone) => {
   if (!phone) return '—';
-  const cleaned = String(phone).replace(/\D/g, '');
+  const cleaned = cleanPhoneDigits(phone);
   if (cleaned.length === 10) {
     return `+91 ${cleaned.slice(0, 5)} ${cleaned.slice(5)}`;
   }
@@ -73,8 +88,8 @@ export const formatPhone = (phone) => {
  */
 export const validatePhone = (phone) => {
   if (!phone) return false;
-  const cleaned = String(phone).replace(/\D/g, '');
-  return cleaned.length === 10 && /^[6-9]\d{9}$/.test(cleaned);
+  const cleaned = cleanPhoneDigits(phone);
+  return cleaned.length === 10;
 };
 
 /**

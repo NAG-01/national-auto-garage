@@ -5,7 +5,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { Modal, ModalCancelButton } from '../../components/ui/Modal.jsx';
 import { Input, Textarea } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
-import { validatePhone } from '../../utils/formatters.js';
+import { validatePhone, cleanPhoneDigits } from '../../utils/formatters.js';
 
 export const JobCardEditModal = ({ isOpen, onClose, job, onSuccess, seqNumber }) => {
   const [customerName, setCustomerName] = useState('');
@@ -21,7 +21,7 @@ export const JobCardEditModal = ({ isOpen, onClose, job, onSuccess, seqNumber })
   useEffect(() => {
     if (job) {
       setCustomerName(job.customerNameSnapshot || '');
-      setMobileNumber(job.mobileNumberSnapshot || '');
+      setMobileNumber(cleanPhoneDigits(job.mobileNumberSnapshot || ''));
       setBikeName(job.bikeNameSnapshot || '');
       setRegistrationNumber(job.registrationNumberSnapshot || '');
       setServiceDetails(job.serviceDetails || '');

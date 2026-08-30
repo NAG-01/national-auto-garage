@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { LogOut, AlertTriangle } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import api from '../api/client.js';
+import { AuthService } from '../services/authService.js';
 import { Modal } from '../components/ui/Modal.jsx';
 import { Button } from '../components/ui/Button.jsx';
 
@@ -11,12 +12,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const saved = localStorage.getItem('nag_user');
       if (!saved || saved === 'undefined' || saved === 'null') {
-        localStorage.removeItem('nag_user');
         return null;
       }
       return JSON.parse(saved);
     } catch (e) {
-      localStorage.removeItem('nag_user');
       return null;
     }
   });
@@ -24,52 +23,28 @@ export const AuthProvider = ({ children }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem('nag_token');
-      if (!token || token === 'undefined' || token === 'null') {
-        localStorage.removeItem('nag_token');
-        localStorage.removeItem('nag_user');
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-      try {
-        const res = await api.get('/auth/me');
-        let userData = null;
-
-        if (res?.data?.user) {
-          userData = res.data.user;
-        } else if (res?.message?.user) {
-          userData = res.message.user;
-        } else if (res?.user) {
-          userData = res.user;
-        }
-
-        if (userData) {
-          setUser(userData);
-          localStorage.setItem('nag_user', JSON.stringify(userData));
-        } else {
-          setUser(null);
-          localStorage.removeItem('nag_token');
-          localStorage.removeItem('nag_user');
-        }
-      } catch (err) {
-        const savedUser = localStorage.getItem('nag_user');
-        if (savedUser && savedUser !== 'undefined' && savedUser !== 'null') {
+    // Listen for Firebase Auth state changes
+    const unsubscribe = AuthService.onAuthStateChanged((fbUser) => {
+      if (fbUser) {
+        setUser(fbUser);
+        localStorage.setItem('nag_user', JSON.stringify(fbUser));
+        localStorage.setItem('nag_token', 'fb_token_' + fbUser.id);
+      } else {
+        const saved = localStorage.getItem('nag_user');
+        if (saved && saved !== 'null' && saved !== 'undefined') {
           try {
-            setUser(JSON.parse(savedUser));
+            setUser(JSON.parse(saved));
           } catch (e) {
             setUser(null);
           }
         } else {
           setUser(null);
         }
-      } finally {
-        setLoading(false);
       }
-    };
+      setLoading(false);
+    });
 
-    checkAuth();
+    return () => unsubscribe();
   }, []);
 
   const login = async (identifier, password) => {
@@ -79,28 +54,15 @@ export const AuthProvider = ({ children }) => {
       password,
     });
 
-    let token = null;
-    let userData = null;
-
-    if (res?.data?.token) {
-      token = res.data.token;
-      userData = res.data.user;
-    } else if (res?.message?.token) {
-      token = res.message.token;
-      userData = res.message.user;
-    } else if (res?.token) {
-      token = res.token;
-      userData = res.user;
-    }
-
-    if (token && userData) {
-      localStorage.setItem('nag_token', token);
+    const userData = res.user || res.data?.user || res;
+    if (userData && (userData.id || userData.username)) {
+      localStorage.setItem('nag_token', 'fb_token_' + (userData.id || 'admin'));
       localStorage.setItem('nag_user', JSON.stringify(userData));
       setUser(userData);
       return userData;
     }
 
-    throw new Error('Invalid authentication response from server.');
+    throw new Error('Invalid authentication response.');
   };
 
   /**
@@ -113,12 +75,18 @@ export const AuthProvider = ({ children }) => {
   /**
    * Confirms & executes logout
    */
-  const confirmLogout = () => {
+  const confirmLogout = async () => {
     setShowLogoutModal(false);
+    await AuthService.logout();
     localStorage.removeItem('nag_token');
     localStorage.removeItem('nag_user');
     setUser(null);
     window.location.href = '/login';
+  };
+
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('nag_user', JSON.stringify(updatedUser));
   };
 
   return (
@@ -129,6 +97,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout: requestLogout,
         confirmLogout,
+        updateUser,
         isAuthenticated: Boolean(user),
       }}
     >
