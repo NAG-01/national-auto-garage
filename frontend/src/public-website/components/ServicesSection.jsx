@@ -88,7 +88,7 @@ export const ServicesSection = () => {
     const activeIndex = deckOrder[0];
     setFlippingCardId(SERVICES[activeIndex].id);
 
-    // Silky slide-out animation delay
+    // Instant soft dissolve (200ms) for 100% friction-free switch
     setTimeout(
       () => {
         setDeckOrder((prev) => {
@@ -100,7 +100,7 @@ export const ServicesSection = () => {
         setFlippingCardId(null);
         setIsAnimating(false);
       },
-      prefersReducedMotion ? 50 : 380
+      prefersReducedMotion ? 40 : 200
     );
   };
 
@@ -113,7 +113,7 @@ export const ServicesSection = () => {
       next.unshift(bottom);
       return next;
     });
-    setTimeout(() => setIsAnimating(false), prefersReducedMotion ? 50 : 350);
+    setTimeout(() => setIsAnimating(false), prefersReducedMotion ? 40 : 200);
   };
 
   const jumpToCard = (targetIdx) => {
@@ -127,7 +127,7 @@ export const ServicesSection = () => {
       next.unshift(moved);
       return next;
     });
-    setTimeout(() => setIsAnimating(false), prefersReducedMotion ? 50 : 350);
+    setTimeout(() => setIsAnimating(false), prefersReducedMotion ? 40 : 200);
   };
 
   return (
@@ -187,7 +187,7 @@ export const ServicesSection = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Ultra-Fluid Physics Card Stack (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Seamless Soft Dissolve Card Deck (Hidden on Desktop) */}
         <div className="block md:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -215,9 +215,9 @@ export const ServicesSection = () => {
                   const isFlipping = flippingCardId === srv.id;
                   const Icon = srv.icon;
 
-                  const translateY = Math.min(stackPos * 14, 42);
-                  const scale = Math.max(1 - stackPos * 0.05, 0.85);
-                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.18, 0.5);
+                  const translateY = Math.min(stackPos * 12, 36);
+                  const scale = Math.max(1 - stackPos * 0.04, 0.88);
+                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.6);
                   const zIndex = 30 - stackPos * 5;
 
                   return (
@@ -225,8 +225,8 @@ export const ServicesSection = () => {
                       key={srv.id}
                       className={`absolute inset-x-0 top-0 p-5 rounded-3xl backdrop-blur-2xl border select-none flex flex-col justify-between will-change-transform ${
                         isFlipping
-                          ? 'duration-380 ease-out z-50 pointer-events-none'
-                          : 'duration-450 ease-[cubic-bezier(0.16,1,0.3,1)]'
+                          ? 'duration-200 ease-out z-40'
+                          : 'duration-300 ease-out'
                       } ${
                         isFront
                           ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
@@ -234,11 +234,11 @@ export const ServicesSection = () => {
                       }`}
                       style={{
                         transform: isFlipping
-                          ? 'translate3d(60px, -45px, 0px) scale(0.95) rotate(4deg)'
+                          ? 'translate3d(0px, -18px, 0px) scale(0.98)'
                           : `translate3d(0px, ${translateY}px, 0px) scale(${scale})`,
                         opacity: isFlipping ? 0 : opacity,
-                        zIndex: isFlipping ? 50 : zIndex,
-                        transitionProperty: 'transform, opacity, scale, background-color, border-color',
+                        zIndex: isFlipping ? 40 : zIndex,
+                        transitionProperty: 'transform, opacity, scale',
                       }}
                     >
                       <div>

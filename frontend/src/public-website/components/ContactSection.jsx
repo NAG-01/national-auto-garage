@@ -55,7 +55,7 @@ export const ContactSection = () => {
       });
       setFlippingCardId(null);
       setIsAnimating(false);
-    }, 380);
+    }, 200);
   };
 
   const cyclePrev = () => {
@@ -67,7 +67,7 @@ export const ContactSection = () => {
       next.unshift(bottom);
       return next;
     });
-    setTimeout(() => setIsAnimating(false), 350);
+    setTimeout(() => setIsAnimating(false), 200);
   };
 
   const jumpToCard = (targetIdx) => {
@@ -81,7 +81,7 @@ export const ContactSection = () => {
       next.unshift(moved);
       return next;
     });
-    setTimeout(() => setIsAnimating(false), 350);
+    setTimeout(() => setIsAnimating(false), 200);
   };
 
   const renderCardBody = (item) => {
@@ -219,7 +219,7 @@ export const ContactSection = () => {
           ))}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Ultra-Fluid Physics Card Stack (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Seamless Soft Dissolve Card Deck (Hidden on Desktop) */}
         <div className="block lg:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -256,8 +256,8 @@ export const ContactSection = () => {
                       key={item.id}
                       className={`absolute inset-x-0 top-0 p-5 rounded-3xl backdrop-blur-2xl border select-none h-full will-change-transform ${
                         isFlipping
-                          ? 'duration-380 ease-out z-50 pointer-events-none'
-                          : 'duration-450 ease-[cubic-bezier(0.16,1,0.3,1)]'
+                          ? 'duration-200 ease-out z-40'
+                          : 'duration-300 ease-out'
                       } ${
                         isFront
                           ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
@@ -265,11 +265,11 @@ export const ContactSection = () => {
                       }`}
                       style={{
                         transform: isFlipping
-                          ? 'translate3d(60px, -45px, 0px) scale(0.95) rotate(4deg)'
+                          ? 'translate3d(0px, -18px, 0px) scale(0.98)'
                           : `translate3d(0px, ${translateY}px, 0px) scale(${scale})`,
                         opacity: isFlipping ? 0 : opacity,
-                        zIndex: isFlipping ? 50 : zIndex,
-                        transitionProperty: 'transform, opacity, scale, background-color, border-color',
+                        zIndex: isFlipping ? 40 : zIndex,
+                        transitionProperty: 'transform, opacity, scale',
                       }}
                     >
                       {renderCardBody(item)}
