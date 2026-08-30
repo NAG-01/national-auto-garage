@@ -28,7 +28,7 @@ const SERVICES = [
     title: 'Engine Repair & Tuning',
     badge: 'Specialist',
     icon: Flame,
-    iconBg: 'bg-amber-100/80 text-amber-700 border border-amber-200/60',
+    iconBg: 'bg-[#0284C7]/10 text-[#0284C7] border border-sky-200/60',
     description: 'Engine rebuilding, fixing white smoke, piston work, and smooth pickup.',
     tags: ['Engine Rebuild', 'Piston Work', 'Clutch Plates'],
   },
@@ -88,6 +88,7 @@ export const ServicesSection = () => {
     const activeIndex = deckOrder[0];
     setFlippingCardId(SERVICES[activeIndex].id);
 
+    // Silky slide-out animation delay
     setTimeout(
       () => {
         setDeckOrder((prev) => {
@@ -99,7 +100,7 @@ export const ServicesSection = () => {
         setFlippingCardId(null);
         setIsAnimating(false);
       },
-      prefersReducedMotion ? 50 : 400
+      prefersReducedMotion ? 50 : 380
     );
   };
 
@@ -186,7 +187,7 @@ export const ServicesSection = () => {
           })}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Interactive Stacked Card Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Ultra-Fluid Physics Card Stack (Hidden on Desktop) */}
         <div className="block md:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -214,29 +215,30 @@ export const ServicesSection = () => {
                   const isFlipping = flippingCardId === srv.id;
                   const Icon = srv.icon;
 
-                  const translateY = Math.min(stackPos * 12, 36);
-                  const scale = Math.max(1 - stackPos * 0.04, 0.88);
-                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.6);
+                  const translateY = Math.min(stackPos * 14, 42);
+                  const scale = Math.max(1 - stackPos * 0.05, 0.85);
+                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.18, 0.5);
                   const zIndex = 30 - stackPos * 5;
 
                   return (
                     <div
                       key={srv.id}
-                      className={`absolute inset-x-0 top-0 p-5 rounded-3xl backdrop-blur-2xl border transition-all ease-[cubic-bezier(0.16,1,0.3,1)] select-none flex flex-col justify-between ${
+                      className={`absolute inset-x-0 top-0 p-5 rounded-3xl backdrop-blur-2xl border select-none flex flex-col justify-between will-change-transform ${
                         isFlipping
-                          ? 'duration-400 -translate-y-8 -translate-x-5 scale-90 opacity-30 z-40 rotate-[-1.5deg]'
-                          : 'duration-500'
+                          ? 'duration-380 ease-out z-50 pointer-events-none'
+                          : 'duration-450 ease-[cubic-bezier(0.16,1,0.3,1)]'
                       } ${
                         isFront
                           ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
-                          : 'bg-white/75 border-white/80 shadow-md'
+                          : 'bg-white/80 border-white/90 shadow-md'
                       }`}
                       style={{
                         transform: isFlipping
-                          ? 'translate3d(-20px, -30px, 0) scale(0.9) rotate(-1.5deg)'
+                          ? 'translate3d(60px, -45px, 0px) scale(0.95) rotate(4deg)'
                           : `translate3d(0px, ${translateY}px, 0px) scale(${scale})`,
-                        opacity: isFlipping ? 0.3 : opacity,
-                        zIndex: isFlipping ? 40 : zIndex,
+                        opacity: isFlipping ? 0 : opacity,
+                        zIndex: isFlipping ? 50 : zIndex,
+                        transitionProperty: 'transform, opacity, scale, background-color, border-color',
                       }}
                     >
                       <div>
@@ -289,7 +291,7 @@ export const ServicesSection = () => {
                     cyclePrev();
                   }}
                   disabled={isAnimating}
-                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer"
+                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -317,7 +319,7 @@ export const ServicesSection = () => {
                     cycleNext();
                   }}
                   disabled={isAnimating}
-                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer"
+                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

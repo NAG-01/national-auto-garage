@@ -31,7 +31,6 @@ const CONTACT_CARDS = [
     id: 'hours',
     icon: Clock,
     iconBg: 'bg-amber-50/90 border-amber-200/60 text-amber-700',
-    title: 'Opening Hours',
     type: 'hours',
   },
 ];
@@ -56,7 +55,7 @@ export const ContactSection = () => {
       });
       setFlippingCardId(null);
       setIsAnimating(false);
-    }, 400);
+    }, 380);
   };
 
   const cyclePrev = () => {
@@ -220,7 +219,7 @@ export const ContactSection = () => {
           ))}
         </div>
 
-        {/* 2. MOBILE VIEW ONLY: Interactive Stacked Card Deck (Hidden on Desktop) */}
+        {/* 2. MOBILE VIEW ONLY: Ultra-Fluid Physics Card Stack (Hidden on Desktop) */}
         <div className="block lg:hidden">
           <ScrollReveal direction="up" delay={100}>
             <div className="max-w-md mx-auto relative px-1 pb-2">
@@ -247,29 +246,30 @@ export const ContactSection = () => {
                   const isFront = stackPos === 0;
                   const isFlipping = flippingCardId === item.id;
 
-                  const translateY = Math.min(stackPos * 12, 36);
-                  const scale = Math.max(1 - stackPos * 0.04, 0.88);
-                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.6);
+                  const translateY = Math.min(stackPos * 14, 42);
+                  const scale = Math.max(1 - stackPos * 0.05, 0.85);
+                  const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.18, 0.5);
                   const zIndex = 30 - stackPos * 5;
 
                   return (
                     <div
                       key={item.id}
-                      className={`absolute inset-x-0 top-0 p-5 rounded-3xl backdrop-blur-2xl border transition-all ease-[cubic-bezier(0.16,1,0.3,1)] select-none h-full ${
+                      className={`absolute inset-x-0 top-0 p-5 rounded-3xl backdrop-blur-2xl border select-none h-full will-change-transform ${
                         isFlipping
-                          ? 'duration-400 -translate-y-8 -translate-x-5 scale-90 opacity-30 z-40 rotate-[-1.5deg]'
-                          : 'duration-500'
+                          ? 'duration-380 ease-out z-50 pointer-events-none'
+                          : 'duration-450 ease-[cubic-bezier(0.16,1,0.3,1)]'
                       } ${
                         isFront
                           ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
-                          : 'bg-white/75 border-white/80 shadow-md'
+                          : 'bg-white/80 border-white/90 shadow-md'
                       }`}
                       style={{
                         transform: isFlipping
-                          ? 'translate3d(-20px, -30px, 0) scale(0.9) rotate(-1.5deg)'
+                          ? 'translate3d(60px, -45px, 0px) scale(0.95) rotate(4deg)'
                           : `translate3d(0px, ${translateY}px, 0px) scale(${scale})`,
-                        opacity: isFlipping ? 0.3 : opacity,
-                        zIndex: isFlipping ? 40 : zIndex,
+                        opacity: isFlipping ? 0 : opacity,
+                        zIndex: isFlipping ? 50 : zIndex,
+                        transitionProperty: 'transform, opacity, scale, background-color, border-color',
                       }}
                     >
                       {renderCardBody(item)}
@@ -287,7 +287,7 @@ export const ContactSection = () => {
                     cyclePrev();
                   }}
                   disabled={isAnimating}
-                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer"
+                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -315,7 +315,7 @@ export const ContactSection = () => {
                     cycleNext();
                   }}
                   disabled={isAnimating}
-                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer"
+                  className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs cursor-pointer active:scale-95"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
