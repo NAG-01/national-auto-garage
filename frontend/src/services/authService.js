@@ -243,9 +243,13 @@ export const AuthService = {
     }
     try {
       const saved = localStorage.getItem('nag_user');
-      if (saved) return JSON.parse(saved);
+      const token = localStorage.getItem('nag_token');
+      if (saved && token && saved !== 'null' && saved !== 'undefined') {
+        const parsed = JSON.parse(saved);
+        if (parsed && (parsed.id || parsed.username)) return parsed;
+      }
     } catch (e) {}
-    return { id: 'nag_admin_master', username: 'admin', role: 'ADMIN' };
+    return null;
   },
 
   onAuthStateChanged(callback) {
@@ -266,10 +270,14 @@ export const AuthService = {
         callback(profile);
       } else {
         const saved = localStorage.getItem('nag_user');
-        if (saved) {
+        const token = localStorage.getItem('nag_token');
+        if (saved && token && saved !== 'null' && saved !== 'undefined') {
           try {
-            callback(JSON.parse(saved));
-            return;
+            const parsed = JSON.parse(saved);
+            if (parsed && (parsed.id || parsed.username)) {
+              callback(parsed);
+              return;
+            }
           } catch (e) {}
         }
         callback(null);

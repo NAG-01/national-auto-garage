@@ -11,31 +11,54 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { ScrollReveal } from './ScrollReveal.jsx';
-
-const CONTACT_CARDS = [
-  {
-    id: 'address',
-    icon: MapPin,
-    iconBg: 'bg-rose-50/90 border-rose-200/60 text-rose-600',
-    title: 'Garage Address',
-    type: 'address',
-  },
-  {
-    id: 'mechanics',
-    icon: Phone,
-    iconBg: 'bg-emerald-50/90 border-emerald-200/60 text-emerald-600',
-    title: 'Contact Mechanics',
-    type: 'mechanics',
-  },
-  {
-    id: 'hours',
-    icon: Clock,
-    iconBg: 'bg-amber-50/90 border-amber-200/60 text-amber-700',
-    type: 'hours',
-  },
-];
+import contactAddressBg from '../../assets/contact_address_bg.jpg';
+import contactMechanicsBg from '../../assets/contact_mechanics_bg.jpg';
+import contactHoursBg from '../../assets/contact_hours_bg.jpg';
+import { useWebsiteConfig } from '../context/WebsiteConfigContext.jsx';
 
 export const ContactSection = () => {
+  const { config } = useWebsiteConfig();
+
+  const m1Name = config?.mechanic1Name || 'Imran Pathan';
+  const m1Phone = config?.mechanic1Phone || '9624844188';
+  const m2Name = config?.mechanic2Name || 'Naim Pathan';
+  const m2Phone = config?.mechanic2Phone || '8128144350';
+  const whatsappPhone = config?.whatsappPhone || '9624844188';
+  const whatsappInquiryText = config?.whatsappInquiryText || 'Hello National Auto Garage, I want to inquire about bike service.';
+  const mapsUrl = config?.googleMapsUrl || 'https://maps.app.goo.gl/skxxbgWa1k7Zrzef9';
+  const addressName = config?.garageAddressName || config?.garageName || 'National Auto Garage';
+  const address1 = config?.addressLine1 || 'Near White House Petrol Pump, Mosali Chowkdi';
+  const address2 = config?.addressLine2 || 'Mosali, Mangrol, Surat - 394421';
+  const hoursMonSat = config?.openingHoursMonSat || '9:00 AM - 9:00 PM';
+  const hoursSun = config?.openingHoursSun || '9:00 AM - 2:00 PM';
+
+  const CONTACT_CARDS = [
+    {
+      id: 'address',
+      icon: MapPin,
+      iconBg: 'bg-rose-50 border-rose-200 text-rose-600',
+      title: 'Garage Address',
+      type: 'address',
+      bgImage: contactAddressBg,
+    },
+    {
+      id: 'mechanics',
+      icon: Phone,
+      iconBg: 'bg-emerald-50 border-emerald-200 text-emerald-600',
+      title: 'Contact Mechanics',
+      type: 'mechanics',
+      bgImage: contactMechanicsBg,
+    },
+    {
+      id: 'hours',
+      icon: Clock,
+      iconBg: 'bg-amber-50 border-amber-200 text-amber-700',
+      title: 'Opening Hours',
+      type: 'hours',
+      bgImage: contactHoursBg,
+    },
+  ];
+
   const [deckOrder, setDeckOrder] = useState([0, 1, 2]);
   const [isAnimating, setIsAnimating] = useState(false);
   const [flippingCardId, setFlippingCardId] = useState(null);
@@ -87,27 +110,29 @@ export const ContactSection = () => {
   const renderCardBody = (item) => {
     if (item.type === 'address') {
       return (
-        <div className="flex flex-col justify-between space-y-4 h-full">
-          <div className="space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-rose-50/90 border border-rose-200/60 text-rose-600 flex items-center justify-center backdrop-blur-md">
-              <MapPin className="w-5 h-5" />
+        <div className="flex flex-col justify-between h-full relative z-10">
+          <div className="space-y-1.5 max-w-[54%]">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shadow-2xs">
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </div>
+              <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-tight">Garage Address</h3>
             </div>
-            <h3 className="text-base font-black text-slate-900">Garage Address</h3>
-            <div className="text-xs text-slate-700 font-medium leading-relaxed space-y-0.5">
-              <div className="font-bold text-slate-900 text-sm">National Auto Garage</div>
-              <div>Near White House Petrol Pump, Mosali Chowkdi,</div>
-              <div>Mosali, Mangrol, Surat - 394421</div>
+            <div className="text-[10px] sm:text-xs text-slate-800 font-extrabold leading-snug space-y-0.5">
+              <div className="font-extrabold text-slate-900 text-xs">{addressName}</div>
+              <div>{address1}</div>
+              <div>{address2}</div>
             </div>
           </div>
 
           <a
-            href="https://maps.app.goo.gl/skxxbgWa1k7Zrzef9"
+            href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="w-full py-2.5 px-4 rounded-2xl bg-slate-900/90 hover:bg-[#0284C7] backdrop-blur-md text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-md active:scale-98"
+            className="w-full py-2 px-3 rounded-xl bg-slate-900/95 hover:bg-[#0284C7] text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-98 relative z-20 shrink-0"
           >
-            <Navigation className="w-4 h-4 text-sky-400" />
+            <Navigation className="w-3 h-3 text-sky-400" />
             <span>Open in Google Maps</span>
           </a>
         </div>
@@ -116,42 +141,44 @@ export const ContactSection = () => {
 
     if (item.type === 'mechanics') {
       return (
-        <div className="flex flex-col justify-between space-y-4 h-full">
-          <div className="space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50/90 border border-emerald-200/60 text-emerald-600 flex items-center justify-center backdrop-blur-md">
-              <Phone className="w-5 h-5" />
+        <div className="flex flex-col justify-between h-full relative z-10">
+          <div className="space-y-1.5 max-w-[54%]">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shadow-2xs">
+                <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </div>
+              <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-tight">Contact Mechanics</h3>
             </div>
-            <h3 className="text-base font-black text-slate-900">Contact Mechanics</h3>
             
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="flex flex-col gap-1 text-[10px] sm:text-xs">
               <a
-                href="tel:+919624844188"
+                href={`tel:+91${m1Phone}`}
                 onClick={(e) => e.stopPropagation()}
-                className="p-2 rounded-2xl bg-white/80 border border-white/90 shadow-2xs hover:bg-sky-50 transition-colors block text-center"
+                className="p-1 px-2 rounded-lg bg-white/95 border border-slate-200 shadow-2xs hover:bg-sky-50 transition-colors block text-left"
               >
-                <span className="text-[10px] text-slate-500 font-bold block uppercase">Imran Pathan</span>
-                <span className="text-xs font-black font-mono text-[#0284C7]">96248 44188</span>
+                <span className="text-[8px] text-slate-500 font-extrabold block uppercase leading-none">{m1Name}</span>
+                <span className="text-[10px] sm:text-xs font-black font-mono text-[#0284C7]">{m1Phone}</span>
               </a>
 
               <a
-                href="tel:+918128144350"
+                href={`tel:+91${m2Phone}`}
                 onClick={(e) => e.stopPropagation()}
-                className="p-2 rounded-2xl bg-white/80 border border-white/90 shadow-2xs hover:bg-sky-50 transition-colors block text-center"
+                className="p-1 px-2 rounded-lg bg-white/95 border border-slate-200 shadow-2xs hover:bg-sky-50 transition-colors block text-left"
               >
-                <span className="text-[10px] text-slate-500 font-bold block uppercase">Naim Pathan</span>
-                <span className="text-xs font-black font-mono text-[#0284C7]">81281 44350</span>
+                <span className="text-[8px] text-slate-500 font-extrabold block uppercase leading-none">{m2Name}</span>
+                <span className="text-[10px] sm:text-xs font-black font-mono text-[#0284C7]">{m2Phone}</span>
               </a>
             </div>
           </div>
 
           <a
-            href="https://api.whatsapp.com/send?phone=919624844188&text=Hello%20National%20Auto%20Garage,%20I%20want%20to%20inquire%20about%20bike%20service."
+            href={`https://api.whatsapp.com/send?phone=91${whatsappPhone}&text=${encodeURIComponent(whatsappInquiryText)}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="w-full py-2.5 px-4 rounded-2xl bg-emerald-600/90 hover:bg-emerald-600 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition-all duration-200 active:scale-98"
+            className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-98 relative z-20 shrink-0"
           >
-            <MessageSquare className="w-4 h-4" />
+            <MessageSquare className="w-3 h-3" />
             <span>Chat on WhatsApp</span>
           </a>
         </div>
@@ -159,30 +186,32 @@ export const ContactSection = () => {
     }
 
     return (
-      <div className="flex flex-col justify-between space-y-4 h-full">
-        <div className="space-y-3">
-          <div className="w-10 h-10 rounded-2xl bg-amber-50/90 border border-amber-200/60 text-amber-700 flex items-center justify-center backdrop-blur-md">
-            <Clock className="w-5 h-5" />
-          </div>
-          <h3 className="text-base font-black text-slate-900">Opening Hours</h3>
-          <div className="space-y-1 text-xs text-slate-600">
-            <div className="flex items-center justify-between pb-1 border-b border-slate-200/60 font-medium">
-              <span>Mon - Sat:</span>
-              <span className="font-bold text-slate-900 font-mono">9:00 AM - 9:00 PM</span>
+      <div className="flex flex-col justify-between h-full relative z-10">
+        <div className="space-y-1.5 max-w-[54%]">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center shadow-2xs">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
-            <div className="flex items-center justify-between pb-1 border-b border-slate-200/60 font-medium">
-              <span>Sunday:</span>
-              <span className="font-bold text-emerald-700 font-mono">9:00 AM - 2:00 PM</span>
+            <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-tight">Opening Hours</h3>
+          </div>
+          <div className="space-y-1 text-[10px] sm:text-xs text-slate-800 font-extrabold">
+            <div className="flex flex-col pb-0.5 border-b border-slate-200">
+              <span className="text-[8px] text-slate-500 uppercase leading-none">Mon - Sat:</span>
+              <span className="font-black text-slate-900 font-mono">{hoursMonSat}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[8px] text-slate-500 uppercase leading-none">Sunday:</span>
+              <span className="font-black text-emerald-800 font-mono">{hoursSun}</span>
             </div>
           </div>
         </div>
 
         <a
-          href="tel:+919624844188"
+          href={`tel:+91${m1Phone}`}
           onClick={(e) => e.stopPropagation()}
-          className="w-full py-2.5 px-4 rounded-2xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-sky-500/25 border border-sky-400/30 transition-all duration-200 active:scale-98 cursor-pointer"
+          className="w-full py-2 px-3 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm border border-sky-400/30 transition-all active:scale-98 cursor-pointer relative z-20 shrink-0"
         >
-          <Phone className="w-4 h-4" />
+          <Phone className="w-3 h-3" />
           <span>Call for Help</span>
         </a>
       </div>
@@ -212,7 +241,21 @@ export const ContactSection = () => {
         <div className="hidden lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
           {CONTACT_CARDS.map((card, idx) => (
             <ScrollReveal key={card.id} direction="up" delay={idx * 100}>
-              <div className="p-5 sm:p-6 rounded-3xl bg-white/65 hover:bg-white/95 backdrop-blur-xl border border-white/80 shadow-md shadow-slate-200/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
+              <div className="group relative p-5 sm:p-6 rounded-3xl bg-white backdrop-blur-xl border border-slate-200/80 hover:border-[#0284C7]/40 shadow-md shadow-slate-200/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full overflow-hidden min-h-[220px]">
+                
+                {/* Background Image with Precision Gradient Mask */}
+                {card.bgImage && (
+                  <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
+                    <img
+                      src={card.bgImage}
+                      alt={card.title}
+                      className="w-full h-full object-cover object-right opacity-100 transition-all duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_26%,rgba(255,255,255,0.5)_38%,transparent_52%)]" />
+                  </div>
+                )}
+
                 {renderCardBody(card)}
               </div>
             </ScrollReveal>
@@ -234,9 +277,9 @@ export const ContactSection = () => {
                 </div>
               </div>
 
-              {/* 330px Stage Container */}
+              {/* Compact 275px Stage Container for h-[210px] Cards */}
               <div
-                className="relative w-full h-[330px] cursor-pointer touch-pan-y"
+                className="relative w-full h-[275px] cursor-pointer touch-pan-y"
                 onClick={cycleNext}
                 tabIndex={0}
                 role="button"
@@ -247,8 +290,7 @@ export const ContactSection = () => {
                   const isFront = stackPos === 0;
                   const isFlipping = flippingCardId === item.id;
 
-                  // Fixed 20px Step so rear cards stay 270px tall and peek as 3 distinct rounded card layers
-                  const translateY = Math.min(stackPos * 20, 60);
+                  const translateY = Math.min(stackPos * 18, 54);
                   const scale = Math.max(1 - stackPos * 0.04, 0.88);
                   const opacity = isFront ? 1 : Math.max(1 - stackPos * 0.15, 0.70);
                   const zIndex = 30 - stackPos * 5;
@@ -256,13 +298,13 @@ export const ContactSection = () => {
                   return (
                     <div
                       key={item.id}
-                      className={`absolute inset-x-0 top-0 h-[270px] p-5 rounded-3xl backdrop-blur-2xl border select-none will-change-transform ${
+                      className={`absolute inset-x-0 top-0 h-[210px] p-4 rounded-3xl backdrop-blur-2xl border select-none will-change-transform overflow-hidden ${
                         isFlipping
                           ? 'duration-200 ease-out z-40'
                           : 'duration-300 ease-out'
                       } ${
                         isFront
-                          ? 'bg-white/95 border-white shadow-xl shadow-slate-900/10'
+                          ? 'bg-white border-white shadow-xl shadow-slate-900/10'
                           : 'bg-white/85 border-white/90 shadow-md shadow-slate-900/10'
                       }`}
                       style={{
@@ -274,7 +316,20 @@ export const ContactSection = () => {
                         transitionProperty: 'transform, opacity, scale',
                       }}
                     >
-                      {/* Hide inner text on rear cards while preserving h-[270px] height */}
+                      {/* Background Image on Front Card */}
+                      {isFront && item.bgImage && (
+                        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
+                          <img
+                            src={item.bgImage}
+                            alt={item.title}
+                            className="w-full h-full object-cover object-right opacity-100"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_26%,rgba(255,255,255,0.5)_38%,transparent_52%)]" />
+                        </div>
+                      )}
+
+                      {/* Hide inner text on rear cards */}
                       <div className={isFront ? 'opacity-100 h-full' : 'opacity-0 invisible h-full'}>
                         {renderCardBody(item)}
                       </div>
@@ -284,7 +339,7 @@ export const ContactSection = () => {
               </div>
 
               {/* Equal Controls */}
-              <div className="flex items-center justify-between mt-8 px-1">
+              <div className="flex items-center justify-between mt-6 px-1">
                 <button
                   type="button"
                   onClick={(e) => {

@@ -14,6 +14,7 @@ import outstandingRoutes from './outstanding.routes.js';
 import dashboardRoutes from './dashboard.routes.js';
 import settingsRoutes from './settings.routes.js';
 import masterKeywordRoutes from './masterKeywordRoutes.js';
+import websiteConfigRoutes from './websiteConfig.routes.js';
 
 const router = Router();
 
@@ -33,5 +34,6 @@ router.use('/outstanding', outstandingRoutes);
 router.use('/master-keywords', masterKeywordRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/settings', settingsRoutes);
+router.use('/website-config', websiteConfigRoutes);
 
 export default router;

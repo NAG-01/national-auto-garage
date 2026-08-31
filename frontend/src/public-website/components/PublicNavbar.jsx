@@ -11,11 +11,12 @@ import {
   Wrench,
   Award,
   MapPin,
-  Sparkles,
 } from 'lucide-react';
 import garageLogo from '../../assets/garage_logo.jpg';
+import { useWebsiteConfig } from '../context/WebsiteConfigContext.jsx';
 
 export const PublicNavbar = () => {
+  const { config } = useWebsiteConfig();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -96,6 +97,11 @@ export const PublicNavbar = () => {
     { id: 'contact', label: 'Contact & Location', icon: MapPin, desc: 'Mosali Chowkdi Workshop' },
   ];
 
+  const currentLogo = config?.logoUrl || garageLogo;
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=91${config?.whatsappPhone || '9624844188'}&text=${encodeURIComponent(
+    config?.whatsappInquiryText || 'Hello National Auto Garage, I want to inquire about bike service.'
+  )}`;
+
   return (
     <>
       {/* Apple-Style Floating Glass Navbar Header */}
@@ -117,8 +123,8 @@ export const PublicNavbar = () => {
             >
               <div className="relative">
                 <img
-                  src={garageLogo}
-                  alt="National Auto Garage"
+                  src={currentLogo}
+                  alt={config?.garageName || 'National Auto Garage'}
                   className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover shadow-md shadow-sky-500/20 group-hover:scale-105 group-hover:rotate-6 transition-all duration-300 ring-2 ring-white/90 ring-offset-1 ring-offset-sky-100"
                 />
                 <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-2xs" />
@@ -160,7 +166,7 @@ export const PublicNavbar = () => {
             {/* Desktop Action Buttons (WhatsApp) */}
             <div className="hidden sm:flex items-center gap-2.5">
               <a
-                href="https://api.whatsapp.com/send?phone=919624844188&text=Hello%20National%20Auto%20Garage,%20I%20want%20to%20inquire%20about%20bike%20service."
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 backdrop-blur-md shadow-md shadow-emerald-600/20 border border-emerald-400/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
@@ -270,30 +276,30 @@ export const PublicNavbar = () => {
           >
             <div className="grid grid-cols-2 gap-2.5">
               <a
-                href="tel:+919624844188"
+                href={`tel:+91${config?.mechanic1Phone || '9624844188'}`}
                 className="py-3 px-3 rounded-2xl bg-white hover:bg-sky-50 text-slate-900 font-bold text-xs flex flex-col items-center justify-center gap-1 border border-slate-200 shadow-xs hover:border-sky-300 hover:shadow-md transition-all duration-200 active:scale-98"
               >
                 <div className="flex items-center gap-1 text-[#0284C7]">
                   <Phone className="w-3.5 h-3.5" />
-                  <span className="text-[10px] uppercase font-bold text-slate-500">Imran Pathan</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-500">{config?.mechanic1Name || 'Imran Pathan'}</span>
                 </div>
-                <span className="font-mono font-black text-xs">96248 44188</span>
+                <span className="font-mono font-black text-xs">{config?.mechanic1Phone || '96248 44188'}</span>
               </a>
 
               <a
-                href="tel:+918128144350"
+                href={`tel:+91${config?.mechanic2Phone || '8128144350'}`}
                 className="py-3 px-3 rounded-2xl bg-white hover:bg-sky-50 text-slate-900 font-bold text-xs flex flex-col items-center justify-center gap-1 border border-slate-200 shadow-xs hover:border-sky-300 hover:shadow-md transition-all duration-200 active:scale-98"
               >
                 <div className="flex items-center gap-1 text-[#0284C7]">
                   <Phone className="w-3.5 h-3.5" />
-                  <span className="text-[10px] uppercase font-bold text-slate-500">Naim Pathan</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-500">{config?.mechanic2Name || 'Naim Pathan'}</span>
                 </div>
-                <span className="font-mono font-black text-xs">81281 44350</span>
+                <span className="font-mono font-black text-xs">{config?.mechanic2Phone || '81281 44350'}</span>
               </a>
             </div>
 
             <a
-              href="https://api.whatsapp.com/send?phone=919624844188&text=Hello%20National%20Auto%20Garage,%20I%20want%20to%20inquire%20about%20bike%20service."
+              href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 hover:shadow-xl active:scale-98 transition-all duration-200"
@@ -303,7 +309,7 @@ export const PublicNavbar = () => {
             </a>
 
             <a
-              href="https://maps.app.goo.gl/skxxbgWa1k7Zrzef9"
+              href={config?.googleMapsUrl || 'https://maps.app.goo.gl/skxxbgWa1k7Zrzef9'}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-2 px-4 rounded-xl text-center text-slate-600 hover:text-[#0284C7] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"

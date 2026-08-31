@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { PublicNavbar } from '../components/PublicNavbar.jsx';
 import { PublicFooter } from '../components/PublicFooter.jsx';
+import { WebsiteConfigProvider } from '../context/WebsiteConfigContext.jsx';
 import { PublicBookingService } from '../services/publicBookingService.js';
 import { formatRegNumber } from '../../utils/formatters.js';
 
@@ -64,8 +65,9 @@ export const TrackServicePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-sky-500 selection:text-white">
-      <PublicNavbar />
+    <WebsiteConfigProvider>
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+        <PublicNavbar />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full space-y-8 flex-1">
         
@@ -245,7 +247,8 @@ export const TrackServicePage = () => {
 
       </main>
 
-      <PublicFooter />
-    </div>
+        <PublicFooter />
+      </div>
+    </WebsiteConfigProvider>
   );
 };

@@ -7,9 +7,23 @@ import {
   Phone,
 } from 'lucide-react';
 import garageLogo from '../../assets/garage_logo.jpg';
+import { useWebsiteConfig } from '../context/WebsiteConfigContext.jsx';
 
 export const PublicFooter = () => {
   const navigate = useNavigate();
+  const { config } = useWebsiteConfig();
+
+  const currentLogo = config?.logoUrl || garageLogo;
+  const garageName = config?.garageName || 'National Auto Garage';
+  const aboutText = config?.footerAboutText || 'Premier two-wheeler workshop at Mosali Chowkdi providing periodic maintenance, precision engine rebuilds, and genuine spare parts.';
+  const addressName = config?.garageAddressName || garageName;
+  const address1 = config?.addressLine1 || 'Near White House Petrol Pump, Mosali Chowkdi';
+  const address2 = config?.addressLine2 || 'Mosali, Taluka: Mangrol, Dist: Surat, Gujarat – 394421';
+  const mapsUrl = config?.googleMapsUrl || 'https://maps.app.goo.gl/skxxbgWa1k7Zrzef9';
+  const m1Name = config?.mechanic1Name || 'Imran Pathan';
+  const m1Phone = config?.mechanic1Phone || '9624844188';
+  const m2Name = config?.mechanic2Name || 'Naim Pathan';
+  const m2Phone = config?.mechanic2Phone || '8128144350';
 
   return (
     <footer className="relative bg-slate-950/90 backdrop-blur-2xl text-slate-400 border-t border-slate-800/80 pt-16 pb-12 select-none overflow-hidden">
@@ -26,8 +40,8 @@ export const PublicFooter = () => {
           <div className="space-y-4 flex flex-col items-center sm:items-start">
             <div className="flex flex-col sm:flex-row items-center gap-3">
               <img
-                src={garageLogo}
-                alt="National Auto Garage Logo"
+                src={currentLogo}
+                alt={`${garageName} Logo`}
                 className="h-14 w-14 rounded-full object-cover shadow-xl border-2 border-slate-700/80 ring-2 ring-sky-500/20"
               />
               <div className="text-center sm:text-left">
@@ -40,7 +54,7 @@ export const PublicFooter = () => {
               </div>
             </div>
             <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-sm">
-              Premier two-wheeler workshop at Mosali Chowkdi providing periodic maintenance, precision engine rebuilds, and genuine spare parts.
+              {aboutText}
             </p>
           </div>
 
@@ -79,13 +93,12 @@ export const PublicFooter = () => {
               <MapPin className="w-3.5 h-3.5 text-rose-400" /> Workshop Location
             </h4>
             <div className="text-xs text-slate-300 space-y-1 font-medium leading-relaxed">
-              <div className="font-bold text-white text-sm">National Auto Garage</div>
-              <div>Near White House Petrol Pump, Mosali Chowkdi</div>
-              <div>Mosali, Taluka: Mangrol</div>
-              <div>Dist: Surat, Gujarat – 394421</div>
+              <div className="font-bold text-white text-sm">{addressName}</div>
+              <div>{address1}</div>
+              <div>{address2}</div>
               <div className="pt-2.5 flex justify-center sm:justify-start">
                 <a
-                  href="https://maps.app.goo.gl/skxxbgWa1k7Zrzef9"
+                  href={mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-sky-500 text-sky-400 hover:text-white border border-slate-800 hover:border-sky-400 text-[11px] font-bold tracking-wide transition-all duration-200 shadow-xs"
@@ -104,22 +117,22 @@ export const PublicFooter = () => {
             </h4>
             <div className="space-y-3 text-xs">
               <div>
-                <span className="text-slate-500 font-bold block text-[10px] uppercase">Imran Pathan</span>
+                <span className="text-slate-500 font-bold block text-[10px] uppercase">{m1Name}</span>
                 <a
-                  href="tel:+919624844188"
+                  href={`tel:+91${m1Phone}`}
                   className="text-white hover:text-sky-400 font-mono font-bold transition-colors duration-200 text-sm"
                 >
-                  +91 96248 44188
+                  +91 {m1Phone}
                 </a>
               </div>
 
               <div>
-                <span className="text-slate-500 font-bold block text-[10px] uppercase">Naim Pathan</span>
+                <span className="text-slate-500 font-bold block text-[10px] uppercase">{m2Name}</span>
                 <a
-                  href="tel:+918128144350"
+                  href={`tel:+91${m2Phone}`}
                   className="text-white hover:text-sky-400 font-mono font-bold transition-colors duration-200 text-sm"
                 >
-                  +91 81281 44350
+                  +91 {m2Phone}
                 </a>
               </div>
             </div>
@@ -134,7 +147,7 @@ export const PublicFooter = () => {
             title="Double-click for Admin Access"
             className="cursor-default hover:text-slate-300 transition-colors select-none"
           >
-            © {new Date().getFullYear()} National Auto Garage. All rights reserved.
+            © {new Date().getFullYear()} {garageName}. All rights reserved.
           </div>
 
           <div>

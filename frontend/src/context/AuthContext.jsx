@@ -11,10 +11,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('nag_user');
-      if (!saved || saved === 'undefined' || saved === 'null') {
+      const token = localStorage.getItem('nag_token');
+      if (!saved || !token || saved === 'undefined' || saved === 'null') {
         return null;
       }
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      return parsed && (parsed.id || parsed.username) ? parsed : null;
     } catch (e) {
       return null;
     }
@@ -23,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
-    // Listen for Firebase Auth state changes
+    // Listen for Auth state changes
     const unsubscribe = AuthService.onAuthStateChanged((fbUser) => {
       if (fbUser) {
         setUser(fbUser);
@@ -31,9 +33,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('nag_token', 'fb_token_' + fbUser.id);
       } else {
         const saved = localStorage.getItem('nag_user');
-        if (saved && saved !== 'null' && saved !== 'undefined') {
+        const token = localStorage.getItem('nag_token');
+        if (saved && token && saved !== 'null' && saved !== 'undefined') {
           try {
-            setUser(JSON.parse(saved));
+            const parsed = JSON.parse(saved);
+            setUser(parsed && (parsed.id || parsed.username) ? parsed : null);
           } catch (e) {
             setUser(null);
           }

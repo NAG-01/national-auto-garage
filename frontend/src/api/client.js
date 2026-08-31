@@ -8,6 +8,7 @@ import { ExpenseService } from '../services/expenseService.js';
 import { SupplierService } from '../services/supplierService.js';
 import { KeywordService } from '../services/keywordService.js';
 import { SettingsService } from '../services/settingsService.js';
+import { WebsiteConfigService } from '../services/websiteConfigService.js';
 import { DashboardService } from '../services/dashboardService.js';
 
 /**
@@ -56,6 +57,20 @@ const firebaseApiAdapter = async (config) => {
       } else {
         const settings = await SettingsService.getSettings();
         resultData = { success: true, settings, data: settings, ...settings };
+      }
+    }
+
+    // --- 2.1 WEBSITE CONFIG CMS ---
+    else if (url.startsWith('/website-config') || url === '/website-config') {
+      if (url.includes('/reset') && method === 'post') {
+        const reset = await WebsiteConfigService.resetToDefaults();
+        resultData = { success: true, data: reset, config: reset };
+      } else if (method === 'put' || method === 'post') {
+        const updated = await WebsiteConfigService.updateConfig(payload);
+        resultData = { success: true, data: updated, config: updated };
+      } else {
+        const configData = await WebsiteConfigService.getConfig();
+        resultData = { success: true, data: configData, config: configData };
       }
     }
 

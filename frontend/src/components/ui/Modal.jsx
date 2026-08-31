@@ -71,26 +71,26 @@ export const Modal = ({
       <div className="fixed inset-0 z-50 overflow-y-auto">
         {/* Backdrop Overlay */}
         <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity animate-in fade-in"
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity animate-in fade-in"
           onClick={handleBackdropClick}
         />
 
         {/* Modal Dialog */}
-        <div className="flex min-h-full items-center justify-center p-2 sm:p-4 text-center">
+        <div className="flex min-h-full items-center justify-center p-3 sm:p-5 text-center">
           <div
-            className={`relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl border border-slate-200 transition-all w-full ${maxWidth} max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95`}
+            className={`relative transform overflow-hidden rounded-3xl bg-white/95 backdrop-blur-2xl text-left shadow-2xl border border-white/80 transition-all w-full ${maxWidth} max-h-[88vh] flex flex-col animate-in fade-in zoom-in-95`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between shrink-0">
+            <div className="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div>
-                <h3 className="text-base sm:text-lg font-extrabold text-slate-900">{title}</h3>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight">{title}</h3>
                 {subtitle && <p className="text-xs text-slate-500 font-medium mt-0.5">{subtitle}</p>}
               </div>
               <button
                 type="button"
                 onClick={handleAttemptClose}
-                className="p-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 hover:bg-slate-100/80 transition-all cursor-pointer"
                 title="Close"
               >
                 <X className="w-5 h-5" />
@@ -98,11 +98,11 @@ export const Modal = ({
             </div>
 
             {/* Content */}
-            <div className="px-5 py-4 overflow-y-auto flex-1 text-slate-900">{children}</div>
+            <div className="px-6 py-5 overflow-y-auto flex-1 text-slate-900">{children}</div>
 
             {/* Footer */}
             {footer && (
-              <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end gap-2.5 shrink-0">
+              <div className="px-6 py-4 bg-slate-50/80 backdrop-blur-md border-t border-slate-100 flex justify-end gap-3 shrink-0">
                 {typeof footer === 'function' ? footer({ requestClose: handleAttemptClose }) : footer}
               </div>
             )}
@@ -147,14 +147,14 @@ export const ConfirmDialog = ({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/70 backdrop-blur-xs transition-opacity animate-in fade-in"
+        className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity animate-in fade-in"
         onClick={onClose}
       />
 
       {/* Dialog */}
       <div className="flex min-h-full items-center justify-center p-4 text-center">
         <div
-          className="relative transform overflow-hidden rounded-2xl bg-white border border-slate-200 text-left shadow-2xl transition-all w-full max-w-md my-8 animate-in fade-in zoom-in-95 p-6"
+          className="relative transform overflow-hidden rounded-3xl bg-white/95 backdrop-blur-2xl border border-white/80 text-left shadow-2xl transition-all w-full max-w-md my-8 animate-in fade-in zoom-in-95 p-6"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-start gap-4">
@@ -170,12 +170,12 @@ export const ConfirmDialog = ({
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold text-slate-900 mb-1">{title}</h3>
+              <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight mb-1">{title}</h3>
               <p className="text-xs font-medium text-slate-600 leading-relaxed">{message}</p>
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end gap-2.5">
+          <div className="mt-6 flex justify-end gap-3">
             <Button variant="outline" onClick={onClose} disabled={loading} size="md">
               {cancelText}
             </Button>

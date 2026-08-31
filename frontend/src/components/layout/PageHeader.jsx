@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronRight, HelpCircle, BookOpen, CheckCircle2, Lightbulb, X } from 'lucide-react';
+import { ChevronRight, HelpCircle, BookOpen, CheckCircle2, Lightbulb, X, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PAGE_HELP_GUIDES } from '../../config/pageHelpGuides.js';
 import { Modal } from '../ui/Modal.jsx';
@@ -38,10 +38,10 @@ export const PageHeader = ({
 
   return (
     <>
-      <div className={`bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs mb-5 ${className}`}>
+      <div className={`bg-white/85 backdrop-blur-2xl border border-white/90 p-5 sm:p-6 rounded-3xl shadow-md shadow-slate-200/40 mb-6 ${className}`}>
         {/* Breadcrumb Navigation */}
         {breadcrumbs && breadcrumbs.length > 0 && (
-          <nav aria-label="Breadcrumb" className="mb-2 flex items-center gap-1.5 text-xs text-slate-500">
+          <nav aria-label="Breadcrumb" className="mb-2.5 flex items-center gap-1.5 text-xs text-slate-500 font-bold">
             {breadcrumbs.map((crumb, idx) => {
               const isLast = idx === breadcrumbs.length - 1;
               return (
@@ -49,12 +49,12 @@ export const PageHeader = ({
                   {crumb.to && !isLast ? (
                     <Link
                       to={crumb.to}
-                      className="hover:text-slate-900 transition-colors font-medium hover:underline"
+                      className="hover:text-[#0284C7] transition-colors font-bold hover:underline"
                     >
                       {crumb.label}
                     </Link>
                   ) : (
-                    <span className={isLast ? 'text-slate-900 font-semibold' : ''}>
+                    <span className={isLast ? 'text-slate-900 font-extrabold' : ''}>
                       {crumb.label}
                     </span>
                   )}
@@ -66,16 +66,16 @@ export const PageHeader = ({
         )}
 
         {/* Main Header Content */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-5 rounded-full bg-[#0284C7] inline-block shrink-0" />
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2 h-6 rounded-full bg-gradient-to-b from-[#0284C7] to-blue-600 inline-block shrink-0 shadow-xs" />
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
                 {title}
               </h1>
             </div>
             {subtitle && (
-              <p className="text-xs text-slate-500 font-medium mt-1 pl-3.5">
+              <p className="text-xs text-slate-600 font-medium mt-1 pl-4.5 max-w-2xl">
                 {subtitle}
               </p>
             )}
@@ -87,7 +87,7 @@ export const PageHeader = ({
                 type="button"
                 onClick={() => setShowHelpModal(true)}
                 title="Page Usage Instructions & Help"
-                className="px-3 py-2 rounded-xl bg-sky-50 text-[#0284C7] hover:bg-[#0284C7] hover:text-white border border-sky-200 transition-all flex items-center gap-1.5 text-xs font-bold shadow-2xs active:scale-95 group"
+                className="px-3.5 py-2 rounded-2xl bg-sky-50/90 text-[#0284C7] hover:bg-[#0284C7] hover:text-white border border-sky-200/80 transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider shadow-2xs active:scale-95 group cursor-pointer"
               >
                 <HelpCircle className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                 <span>How to Use</span>
@@ -105,21 +105,21 @@ export const PageHeader = ({
         title={guide.title || `${title} Operating Guide`}
       >
         <div className="space-y-4">
-          <div className="p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-[#0C4A6E] text-xs font-medium leading-relaxed flex items-start gap-2.5">
+          <div className="p-4 rounded-2xl bg-sky-50/90 border border-sky-200/80 text-[#0C4A6E] text-xs font-medium leading-relaxed flex items-start gap-3">
             <BookOpen className="w-5 h-5 text-[#0284C7] shrink-0 mt-0.5" />
             <div>
-              <span className="font-bold block text-slate-900 text-xs mb-0.5">Page Overview</span>
+              <span className="font-black block text-slate-900 text-xs mb-0.5 uppercase tracking-wider">Page Overview</span>
               {guide.summary}
             </div>
           </div>
 
           <div className="space-y-2">
-            <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
-              Step-by-Step Instructions:
+            <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-[#0284C7]" /> Step-by-Step Instructions:
             </h4>
             <ul className="space-y-2">
               {guide.steps?.map((step, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-xs text-slate-700 font-medium bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
+                <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 font-medium bg-slate-50/90 p-3 rounded-2xl border border-slate-200/80">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                   <span>{step}</span>
                 </li>
@@ -129,7 +129,7 @@ export const PageHeader = ({
 
           {guide.tips && guide.tips.length > 0 && (
             <div className="space-y-1.5 pt-2 border-t border-slate-100">
-              <h4 className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">
                 <Lightbulb className="w-3.5 h-3.5 text-amber-500" /> Helpful Tips:
               </h4>
               <ul className="space-y-1">
@@ -153,7 +153,7 @@ export const PageHeader = ({
             <button
               type="button"
               onClick={() => setShowHelpModal(false)}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
             >
               Close
             </button>
