@@ -10,7 +10,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { ScrollReveal } from './ScrollReveal.jsx';
-import whyUsExpBg from '../../assets/why_us_exp_bg.png';
+import whyUsExpBg from '../../assets/why_us_exp_bg.jpg';
 import whyUsPartsBg from '../../assets/why_us_parts_bg.jpg';
 import whyUsFastBg from '../../assets/why_us_fast_bg.jpg';
 import whyUsBillBg from '../../assets/why_us_bill_bg.jpg';
