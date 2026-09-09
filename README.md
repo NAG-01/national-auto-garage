@@ -1,4 +1,4 @@
-# 🏍️ National Auto Garage — Enterprise Management System & 3D Web Portal
+# 🏍️ National Auto Garage — Serverless Management ERP & 3D Web Portal
 
 <p align="center">
   <img src="frontend/src/assets/garage_logo.jpg" alt="National Auto Garage Logo" width="130" style="border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 3px solid white;" />
@@ -16,20 +16,33 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-100%25%20Production%20Ready-emerald?style=for-the-badge&logo=shield" alt="Status Badge" />
+  <img src="https://img.shields.io/badge/Architecture-100%25%20Serverless%20Firebase-ffca28?style=for-the-badge&logo=firebase" alt="Firebase Badge" />
   <img src="https://img.shields.io/badge/UI%2FUX-Apple%20VisionOS%20Glassmorphism-38bdf8?style=for-the-badge&logo=apple" alt="VisionOS Badge" />
   <img src="https://img.shields.io/badge/CMS-Live%20Admin%20Controller-blue?style=for-the-badge&logo=react" alt="CMS Badge" />
   <img src="https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react" alt="React Badge" />
   <img src="https://img.shields.io/badge/Vite-6-purple?style=for-the-badge&logo=vite" alt="Vite Badge" />
-  <img src="https://img.shields.io/badge/Tailwind-3-38bdf8?style=for-the-badge&logo=tailwindcss" alt="Tailwind Badge" />
-  <img src="https://img.shields.io/badge/Node.js-Express-green?style=for-the-badge&logo=nodedotjs" alt="Node.js Badge" />
-  <img src="https://img.shields.io/badge/Database-MongoDB%20%2B%20Firestore-47a248?style=for-the-badge&logo=mongodb" alt="Database Badge" />
+  <img src="https://img.shields.io/badge/Database-Google%20Cloud%20Firestore-ffca28?style=for-the-badge&logo=firebase" alt="Firestore Badge" />
 </p>
 
 ---
 
 ## 📌 Project Overview
 
-**National Auto Garage** is an end-to-end, ultra-modern, high-performance web platform designed for a premier two-wheeler workshop at Mosali Chowkdi, Gujarat. It features an **ultra-luxury public customer portal** with custom 3D graphic service cards, real-time vehicle repair tracking, online booking, and a **comprehensive workshop management ERP** with live Website CMS, billing, inventory, job cards, partner settlement, and customer khata management.
+**National Auto Garage** is an end-to-end, ultra-modern, high-performance web platform designed for a premier two-wheeler workshop at Mosali Chowkdi, Gujarat. Built with a **100% Serverless Cloud Firestore architecture**, it features an **ultra-luxury public customer portal** with custom 3D graphic service cards, real-time vehicle repair tracking, online booking, and a **comprehensive workshop management ERP** with live Website CMS, billing, inventory, job cards, partner settlement, and customer khata management.
+
+---
+
+## ⚡ Smart Storage & Performance Engine
+
+1. **🖼️ Client-Side Auto-Compressor (`imageCompressor.js`)**:
+   - Automatically downsizes and compresses large camera photos and logo uploads to < 80KB WebP/JPEG format.
+   - Saves 95%+ Cloud Firestore document storage and eliminates 1MB document quota overflow.
+2. **🧹 Cascading Hard-Delete (Zero Ghost Data)**:
+   - When a Product, Invoice, or Supplier is deleted, all corresponding sub-ledger records and orphan payments are permanently erased from Firestore.
+3. **💾 Multi-Tab IndexedDB Persistence**:
+   - Full offline functionality and instant local cache reading, drastically saving read quota.
+4. **🔢 Atomic Incremental Counters**:
+   - Generates sequential IDs (`INV-2026-0001`, `JOB-0001`, `CUST-0001`) via transactional atomic increments.
 
 ---
 
@@ -93,59 +106,45 @@
    - Live 50/50 Partner Equity Profit & Advance Draw Calculator with net payout breakdown for **Naim Pathan** & **Imran Pathan**.
 
 10. 🏷️ **Smart Keywords & Typo-Tolerant Auto-Suggestions (`/keywords`)**:
-    - Global master keyword management with typo-tolerant fuzzy auto-suggestions (*tayer* ➔ **Tyre**, *brek* ➔ **Brake Pad**, *oil* ➔ **Engine Oil**) across all input fields.
+    - Global master keyword management with typo-tolerant fuzzy auto-suggestions across all input fields.
 
 ---
 
-## 🗄️ Database Architecture (MongoDB + Cloud Firestore)
+## 🗄️ Cloud Firestore Database Architecture
 
-The application supports both a **Node/Express MongoDB API** and a **Direct Cloud Firestore Adapter**:
-
-| Collection / Model | Purpose |
-| :--- | :--- |
-| **`User`** | Admin authentication & credentials |
-| **`WebsiteConfig`** | Dynamic Visiting Website CMS settings & card data |
-| **`Customer`** | Customer profiles with normalized 10-digit mobile numbers |
-| **`Vehicle`** | Two-wheeler records with normalized registration numbers |
-| **`Product` / `Part`** | Spare parts & oil stock catalog with MRP and cost prices |
-| **`InventoryMovement`** | Immutable stock ledger movement records |
-| **`Supplier`** | Vendor contact directory and GSTIN |
-| **`SupplierOrder`** | Spare part purchase orders |
-| **`ServiceJob`** | Service & Engine Repair job card records |
-| **`Bill`** | Customer invoice snapshot & payment status |
-| **`Payment`** | Customer payment receipts register |
-| **`Expense`** | Garage operating expenses & 3-account ledger attribution |
-| **`CustomerOutstanding`** | Standalone customer khata dues register |
-| **`MasterKeyword`** | Global auto-suggestion keywords list |
-| **`Settings`** | Garage branding, prefixes, and GST configuration |
+| Collection / Document | Purpose | Storage Optimization |
+| :--- | :--- | :--- |
+| **`users`** | Admin authentication & credentials | Compact profile object |
+| **`website_config/global`** | Dynamic Visiting Website CMS settings & card data | Auto-compressed base64 images (< 80KB) |
+| **`inventory`** | Spare parts & oil stock catalog with MRP and cost prices | Atomic stock adjustments |
+| **`stockMovements`** | Immutable stock ledger movement records | Cascaded delete on product removal |
+| **`jobCards`** | Full service and engine overhaul job cards | Lean complaint & part items |
+| **`invoices`** | Customer invoice snapshot & payment status | PDF generated on client side |
+| **`payments`** | Multi-payment records & receipts | Cascaded delete on invoice removal |
+| **`expenses`** | Garage operating expenses & 3-account ledger attribution | Bulk deletion support |
+| **`customerOutstanding`** | Standalone customer khata dues register | Atomic payment settlement |
+| **`suppliers` & `supplierOrders`** | Vendor contact directory and purchase orders | Cascaded delete |
+| **`masterKeywords`** | Global auto-suggestion keywords list | Lean string items |
+| **`counters`** | Sequential ID generator (`CUST-`, `JOB-`, `INV-`, `EXP-`, `DUE-`) | Atomic transaction counter |
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React 18, Vite 6, Tailwind CSS, Lucide React, HTML2Canvas / JSPDF, Firebase Cloud Firestore & Auth SDK
-- **Backend**: Node.js, Express.js, Mongoose, MongoDB, Zod Validation, Bcrypt.js, JsonWebToken
+- **Frontend**: React 18, Vite 6, Tailwind CSS, Lucide React, HTML2Canvas / JSPDF
+- **Database & Auth**: Google Cloud Firestore, Firebase Authentication SDK (v12)
 - **Styling**: Apple VisionOS Glassmorphism, Tailwind Typography, CSS Backdrop Filter
 
 ---
 
 ## 🚀 How to Run Locally
 
-### 1. Start Frontend Application
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 Access the application at: `http://localhost:5173/`
-
-### 2. Start Backend API Server (Optional for MongoDB mode)
-```bash
-cd backend
-npm install
-npm run dev
-```
-API running at: `http://localhost:5000/api`
 
 ---
 

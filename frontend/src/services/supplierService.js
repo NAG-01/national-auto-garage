@@ -101,6 +101,24 @@ export const SupplierService = {
   async deleteSupplier(id) {
     const docRef = doc(db, 'suppliers', id);
     await deleteDoc(docRef);
+
+    // Smart Storage Cleanup: Cascade delete orphaned supplier orders
+    try {
+      const ordersRef = collection(db, 'supplierOrders');
+      const snap = await getDocs(ordersRef);
+      const deletePromises = [];
+      snap.forEach((o) => {
+        if (o.data().supplierId === id) {
+          deletePromises.push(deleteDoc(doc(db, 'supplierOrders', o.id)));
+        }
+      });
+      if (deletePromises.length > 0) {
+        await Promise.all(deletePromises);
+      }
+    } catch (e) {
+      console.warn('Supplier orders cleanup note:', e);
+    }
+
     return { success: true };
   },
 

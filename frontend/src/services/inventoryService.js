@@ -260,6 +260,24 @@ export const InventoryService = {
   async deleteProduct(id) {
     const docRef = doc(db, 'inventory', id);
     await deleteDoc(docRef);
+
+    // Smart Storage Cleanup: Cascade delete orphaned stock movements for this product
+    try {
+      const movementsRef = collection(db, 'stockMovements');
+      const snap = await getDocs(movementsRef);
+      const deletePromises = [];
+      snap.forEach((m) => {
+        if (m.data().productId === id) {
+          deletePromises.push(deleteDoc(doc(db, 'stockMovements', m.id)));
+        }
+      });
+      if (deletePromises.length > 0) {
+        await Promise.all(deletePromises);
+      }
+    } catch (e) {
+      console.warn('Movement cleanup note:', e);
+    }
+
     return { success: true };
   },
 

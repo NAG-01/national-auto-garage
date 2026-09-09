@@ -287,6 +287,24 @@ export const BillingService = {
   async deleteBill(id) {
     const docRef = doc(db, 'invoices', id);
     await deleteDoc(docRef);
+
+    // Smart Storage Cleanup: Cascade delete orphaned payments for this bill
+    try {
+      const paymentsRef = collection(db, 'payments');
+      const snap = await getDocs(paymentsRef);
+      const deletePromises = [];
+      snap.forEach((p) => {
+        if (p.data().billId === id) {
+          deletePromises.push(deleteDoc(doc(db, 'payments', p.id)));
+        }
+      });
+      if (deletePromises.length > 0) {
+        await Promise.all(deletePromises);
+      }
+    } catch (e) {
+      console.warn('Payment cleanup note:', e);
+    }
+
     return { success: true };
   },
 };

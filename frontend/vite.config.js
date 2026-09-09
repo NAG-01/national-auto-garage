@@ -3,15 +3,9 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: './', // Ensures relative asset paths work everywhere (GitHub Pages, Vercel, Netlify)
+  base: './', // Ensures relative asset paths work everywhere (Vercel, Netlify, Firebase Hosting, GitHub Pages)
   server: {
     port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true
-      }
-    }
   },
   build: {
     chunkSizeWarningLimit: 1000,

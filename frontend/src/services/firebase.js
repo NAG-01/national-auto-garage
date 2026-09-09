@@ -1,5 +1,10 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  getFirestore,
+} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -12,11 +17,22 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-D4XZ9ZPGBV',
 };
 
-// Initialize Firebase App
+// 1. Initialize Firebase App
 export const app = initializeApp(firebaseConfig);
 
-// Initialize Cloud Firestore
-export const db = getFirestore(app);
+// 2. Initialize Cloud Firestore with Intelligent Multi-Tab Offline Cache (Zero Quota Waste!)
+let firestoreInstance;
+try {
+  firestoreInstance = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager(),
+    }),
+  });
+} catch (e) {
+  firestoreInstance = getFirestore(app);
+}
 
-// Initialize Firebase Authentication
+export const db = firestoreInstance;
+
+// 3. Initialize Firebase Authentication
 export const auth = getAuth(app);

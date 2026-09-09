@@ -24,6 +24,7 @@ import { Input, Textarea } from '../../components/ui/Input.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import api from '../../api/client.js';
 import garageLogoDefault from '../../assets/garage_logo.jpg';
+import { compressImage } from '../../utils/imageCompressor.js';
 
 export const WebsiteSettingsTab = () => {
   const toast = useToast();
@@ -122,49 +123,21 @@ export const WebsiteSettingsTab = () => {
 
   // High-performance image compressor: Resizes large images to max 800x800 and compresses with quality 0.82
   // Reduces 2MB-5MB photos down to ~40KB - 80KB (95%+ storage saved, blazing fast database sync!)
-  const handleImageUpload = (file, callback) => {
+  const handleImageUpload = async (file, callback) => {
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      showError('Please select an image smaller than 10MB.');
-      return;
+    try {
+      const compressedDataUrl = await compressImage(file, {
+        maxWidth: 800,
+        maxHeight: 800,
+        quality: 0.82,
+        mimeType: 'image/jpeg',
+      });
+      callback(compressedDataUrl);
+      showSuccess('Image compressed & uploaded successfully (Storage optimized)!');
+    } catch (err) {
+      console.error('Image compression error:', err);
+      showError('Could not process this image file. Please try another image.');
     }
-    const reader = new FileReader();
-    reader.onload = (readerEvent) => {
-      const img = new Image();
-      img.onload = () => {
-        const MAX_WIDTH = 800;
-        const MAX_HEIGHT = 800;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
-        callback(compressedDataUrl);
-        showSuccess('Image compressed & uploaded successfully (Storage optimized)!');
-      };
-      img.onerror = () => {
-        showError('Could not process this image file.');
-      };
-      img.src = readerEvent.target.result;
-    };
-    reader.readAsDataURL(file);
   };
 
   const handleSave = async (e) => {

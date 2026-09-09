@@ -672,7 +672,7 @@ export const ExpenseListPage = () => {
         onClose={() => setShowBulkDeleteConfirm(false)}
         onConfirm={executeBulkDeleteExpenses}
         title={`Bulk Delete ${selectedCount} Expense Entries?`}
-        message={`Kya aap sach me selected ${selectedCount} expense entries ko database se permanently delete karna chahte hain? Database size kam rakhne ke liye saari selected entries MongoDB se turant hard delete ho jayengi.`}
+        message={`Kya aap sach me selected ${selectedCount} expense entries ko database se permanently delete karna chahte hain? Database storage kam rakhne ke liye saari selected entries cloud database se turant hard delete ho jayengi.`}
         confirmText={`Yes, Permanently Delete ${selectedCount} Items`}
         cancelText="Cancel"
         variant="danger"
