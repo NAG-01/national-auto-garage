@@ -6,7 +6,7 @@ export class WebsiteConfigController {
   static async getPublicConfig(req, res, next) {
     try {
       const config = await WebsiteConfigService.getConfig();
-      return res.json(ApiResponse.success(config, 'Public website configuration retrieved successfully'));
+      return ApiResponse.success(res, 'Public website configuration retrieved successfully', config);
     } catch (err) {
       next(err);
     }
@@ -16,7 +16,7 @@ export class WebsiteConfigController {
   static async getAdminConfig(req, res, next) {
     try {
       const config = await WebsiteConfigService.getConfig();
-      return res.json(ApiResponse.success(config, 'Website CMS configuration retrieved successfully'));
+      return ApiResponse.success(res, 'Website CMS configuration retrieved successfully', config);
     } catch (err) {
       next(err);
     }
@@ -26,7 +26,7 @@ export class WebsiteConfigController {
   static async updateAdminConfig(req, res, next) {
     try {
       const updated = await WebsiteConfigService.updateConfig(req.body);
-      return res.json(ApiResponse.success(updated, 'Website CMS configuration updated successfully'));
+      return ApiResponse.success(res, 'Website CMS configuration updated successfully', updated);
     } catch (err) {
       next(err);
     }
@@ -36,7 +36,7 @@ export class WebsiteConfigController {
   static async resetAdminConfig(req, res, next) {
     try {
       const reset = await WebsiteConfigService.resetToDefaults();
-      return res.json(ApiResponse.success(reset, 'Website CMS configuration reset to default factory settings'));
+      return ApiResponse.success(res, 'Website CMS configuration reset to default factory settings', reset);
     } catch (err) {
       next(err);
     }
