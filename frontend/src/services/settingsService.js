@@ -45,18 +45,41 @@ export const defaultSettings = {
   ],
 };
 
+const SETTINGS_CACHE_KEY = 'nag_settings_cache';
+const SETTINGS_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes cache to minimize Firestore read quota
+
 export const SettingsService = {
   async getSettings() {
+    // 1. Check local cache to save Firestore reads
+    try {
+      const cached = localStorage.getItem(SETTINGS_CACHE_KEY);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < SETTINGS_CACHE_TTL_MS && data) {
+          return { ...defaultSettings, ...data };
+        }
+      }
+    } catch (e) {}
+
+    // 2. Fetch from Firestore if cache expired or missing
     try {
       const settingsRef = doc(db, 'settings', 'global');
       const snap = await getDoc(settingsRef);
+      let result = defaultSettings;
       if (snap && snap.exists()) {
-        return { ...defaultSettings, ...snap.data() };
+        result = { ...defaultSettings, ...snap.data() };
+      } else {
+        try {
+          await setDoc(settingsRef, defaultSettings, { merge: true });
+        } catch (e) {}
       }
+
+      // Save to local cache
       try {
-        await setDoc(settingsRef, defaultSettings, { merge: true });
+        localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify({ data: result, timestamp: Date.now() }));
       } catch (e) {}
-      return defaultSettings;
+
+      return result;
     } catch (e) {
       return defaultSettings;
     }
@@ -70,7 +93,14 @@ export const SettingsService = {
         updatedAt: new Date().toISOString(),
       };
       await setDoc(settingsRef, updated, { merge: true });
-      return { ...defaultSettings, ...updated };
+      const finalSettings = { ...defaultSettings, ...updated };
+
+      // Invalidate and update local cache immediately
+      try {
+        localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify({ data: finalSettings, timestamp: Date.now() }));
+      } catch (e) {}
+
+      return finalSettings;
     } catch (e) {
       return { ...defaultSettings, ...newSettings };
     }

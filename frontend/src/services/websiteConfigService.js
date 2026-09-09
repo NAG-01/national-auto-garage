@@ -144,18 +144,41 @@ export const defaultWebsiteConfig = {
     "National Auto Garage is Mosali's premier two-wheeler workshop providing transparent, reliable bike servicing and repairs by Imran & Naim Pathan.",
 };
 
+const CACHE_KEY = 'nag_website_config_cache';
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes cache to minimize Firebase read quota
+
 export const WebsiteConfigService = {
   async getConfig() {
+    // 1. Check local cache to save 95%+ Firestore reads
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < CACHE_TTL_MS && data) {
+          return { ...defaultWebsiteConfig, ...data };
+        }
+      }
+    } catch (e) {}
+
+    // 2. Fetch from Firestore if cache expired or missing
     try {
       const configRef = doc(db, 'website_config', 'global');
       const snap = await getDoc(configRef);
+      let result = defaultWebsiteConfig;
       if (snap && snap.exists()) {
-        return { ...defaultWebsiteConfig, ...snap.data() };
+        result = { ...defaultWebsiteConfig, ...snap.data() };
+      } else {
+        try {
+          await setDoc(configRef, defaultWebsiteConfig, { merge: true });
+        } catch (e) {}
       }
+
+      // Save to local cache
       try {
-        await setDoc(configRef, defaultWebsiteConfig, { merge: true });
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ data: result, timestamp: Date.now() }));
       } catch (e) {}
-      return defaultWebsiteConfig;
+
+      return result;
     } catch (e) {
       return defaultWebsiteConfig;
     }
@@ -169,7 +192,14 @@ export const WebsiteConfigService = {
         updatedAt: new Date().toISOString(),
       };
       await setDoc(configRef, updated, { merge: true });
-      return { ...defaultWebsiteConfig, ...updated };
+      const finalConfig = { ...defaultWebsiteConfig, ...updated };
+
+      // Invalidate and update local cache immediately
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ data: finalConfig, timestamp: Date.now() }));
+      } catch (e) {}
+
+      return finalConfig;
     } catch (e) {
       return { ...defaultWebsiteConfig, ...newConfig };
     }
@@ -179,6 +209,11 @@ export const WebsiteConfigService = {
     try {
       const configRef = doc(db, 'website_config', 'global');
       await setDoc(configRef, defaultWebsiteConfig);
+
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ data: defaultWebsiteConfig, timestamp: Date.now() }));
+      } catch (e) {}
+
       return defaultWebsiteConfig;
     } catch (e) {
       return defaultWebsiteConfig;
