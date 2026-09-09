@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import {
   Phone,
   MessageSquare,
@@ -11,6 +11,7 @@ import {
   Wrench,
   Award,
   MapPin,
+  Search,
 } from 'lucide-react';
 import garageLogo from '../../assets/garage_logo.jpg';
 import { useWebsiteConfig } from '../context/WebsiteConfigContext.jsx';
@@ -163,8 +164,15 @@ export const PublicNavbar = () => {
               })}
             </div>
 
-            {/* Desktop Action Buttons (WhatsApp) */}
-            <div className="hidden sm:flex items-center gap-2.5">
+            {/* Desktop Action Buttons (Track Bike & WhatsApp) */}
+            <div className="hidden sm:flex items-center gap-2">
+              <Link
+                to="/track-service"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-black uppercase tracking-wider text-[#0284C7] bg-sky-50/90 hover:bg-sky-100/90 border border-sky-200/80 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <Search className="w-3.5 h-3.5 text-[#0284C7]" />
+                <span>Track Bike</span>
+              </Link>
               <a
                 href={whatsappUrl}
                 target="_blank"
@@ -297,6 +305,15 @@ export const PublicNavbar = () => {
                 <span className="font-mono font-black text-xs">{config?.mechanic2Phone || '81281 44350'}</span>
               </a>
             </div>
+
+            <Link
+              to="/track-service"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full py-3.5 px-4 rounded-2xl bg-sky-50 hover:bg-sky-100 text-[#0284C7] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 border border-sky-200/80 shadow-sm active:scale-98 transition-all duration-200"
+            >
+              <Search className="w-4 h-4 text-[#0284C7]" />
+              <span>Track Bike Repair Status</span>
+            </Link>
 
             <a
               href={whatsappUrl}

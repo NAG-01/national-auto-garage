@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
 import { AppShell } from './components/layout/AppShell.jsx';
 import { PublicHomePage } from './public-website/pages/PublicHomePage.jsx';
+import { TrackServicePage } from './public-website/pages/TrackServicePage.jsx';
 import { LoginPage } from './features/auth/LoginPage.jsx';
 import { DashboardPage } from './features/dashboard/DashboardPage.jsx';
 import { InventoryListPage } from './features/inventory/InventoryListPage.jsx';
@@ -51,6 +52,7 @@ export default function App() {
     <Routes>
       {/* 1. Public Website Routes (For Customers & Public Visitors) */}
       <Route path="/" element={<PublicHomePage />} />
+      <Route path="/track-service" element={<TrackServicePage />} />
       <Route path="/admin" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
 
