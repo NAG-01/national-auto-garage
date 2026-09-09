@@ -1,8 +1,79 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write for all collections to authenticated users, or allow initial bootstrap
-    match /{document=**} {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // 1. Website Configuration (Public visiting website reads live CMS, Admin writes)
+    match /website_config/{document=**} {
+      allow read: if true;
+      allow write: if true; // Managed via Admin Portal settings
+    }
+
+    // 2. Settings & Admin Credentials
+    match /settings/{document=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // 3. Inventory & Spare Parts Catalog
+    match /inventory/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 4. Stock Movements Ledger
+    match /stockMovements/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 5. Job Cards (Track Service allows customer phone/vehicle lookup, Admin manages)
+    match /jobCards/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 6. Bills & Invoices
+    match /invoices/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 7. Multi-Payments Ledger
+    match /payments/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 8. Operating Expenses (3-Accounts)
+    match /expenses/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 9. Customer Outstanding (Khata)
+    match /customerOutstanding/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 10. Suppliers & Purchase Orders
+    match /suppliers/{document=**} {
+      allow read, write: if true;
+    }
+    match /supplierOrders/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 11. Master Keywords & Typo Suggestions
+    match /masterKeywords/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 12. Atomic Sequential Counters
+    match /counters/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 13. Users & Auth Profiles
+    match /users/{document=**} {
       allow read, write: if true;
     }
   }
